@@ -19,6 +19,7 @@ import traceback
 from pathlib import Path
 
 from qenas.config import QENAS_ROOT, SUPPORTED_DATASETS, build_config, config_fingerprint
+from qenas.datasets.discovery import locate_data_root
 from qenas.experiment import Experiment, ResumeConflict
 from qenas.pipeline import STAGES, Pipeline
 from qenas.utils.env import environment_info, resolve_device
@@ -115,8 +116,10 @@ def main(argv=None) -> int:
     cfg = build_config(a.dataset, yaml_path=yaml_path, overrides=overrides_from_args(a))
     if a.smoke:
         cfg["smoke_test"] = True
-    fp = config_fingerprint(cfg)
     setup_logging()
+    # e.g. on Kaggle the datasets live under the read-only /kaggle/input/<dataset-slug>/...
+    cfg["data"]["root"] = locate_data_root(cfg["data"]["root"], cfg["data"]["dataset"])
+    fp = config_fingerprint(cfg)   # data.root is not part of the fingerprint
     try:
         if a.experiment_dir:
             exp = Experiment.open_existing(Path(a.experiment_dir), cfg, fp)

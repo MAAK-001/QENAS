@@ -20,7 +20,7 @@ import torch
 
 from .config import config_fingerprint
 from .datasets.dataset import DataBundle
-from .datasets.discovery import DatasetError, Sample, discover
+from .datasets.discovery import DatasetError, Sample, discover, rebase_path, relative_to_root
 from .datasets.splits import check_no_leakage, make_splits, split_summary
 from .experiment import Experiment
 from .models.chromosome import SEARCH_SPACE_SIZE, chromosome_key, chromosome_to_str, decode, decode_short
@@ -73,11 +73,19 @@ class Pipeline:
         if self._splits is None:
             d = load_json(self.path("split.json"))
             self._splits = {k: [Sample.from_dict(s) for s in v] for k, v in d["splits"].items()}
+            # Paths are re-based onto the *current* data root, so an experiment created on one machine
+            # (e.g. Windows) can be resumed on another (e.g. Kaggle). Sample IDs and split membership
+            # are unchanged; only file locations are resolved anew.
+            root, ds, old_root = self.cfg["data"]["root"], self.cfg["data"]["dataset"], d.get("data_root")
             for lst in self._splits.values():
                 for s in lst:
+                    s.image = rebase_path(s.image, root, ds, old_root)
+                    s.masks = [rebase_path(m, root, ds, old_root) for m in s.masks]
                     for p in [s.image] + s.masks:
                         if not Path(p).exists():
-                            raise DatasetError(f"File listed in split.json no longer exists: {p}")
+                            raise DatasetError(
+                                f"File listed in split.json not found under the data root '{root}': {p}\n"
+                                f"Pass --data-root pointing to the folder that contains the {ds} dataset folder.")
             check_no_leakage(self._splits)
         return self._splits
 
@@ -117,9 +125,18 @@ class Pipeline:
         splits = make_splits(disc, self.cfg)
         summ = split_summary(splits)
         save_json(self.path("dataset_report.json"), disc.report)
+        root = self.cfg["data"]["root"]
+
+        def portable(s: Sample) -> Dict[str, Any]:
+            d = s.to_dict()
+            d["image"] = relative_to_root(s.image, root)
+            d["masks"] = [relative_to_root(m, root) for m in s.masks]
+            return d
+
         save_json(self.path("split.json"), {
-            "dataset": disc.dataset, "seed": self.seed, "summary": summ,
-            "splits": {k: [s.to_dict() for s in v] for k, v in splits.items()},
+            "dataset": disc.dataset, "seed": self.seed, "summary": summ, "data_root": root,
+            "paths": "relative to data_root (re-based onto --data-root when resumed elsewhere)",
+            "splits": {k: [portable(s) for s in v] for k, v in splits.items()},
         })
         self._splits = splits
         ds = self.cfg["data"]["dataset"]

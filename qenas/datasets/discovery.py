@@ -449,6 +449,66 @@ def discover_idrid(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
 DISCOVERERS = {"BUSI": discover_busi, "CVC": discover_cvc, "IDRID": discover_idrid}
 
 
+# --------------------------------------------------------------------------------------
+# portability: data root detection and path re-basing (experiments can move between machines)
+# --------------------------------------------------------------------------------------
+
+def _has_dataset_dir(root: Path, key: str) -> bool:
+    try:
+        return root.is_dir() and any(p.is_dir() and p.name.upper().startswith(key) for p in root.iterdir())
+    except OSError:
+        return False
+
+
+def locate_data_root(root: str, dataset: str, search_roots=("/kaggle/input",), max_depth: int = 4) -> str:
+    """Return ``root`` if it contains the dataset folder; otherwise search well-known locations
+    (e.g. Kaggle's read-only ``/kaggle/input``) for a folder that does."""
+    key = dataset.upper()
+    if _has_dataset_dir(Path(root), key):
+        return str(root)
+    for base in search_roots:
+        base = Path(base)
+        if not base.is_dir():
+            continue
+        for dirpath, dirnames, _ in os.walk(base):
+            dirnames.sort()
+            p = Path(dirpath)
+            if len(p.parts) - len(base.parts) > max_depth:
+                dirnames[:] = []
+                continue
+            if _has_dataset_dir(p, key):
+                log.info("Data root '%s' has no %s folder; using auto-detected data root %s", root, key, p)
+                return str(p)
+    return str(root)
+
+
+def relative_to_root(path: str, data_root: str) -> str:
+    try:
+        return Path(path).resolve().relative_to(Path(data_root).resolve()).as_posix()
+    except ValueError:
+        return path
+
+
+def rebase_path(path: str, data_root: str, dataset: str, old_root: Optional[str] = None) -> str:
+    """Map a path stored in split.json onto the current data root.
+
+    Handles relative paths ('<dataset folder>/...'), and absolute paths written on another
+    machine/OS (e.g. Windows paths read on Linux). The dataset folder is re-resolved under the
+    new root, so it may even have a slightly different name (same rule as discovery: the name
+    starts with the dataset key)."""
+    parts = [x for x in re.split(r"[\\/]+", path) if x]
+    if old_root:
+        old = [x for x in re.split(r"[\\/]+", old_root) if x]
+        if [x.lower() for x in parts[:len(old)]] == [x.lower() for x in old]:
+            parts = parts[len(old):]
+    key = dataset.upper()
+    for i, part in enumerate(parts):
+        if part.upper().startswith(key):
+            ds_dir = _find_dataset_dir(Path(data_root), key)
+            return str(ds_dir.joinpath(*parts[i + 1:]))
+    return path
+
+
 def discover(cfg: Dict[str, Any]) -> DiscoveryResult:
     name = cfg["data"]["dataset"].upper()
     res = DISCOVERERS[name](Path(cfg["data"]["root"]), cfg)
