@@ -1,0 +1,29 @@
+# Tiny configuration that exercises every QENAS stage in minutes (CPU).
+# Results are NOT scientifically meaningful; experiments are written to results/<DS>/smoke_*.
+data:
+  image_size: [64, 64]
+  max_samples: {train: 24, val: 12, test: 12}
+model:
+  base_channels: 16
+search:
+  population_size: 6
+  generations: 2
+  plot_every: 1
+pareto:
+  max_candidates: 3
+candidate_training:
+  epochs: 3
+  batch_size: 4
+loss_weights:
+  alphas: [0.5, 0.7]
+  epochs: 3
+  criterion_window: 2
+selection:
+  noise_window: 2
+final_training:
+  epochs: 4
+  batch_size: 4
+  early_stopping:
+    enabled: true
+    patience: 2
+    min_epochs: 3

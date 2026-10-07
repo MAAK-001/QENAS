@@ -1,0 +1,93 @@
+{
+  "layout": "class folders; masks '<stem>_mask[_k].png' (union of all masks per image)",
+  "directory": "C:\\Users\\aquee\\OneDrive\\Desktop\\GGNAS\\Datasets\\BUSI (Breast Ultrasound Image)",
+  "tree": [
+    "BUSI (Breast Ultrasound Image)/",
+    "  benign/  [891 .png]",
+    "  malignant/  [421 .png]",
+    "  normal/  [266 .png]"
+  ],
+  "extensions": {
+    ".png": 1578
+  },
+  "per_class": {
+    "benign": {
+      "images": 437,
+      "mask_files": 454,
+      "multi_mask_images": 16
+    },
+    "malignant": {
+      "images": 210,
+      "mask_files": 211,
+      "multi_mask_images": 1
+    },
+    "normal": {
+      "images": 133,
+      "mask_files": 133,
+      "multi_mask_images": 0,
+      "excluded": 133
+    }
+  },
+  "include_normal": false,
+  "exact_duplicates": [
+    {
+      "ids": [
+        "benign/benign (433)",
+        "malignant/malignant (145)"
+      ],
+      "masks_identical": false,
+      "action": "excluded all copies (conflicting masks/labels)"
+    }
+  ],
+  "official_split": null,
+  "patient_metadata": "none available -> image-level split (documented limitation)",
+  "validation": {
+    "n_samples": 645,
+    "image_modes": {
+      "RGB": 645
+    },
+    "n_distinct_image_sizes": 544,
+    "most_common_image_sizes": [
+      [
+        [
+          557,
+          465
+        ],
+        6
+      ],
+      [
+        [
+          564,
+          469
+        ],
+        4
+      ],
+      [
+        [
+          562,
+          471
+        ],
+        3
+      ],
+      [
+        [
+          777,
+          578
+        ],
+        3
+      ],
+      [
+        [
+          562,
+          470
+        ],
+        3
+      ]
+    ],
+    "mask_intermediate_pixel_fraction_max": 0.0,
+    "mask_intermediate_pixel_fraction_mean": 0.0,
+    "foreground_fraction_mean": 0.09460787285568222,
+    "n_empty_masks": 0,
+    "warnings": []
+  }
+}

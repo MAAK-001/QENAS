@@ -1,0 +1,118 @@
+{
+  "fingerprint": "38472af47c059b7c",
+  "config": {
+    "seed": 42,
+    "device": "auto",
+    "deterministic": true,
+    "smoke_test": false,
+    "data": {
+      "dataset": "BUSI",
+      "root": "C:\\Users\\aquee\\OneDrive\\Desktop\\GGNAS\\Datasets",
+      "image_size": [
+        256,
+        256
+      ],
+      "in_channels": 3,
+      "test_fraction": 0.2,
+      "val_fraction": 0.2,
+      "mask_threshold": 127,
+      "busi_include_normal": false,
+      "busi_drop_conflicting_duplicates": true,
+      "idrid_target": "OD",
+      "normalization": "train_stats",
+      "cache_preprocessed": true,
+      "num_workers": 0,
+      "max_samples": null
+    },
+    "augmentation": {
+      "enabled": true,
+      "hflip": 0.5,
+      "vflip": 0.0,
+      "affine_p": 0.5,
+      "rotate_deg": 15.0,
+      "scale": [
+        0.9,
+        1.1
+      ],
+      "translate": 0.05,
+      "brightness": 0.1,
+      "contrast": 0.1
+    },
+    "model": {
+      "base_channels": 32,
+      "scale": 3,
+      "darts_genotype": "auto",
+      "num_classes": 1
+    },
+    "search": {
+      "population_size": 10,
+      "generations": 10,
+      "crossover_prob": 0.9,
+      "mutation_prob": 1.0,
+      "mutation_prob_var": 0.125,
+      "eliminate_duplicates": true,
+      "plot_every": 2,
+      "synflow": {
+        "dtype": "float64",
+        "input_size": null,
+        "init_seed": null,
+        "batch_size": 1
+      },
+      "cache_dir": "C:\\Users\\aquee\\OneDrive\\Desktop\\GGNAS\\QENAS\\cache\\zero_cost"
+    },
+    "pareto": {
+      "max_candidates": 8
+    },
+    "candidate_training": {
+      "epochs": 20,
+      "batch_size": 8,
+      "optimizer": "adamw",
+      "lr": 0.001,
+      "weight_decay": 5e-05,
+      "momentum": 0.9,
+      "scheduler": "none",
+      "warmup_epochs": 0,
+      "poly_power": 0.9,
+      "grad_clip": null,
+      "amp": "auto",
+      "loss_alpha": 0.5
+    },
+    "selection": {
+      "significance": 0.05,
+      "noise_window": 5
+    },
+    "loss_weights": {
+      "enabled": true,
+      "alphas": [
+        0.2,
+        0.4,
+        0.5,
+        0.6,
+        0.8
+      ],
+      "epochs": 20,
+      "criterion_window": 5,
+      "reuse_candidate_run": true
+    },
+    "final_training": {
+      "epochs": 100,
+      "batch_size": 8,
+      "optimizer": "adamw",
+      "lr": 0.001,
+      "weight_decay": 5e-05,
+      "momentum": 0.9,
+      "scheduler": "poly",
+      "warmup_epochs": 1,
+      "poly_power": 0.9,
+      "grad_clip": null,
+      "amp": "auto",
+      "early_stopping": {
+        "enabled": true,
+        "patience": 20,
+        "min_epochs": 30,
+        "window": 5,
+        "significance": 0.05
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+# Example override file:  python main.py --dataset BUSI --config configs/example_override.yaml
+# Any key of qenas/config.py::DEFAULT_CONFIG may be overridden; unknown keys are rejected.
+# The values below are the QENAS defaults, shown for reference.
+seed: 42
+search:
+  population_size: 10
+  generations: 10
+  crossover_prob: 0.9
+  mutation_prob_var: 0.125
+pareto:
+  max_candidates: 8
+candidate_training:
+  epochs: 20
+  optimizer: adamw
+  lr: 0.001
+  weight_decay: 0.00005
+  scheduler: none
+  loss_alpha: 0.5
+loss_weights:
+  enabled: true
+  alphas: [0.2, 0.4, 0.5, 0.6, 0.8]
+  epochs: 20
+final_training:
+  epochs: 100
+  optimizer: adamw
+  lr: 0.001
+  weight_decay: 0.00005
+  scheduler: poly
+  warmup_epochs: 1
+  early_stopping:
+    enabled: true
+    patience: 20
+    min_epochs: 30
