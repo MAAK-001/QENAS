@@ -1,0 +1,78 @@
+{
+  "fingerprint": "fbf0b4da252b5a0d",
+  "created": "2026-10-11T10:33:36",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-11T10:33:58",
+      "train": 413,
+      "val": 103,
+      "test": 129,
+      "seconds": 16.0
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-11T10:41:12",
+      "unique_evaluations": 219,
+      "final_front_size": 20,
+      "cache_hits": 0,
+      "cache_misses": 219,
+      "hypervolume_generation_0": 0.7083137421613579,
+      "hypervolume_final": 1.0975458909128077,
+      "seconds": 434.3
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-11T10:41:13",
+      "front_size": 20,
+      "n_candidates": 8,
+      "seconds": 1.4
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-11T11:21:58",
+      "n_candidates": 8,
+      "n_diverged": 0,
+      "seconds": 2444.4
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-11T11:22:00",
+      "selected_candidate": 4,
+      "relaxed_gates": [],
+      "seconds": 2.3
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-11T11:49:11",
+      "alpha": 0.4,
+      "beta": 0.6,
+      "seconds": 1630.7
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-11T12:20:18",
+      "best_epoch": 54,
+      "best_val_dice": 0.8022636090281251,
+      "tta": true,
+      "seconds": 1867.2
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-11T12:20:27",
+      "test_dice": 0.7940532694510315,
+      "test_miou": 0.8258841218493032,
+      "test_hd95": 29.163359774464624,
+      "seconds": 8.8
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-11T12:20:31",
+      "seconds": 4.5
+    }
+  },
+  "test_evaluated": true,
+  "updated": "2026-10-11T12:20:31",
+  "test_evaluated_at": "2026-10-11T12:20:27"
+}

@@ -1,0 +1,78 @@
+{
+  "fingerprint": "a38510dcbb29e577",
+  "created": "2026-10-11T12:20:59",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-11T12:21:20",
+      "train": 395,
+      "val": 96,
+      "test": 121,
+      "seconds": 19.3
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-11T12:26:19",
+      "unique_evaluations": 215,
+      "final_front_size": 20,
+      "cache_hits": 0,
+      "cache_misses": 215,
+      "hypervolume_generation_0": 0.6973929001385784,
+      "hypervolume_final": 1.0425564389272273,
+      "seconds": 299.7
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-11T12:26:21",
+      "front_size": 20,
+      "n_candidates": 8,
+      "seconds": 1.2
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-11T12:55:44",
+      "n_candidates": 8,
+      "n_diverged": 0,
+      "seconds": 1763.4
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-11T12:55:46",
+      "selected_candidate": 6,
+      "relaxed_gates": [],
+      "seconds": 2.3
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-11T13:11:25",
+      "alpha": 0.4,
+      "beta": 0.6,
+      "seconds": 938.7
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-11T13:29:27",
+      "best_epoch": 43,
+      "best_val_dice": 0.7208935559019,
+      "tta": false,
+      "seconds": 1082.2
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-11T13:29:33",
+      "test_dice": 0.6640881326504885,
+      "test_miou": 0.7504218795163434,
+      "test_hd95": 55.8132162682376,
+      "seconds": 5.2
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-11T13:29:36",
+      "seconds": 3.5
+    }
+  },
+  "test_evaluated": true,
+  "updated": "2026-10-11T13:29:36",
+  "test_evaluated_at": "2026-10-11T13:29:32"
+}
