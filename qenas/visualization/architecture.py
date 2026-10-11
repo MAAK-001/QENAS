@@ -75,6 +75,6 @@ def plot_architecture(summary: Dict[str, Any], path: Path, title: str = "") -> N
     ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, -0.06), ncol=5, title="block types")
     ttl = title or "Selected QENAS architecture"
     ax.set_title(f"{ttl}\nchromosome {chromosome_to_str(summary['chromosome'])} · "
-                 f"{summary['total_params'] / 1e6:.3f} M parameters · {summary['gmacs']:.2f} GMACs · "
+                 f"{summary['params_m']:.3f} M parameters · {summary['gflops_per_image']:.2f} GFLOPs/image · "
                  f"scale {summary['scale']} · DARTS genotype {summary['darts_genotype']}", fontsize=11)
     save(fig, path)

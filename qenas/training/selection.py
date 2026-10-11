@@ -4,7 +4,7 @@ Primary criterion (as specified):     ΔDice = Dice_val(epoch E) - Dice_val(epoc
 Secondary quantities:                 ΔLoss = Loss_val(epoch 1) - Loss_val(epoch E),
                                       final validation Dice, stability, overfitting.
 
-No weighted score is used. Instead a candidate must first pass four *eligibility gates*,
+No weighted score is used. Instead a candidate must first pass five *eligibility gates*,
 each a falsifiable statement about pathological behaviour, and only then is ΔDice
 compared. Thresholds are either standard statistical significance levels or derived
 from the data itself:
@@ -84,10 +84,11 @@ def analyse_candidate(history: List[Dict[str, Any]], trivial_dice: float, signif
 
 def select_by_learning_capability(candidates: List[Dict[str, Any]], trivial_dice: float,
                                   significance: float, noise_window: int) -> Dict[str, Any]:
-    """``candidates``: dicts with keys id, params, f2_synflow, synflow_log, history (list) or diverged=True."""
+    """``candidates``: dicts with the candidate id, chromosome, objectives and ``history`` (or diverged=True)."""
     analysed = []
     for c in candidates:
-        rec = {k: c[k] for k in ("candidate_id", "chromosome", "blocks", "params", "synflow_log", "f2_synflow")}
+        rec = {k: c[k] for k in ("candidate_id", "chromosome", "blocks", "params", "synflow_log", "zico",
+                                 "f2_synflow", "f3_zico")}
         if c.get("diverged"):
             rec.update({"diverged": True, "divergence": c.get("divergence", ""),
                         "gates": {g: (False if g == "G1_finite" else None) for g in ALL_GATES}})

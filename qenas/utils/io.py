@@ -1,4 +1,4 @@
-"""Atomic, corruption-resistant file I/O helpers (JSON, CSV, pickle, torch)."""
+"""Atomic, corruption-resistant file I/O helpers (JSON, CSV, Markdown)."""
 
 from __future__ import annotations
 
@@ -6,7 +6,6 @@ import csv
 import json
 import math
 import os
-import pickle
 import tempfile
 import time
 from pathlib import Path
@@ -83,15 +82,6 @@ def load_json(path: os.PathLike) -> Any:
         return json.load(fh)
 
 
-def save_pickle(path: os.PathLike, obj: Any) -> None:
-    atomic_write_bytes(path, pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
-
-
-def load_pickle(path: os.PathLike) -> Any:
-    with open(path, "rb") as fh:
-        return pickle.load(fh)
-
-
 def save_csv(path: os.PathLike, rows: Sequence[Dict[str, Any]], fieldnames: Optional[List[str]] = None) -> None:
     """Write a list of dict rows as CSV (atomic). Field order follows first appearance."""
     if fieldnames is None:
@@ -143,9 +133,3 @@ def save_markdown_table(path: os.PathLike, rows: Sequence[Dict[str, Any]], colum
     text = "\n".join(lines) + "\n"
     atomic_write_bytes(path, text.encode("utf-8"))
     return text
-
-
-def ensure_dir(path: os.PathLike) -> Path:
-    p = Path(path)
-    p.mkdir(parents=True, exist_ok=True)
-    return p

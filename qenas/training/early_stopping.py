@@ -1,4 +1,4 @@
-"""Early stopping that triggers on *overfitting*, never on mere stagnation.
+"""Early stopping that triggers on *overfitting*, never on mere stagnation (final training only).
 
 Training is stopped at epoch t only if ALL of the following hold:
 
@@ -16,7 +16,7 @@ checkpoint is always kept and restored before testing regardless of stopping.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 from scipy.stats import kendalltau
@@ -34,16 +34,14 @@ def trend_test(values: List[float], alternative: str) -> Tuple[float, float]:
 
 
 class OverfittingEarlyStopping:
-    def __init__(self, cfg: Optional[Dict[str, Any]]):
-        cfg = cfg or {}
-        self.enabled = bool(cfg.get("enabled", False))
-        self.patience = int(cfg.get("patience", 20))
-        self.min_epochs = int(cfg.get("min_epochs", 0))
-        self.alpha = float(cfg.get("significance", 0.05))
+    def __init__(self, cfg: Dict[str, Any]):
+        self.patience = int(cfg["patience"])
+        self.min_epochs = int(cfg["min_epochs"])
+        self.alpha = float(cfg["significance"])
         self.reason = ""
 
     def should_stop(self, history: List[Dict[str, Any]]) -> bool:
-        if not self.enabled or len(history) < max(self.min_epochs, self.patience + 1):
+        if len(history) < max(self.min_epochs, self.patience + 1):
             return False
         dices = [h["val_dice"] for h in history]
         best_epoch = int(np.argmax(dices))

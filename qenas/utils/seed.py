@@ -10,25 +10,18 @@ import numpy as np
 import torch
 
 
-def seed_everything(seed: int, deterministic: bool = True) -> None:
-    """Seed Python, NumPy and PyTorch (CPU + CUDA) RNGs.
-
-    ``deterministic=True`` asks PyTorch for deterministic kernels where available
-    (``warn_only`` so that ops without a deterministic implementation still run).
-    """
+def seed_everything(seed: int) -> None:
+    """Seed Python, NumPy and PyTorch (CPU + CUDA) RNGs and request deterministic kernels where available
+    (``warn_only`` so that ops without a deterministic implementation still run)."""
     random.seed(seed)
     np.random.seed(seed % (2**32))
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
-    if deterministic:
-        os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
-        try:
-            torch.use_deterministic_algorithms(True, warn_only=True)
-        except Exception:  # pragma: no cover - very old torch
-            pass
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.use_deterministic_algorithms(True, warn_only=True)
 
 
 def derive_seed(*parts: Any) -> int:

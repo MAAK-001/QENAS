@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from qenas.config import build_config
+from qenas.config import build_config, config_fingerprint
 from qenas.datasets.discovery import Sample
 from qenas.datasets.splits import _group_select, check_no_leakage, DatasetError
 from qenas.search.pareto import select_pareto_candidates
@@ -27,23 +27,32 @@ def test_leakage_detector():
         check_no_leakage({"train": [s], "test": [Sample("b", "img_b", [], group="g")]})
 
 
-def test_pareto_subset_keeps_extremes_and_size():
-    front = [{"chromosome": [i] * 8, "f1_params": float(i), "f2_synflow": 1.0 / (1 + i), "params": i}
-             for i in range(1, 21)]
+def _front(n=20, seed=0):
+    rng = np.random.default_rng(seed)
+    return [{"chromosome": [i % 5] * 8, "f1_params": float(rng.integers(1, 100)), "f2_synflow": float(rng.random()),
+             "f3_zico": float(rng.random()), "params": i} for i in range(n)]
+
+
+def test_pareto_subset_keeps_every_objective_extreme_and_size():
+    front = _front()
     sub = select_pareto_candidates(front, 6)
     assert len(sub) == 6
-    p = [r["f1_params"] for r in sub]
-    assert min(p) == 1 and max(p) == 20
-    assert select_pareto_candidates(front[:4], 6) == [dict(r, selection_reason="entire front (|front| <= k)")
-                                                      for r in front[:4]]
+    for k in ("f1_params", "f2_synflow", "f3_zico"):
+        assert min(r[k] for r in sub) == min(r[k] for r in front)
+    assert any(r["selection_reason"].startswith("extreme") for r in sub)
+    small = select_pareto_candidates(front[:4], 6)
+    assert len(small) == 4 and all(r["selection_reason"] == "entire front (|front| <= k)" for r in small)
+    for k in (1, 2):   # never more than k, even when there are more objective extremes than k
+        assert len(select_pareto_candidates(front, k)) == k
 
 
-def test_pymoo_operators_produce_valid_integer_chromosomes():
+def test_pymoo_operators_produce_valid_integer_chromosomes_with_three_objectives():
     from pymoo.core.evaluator import Evaluator
     from pymoo.problems.static import StaticProblem
     cfg = build_config("BUSI")
     alg = build_algorithm(cfg)
     prob = QENASProblem()
+    assert prob.n_obj == 3
     alg.setup(prob, termination=("n_gen", 4), seed=1, verbose=False)
     rng = np.random.default_rng(0)
     while alg.has_next():
@@ -51,8 +60,19 @@ def test_pymoo_operators_produce_valid_integer_chromosomes():
         X = pop.get("X")
         assert X.dtype.kind in "iu" and X.shape[1] == 8 and X.min() >= 0 and X.max() <= 4
         assert len({tuple(r) for r in X.tolist()}) == len(X)   # duplicates eliminated
-        Evaluator().eval(StaticProblem(prob, F=rng.random((len(X), 2)) + 0.1), pop)
+        Evaluator().eval(StaticProblem(prob, F=rng.random((len(X), 3)) + 0.1), pop)
         alg.tell(infills=pop)
+
+
+def test_config_is_a_single_protocol():
+    a = build_config("BUSI")
+    b = build_config("BUSI", overrides={"device": "cpu", "data.root": "elsewhere", "data.num_workers": 4})
+    assert config_fingerprint(a) == config_fingerprint(b)          # run settings are not scientific
+    assert config_fingerprint(a) != config_fingerprint(build_config("BUSI", overrides={"seed": 1}))
+    with pytest.raises(KeyError):
+        build_config("BUSI", overrides={"evaluation.tta": "on"})   # no alternative modes exist
+    with pytest.raises(ValueError):
+        build_config("BUSI", overrides={"candidate_training.loss_alpha": 0.3})   # must be one of the alphas
 
 
 @pytest.mark.skipif(not DATA_ROOT.exists(), reason="datasets not available")

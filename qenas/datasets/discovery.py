@@ -227,8 +227,8 @@ _BUSI_MASK_RE = re.compile(r"^(?P<stem>.+)_mask(?:_(?P<k>\d+))?$")
 
 
 def discover_busi(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
+    """647 benign + malignant images as in Mixed-GGNAS (``normal`` images have empty masks and are excluded)."""
     root = _find_dataset_dir(data_root, "BUSI")
-    include_normal = bool(cfg["data"]["busi_include_normal"])
     threshold = int(cfg["data"]["mask_threshold"])
     classes = sorted(p.name for p in root.iterdir() if p.is_dir())
     expected = {"benign", "malignant", "normal"}
@@ -256,15 +256,15 @@ def discover_busi(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
             raise DatasetError(f"BUSI/{cls}: images without mask: {no_mask[:10]}")
         per_class[cls] = {"images": len(images), "mask_files": sum(len(v) for v in masks.values()),
                           "multi_mask_images": sum(1 for v in masks.values() if len(v) > 1)}
-        if cls == "normal" and not include_normal:
+        if cls == "normal":
             per_class[cls]["excluded"] = len(images)
             continue
         for stem, ip in images.items():
             sid = f"{cls}/{stem}"
             samples.append(Sample(sample_id=sid, image=ip, masks=sorted(masks[stem]), group=sid, stratum=cls))
 
-    # Exact duplicate detection (pixel hash). Duplicates must share a split; duplicates whose
-    # masks disagree have ambiguous ground truth and are excluded (configurable).
+    # Exact duplicate detection (pixel hash). Identical duplicates are kept once; duplicates whose
+    # masks disagree have ambiguous ground truth and are excluded.
     hashes: Dict[str, List[int]] = defaultdict(list)
     for i, s in enumerate(samples):
         with Image.open(s.image) as im:
@@ -277,16 +277,11 @@ def discover_busi(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
         identical = all(m.shape == ms[0].shape and np.array_equal(m, ms[0]) for m in ms[1:])
         ids = [samples[i].sample_id for i in idxs]
         if identical:
-            for i in idxs[1:]:
-                drop.add(i)   # keep a single copy
+            drop.update(idxs[1:])   # keep a single copy
             action = "kept one copy (identical masks)"
-        elif cfg["data"]["busi_drop_conflicting_duplicates"]:
+        else:
             drop.update(idxs)
             action = "excluded all copies (conflicting masks/labels)"
-        else:
-            for i in idxs:
-                samples[i].group = f"dup:{h[:12]}"
-            action = "grouped into one split (conflicting masks kept)"
         dup_report.append({"ids": ids, "masks_identical": identical, "action": action})
         log.warning("BUSI exact duplicate %s -> %s", ids, action)
     samples = [s for i, s in enumerate(samples) if i not in drop]
@@ -297,12 +292,11 @@ def discover_busi(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
         "tree": _tree(root),
         "extensions": _ext_counts(root),
         "per_class": per_class,
-        "include_normal": include_normal,
         "exact_duplicates": dup_report,
         "official_split": None,
         "patient_metadata": "none available -> image-level split (documented limitation)",
     }
-    report["validation"] = _validate_pairs(samples, threshold, allow_empty=include_normal)
+    report["validation"] = _validate_pairs(samples, threshold, allow_empty=False)
     return DiscoveryResult("BUSI", str(root), samples, False, report)
 
 
@@ -380,12 +374,13 @@ def discover_cvc(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
 # --------------------------------------------------------------------------------------
 
 IDRID_CODES = {"MA": "Microaneurysms", "HE": "Haemorrhages", "EX": "Hard Exudates", "SE": "Soft Exudates", "OD": "Optic Disc"}
+IDRID_TARGET = "OD"   # optic disc: the only IDRiD target compatible with Mixed-GGNAS' reported Dice (D24)
 
 
 def discover_idrid(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
     root = _find_dataset_dir(data_root, "IDRID")
     threshold = int(cfg["data"]["mask_threshold"])
-    target = cfg["data"]["idrid_target"].upper()
+    target = IDRID_TARGET
     seg_roots = _walk_find(root, lambda p: p.name.lower().endswith("segmentation") and (p / "1. Original Images").is_dir())
     if len(seg_roots) != 1:
         raise DatasetError(f"IDRID: expected exactly one segmentation root containing '1. Original Images', found {seg_roots}")
@@ -393,7 +388,7 @@ def discover_idrid(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
     img_root, gt_root = seg / "1. Original Images", seg / "2. All Segmentation Groundtruths"
     if not gt_root.is_dir():
         raise DatasetError(f"IDRID: ground-truth folder not found: {gt_root}")
-    codes = ["MA", "HE", "EX", "SE"] if target == "LESIONS" else [target]
+    codes = [target]
     split_dirs = {"train": "a. Training Set", "test": "b. Testing Set"}
     samples: List[Sample] = []
     per_split: Dict[str, Any] = {}
@@ -427,7 +422,7 @@ def discover_idrid(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
                             "masks_per_lesion": {c: len(m) for c, m in masks_by_code.items()}}
         for stem, ip in images.items():
             mlist = [masks_by_code[c][stem] for c in codes if stem in masks_by_code[c]]
-            if target == "OD" and not mlist:
+            if not mlist:
                 raise DatasetError(f"IDRID: optic-disc mask missing for {stem}")
             samples.append(Sample(sample_id=stem, image=ip, masks=mlist, group=stem, stratum="",
                                   official_split=split, meta={"target": target}))
@@ -442,7 +437,7 @@ def discover_idrid(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
         "official_split": "54 train / 27 test (used as-is; validation is carved from the official train set)",
         "patient_metadata": "none available -> image-level validation split (documented limitation)",
     }
-    report["validation"] = _validate_pairs(samples, threshold, allow_empty=(target != "OD"))
+    report["validation"] = _validate_pairs(samples, threshold, allow_empty=False)
     return DiscoveryResult("IDRID", str(seg), samples, True, report)
 
 

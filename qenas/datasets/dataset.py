@@ -7,6 +7,7 @@ the pipeline calls once, after the final model is trained and every choice is fi
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Sequence
 
 import numpy as np
@@ -25,7 +26,7 @@ class ArraySegDataset(Dataset):
         self.images, self.masks = images, masks
         self.mean = torch.tensor(mean, dtype=torch.float32).view(3, 1, 1)
         self.std = torch.tensor(std, dtype=torch.float32).view(3, 1, 1)
-        self.augment = augment if (augment and augment.get("enabled", False)) else None
+        self.augment = augment
         self.seed = int(seed)
 
     def __len__(self) -> int:
@@ -63,7 +64,7 @@ class EpochShuffleSampler(Sampler[int]):
 
 
 class DataBundle:
-    """Holds train/val arrays + normalisation; test is loaded lazily and only once."""
+    """Train/val arrays + training-split normalisation statistics; test is loaded lazily and only once."""
 
     def __init__(self, splits: Dict[str, List[Sample]], cfg: Dict[str, Any]):
         self.cfg = cfg
@@ -72,19 +73,14 @@ class DataBundle:
         self.size_hw = tuple(d["image_size"])
         self.threshold = int(d["mask_threshold"])
         self.dataset = d["dataset"]
-        use_cache = bool(d["cache_preprocessed"])
-        self.train_images, self.train_masks = preload_split(splits["train"], self.size_hw, self.threshold,
-                                                            self.dataset, "train", use_cache)
-        self.val_images, self.val_masks = preload_split(splits["val"], self.size_hw, self.threshold,
-                                                        self.dataset, "val", use_cache)
-        if d["normalization"] == "train_stats":
-            self.mean, self.std = channel_stats(self.train_images)
-        elif d["normalization"] == "imagenet":
-            self.mean, self.std = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
-        else:
-            raise ValueError(f"Unknown normalization '{d['normalization']}'")
+        self.cache_dir = Path(cfg["paths"]["cache"]) / "preprocessed"
+        self.train_images, self.train_masks = self._load("train")
+        self.val_images, self.val_masks = self._load("val")
+        self.mean, self.std = channel_stats(self.train_images)
         self.val_trivial_dice = trivial_foreground_dice(self.val_masks)
-        self._test_loaded = False
+
+    def _load(self, split: str):
+        return preload_split(self.splits[split], self.size_hw, self.threshold, self.dataset, split, self.cache_dir)
 
     def _loader(self, ds: ArraySegDataset, batch_size: int, train: bool, seed: int) -> DataLoader:
         nw = int(self.cfg["data"]["num_workers"])
@@ -104,19 +100,32 @@ class DataBundle:
 
     def train_eval_loader(self, batch_size: int) -> DataLoader:
         """Training images without augmentation (for reporting final train metrics)."""
-        ds = ArraySegDataset(self.train_images, self.train_masks, self.mean, self.std, augment=None)
+        ds = ArraySegDataset(self.train_images, self.train_masks, self.mean, self.std)
         return self._loader(ds, batch_size, train=False, seed=0)
 
     def val_loader(self, batch_size: int) -> DataLoader:
-        ds = ArraySegDataset(self.val_images, self.val_masks, self.mean, self.std, augment=None)
+        ds = ArraySegDataset(self.val_images, self.val_masks, self.mean, self.std)
         return self._loader(ds, batch_size, train=False, seed=0)
+
+    def zico_batches(self, batch_size: int, n_batches: int, seed: int):
+        """The first ``n_batches`` training batches of epoch 0 (shuffled and augmented exactly as in training).
+        Fixed for the whole search, as the official ZiCo search fixes ``trainbatches`` once."""
+        loader = self.train_loader(batch_size, seed)
+        set_loader_epoch(loader, 0)
+        out = []
+        for x, y in loader:
+            out.append((x, y))
+            if len(out) == n_batches:
+                break
+        if len(out) < n_batches:
+            raise RuntimeError(f"ZiCo needs {n_batches} training batches of size {batch_size}; "
+                               f"the training split has only {len(self.train_images)} images")
+        return out
 
     def load_test(self, batch_size: int) -> DataLoader:
         """Materialise the held-out test split. Must only be called by the final test stage."""
-        imgs, masks = preload_split(self.splits["test"], self.size_hw, self.threshold, self.dataset, "test",
-                                    bool(self.cfg["data"]["cache_preprocessed"]))
-        self._test_loaded = True
-        ds = ArraySegDataset(imgs, masks, self.mean, self.std, augment=None)
+        imgs, masks = self._load("test")
+        ds = ArraySegDataset(imgs, masks, self.mean, self.std)
         return self._loader(ds, batch_size, train=False, seed=0)
 
 

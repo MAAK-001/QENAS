@@ -34,7 +34,7 @@ import torch.nn.functional as F
 
 from .blocks import MANUAL_BLOCKS
 from .chromosome import BLOCK_NAMES, POSITION_NAMES, validate_chromosome
-from .darts_cell import GENOTYPES, DartsCell, resolve_genotype_name
+from .darts_cell import GENOTYPES, DartsCell, genotype_name_for
 
 
 class SpatialAttention(nn.Module):
@@ -93,7 +93,7 @@ class DecoderPosition(nn.Module):
             up = F.pad(up, [dx // 2, dx - dx // 2, dy // 2, dy - dy // 2])
         s = self.bn_skip(skip)
         # Spatial-channel attention enhancement: s + s * sigma_s(s) * sigma_c(s).
-        # (The official code multiplies two attended copies, s^2 * sigma_s * sigma_c; see DESIGN_DECISIONS.md D7.)
+        # (The official code multiplies two attended copies, s^2 * sigma_s * sigma_c; see DESIGN_DECISIONS.md D8.)
         s = s + s * self.satt.gate(s) * self.catt.gate(s)
         return self.block(self.fuse(torch.cat([s, up], dim=1)))
 
@@ -200,15 +200,15 @@ def count_parameters(module: nn.Module) -> int:
 
 def build_model(chromosome: Sequence[int], cfg: Dict[str, Any]) -> QENASNet:
     m = cfg["model"]
-    gname = resolve_genotype_name(m["darts_genotype"], cfg["data"]["dataset"])
     return QENASNet(chromosome, in_channels=int(cfg["data"]["in_channels"]), num_classes=int(m["num_classes"]),
-                    base_channels=int(m["base_channels"]), scale=int(m["scale"]), genotype_name=gname)
+                    base_channels=int(m["base_channels"]), scale=int(m["scale"]),
+                    genotype_name=genotype_name_for(cfg["data"]["dataset"]))
 
 
 def architecture_signature(cfg: Dict[str, Any]) -> Dict[str, Any]:
     """Everything (besides the chromosome) that determines the architecture."""
     m = cfg["model"]
-    gname = resolve_genotype_name(m["darts_genotype"], cfg["data"]["dataset"])
+    gname = genotype_name_for(cfg["data"]["dataset"])
     g = GENOTYPES[gname]
     return {
         "in_channels": int(cfg["data"]["in_channels"]),

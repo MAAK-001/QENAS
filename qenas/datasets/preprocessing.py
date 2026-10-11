@@ -17,12 +17,11 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from typing import Dict, List, Sequence, Tuple
+from typing import List, Sequence, Tuple
 
 import numpy as np
 from PIL import Image
 
-from ..config import QENAS_ROOT
 from ..utils.io import retry_on_lock
 from ..utils.logging_utils import ProgressTimer, get_logger
 from .discovery import DatasetError, Sample, read_binary_mask_union
@@ -41,7 +40,7 @@ def load_and_resize(sample: Sample, size_hw: Tuple[int, int], threshold: int) ->
     mask = read_binary_mask_union(sample.masks, threshold, size_hw=(orig_wh[1], orig_wh[0]))
     if mask.shape != (orig_wh[1], orig_wh[0]):
         raise DatasetError(f"Mask/image size mismatch for {sample.sample_id}: mask {mask.shape[::-1]} vs image {orig_wh}")
-    mask_img = Image.fromarray((mask.astype(np.uint8) * 255), mode="L")
+    mask_img = Image.fromarray(mask.astype(np.uint8) * 255)   # 2-D uint8 -> mode "L"
     mask_r = np.asarray(mask_img.resize((w, h), resample=Image.NEAREST), dtype=np.uint8)
     mask_r = (mask_r > 127).astype(np.uint8)
     if img.shape != (h, w, 3) or mask_r.shape != (h, w):
@@ -61,25 +60,23 @@ def _cache_key(samples: Sequence[Sample], size_hw: Tuple[int, int], threshold: i
 
 
 def preload_split(samples: Sequence[Sample], size_hw: Tuple[int, int], threshold: int, dataset: str,
-                  split_name: str, use_cache: bool = True) -> Tuple[np.ndarray, np.ndarray]:
-    """Return (images [N,H,W,3] uint8, masks [N,H,W] uint8 in {0,1}) for a split."""
-    cache_file = None
-    if use_cache:
-        key = _cache_key(samples, size_hw, threshold, dataset)
-        cache_dir = QENAS_ROOT / "cache" / "preprocessed"
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        cache_file = cache_dir / f"{dataset}_{split_name}_{size_hw[0]}x{size_hw[1]}_{key}.npz"
-        if cache_file.exists():
-            try:
-                with np.load(cache_file) as z:
-                    imgs, masks = z["images"], z["masks"]
-                if imgs.shape[0] == len(samples) and set(np.unique(masks).tolist()) <= {0, 1}:
-                    log.info("Loaded cached preprocessed %s/%s (%d samples) from %s", dataset, split_name,
-                             len(samples), cache_file.name)
-                    return imgs, masks
-                log.warning("Preprocessing cache %s is inconsistent; rebuilding", cache_file.name)
-            except Exception as exc:
-                log.warning("Preprocessing cache %s unreadable (%s); rebuilding", cache_file.name, exc)
+                  split_name: str, cache_dir: Path) -> Tuple[np.ndarray, np.ndarray]:
+    """Return (images [N,H,W,3] uint8, masks [N,H,W] uint8 in {0,1}) for a split (cached on disk)."""
+    key = _cache_key(samples, size_hw, threshold, dataset)
+    cache_dir = Path(cache_dir)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_file = cache_dir / f"{dataset}_{split_name}_{size_hw[0]}x{size_hw[1]}_{key}.npz"
+    if cache_file.exists():
+        try:
+            with np.load(cache_file) as z:
+                imgs, masks = z["images"], z["masks"]
+            if imgs.shape[0] == len(samples) and set(np.unique(masks).tolist()) <= {0, 1}:
+                log.info("Loaded cached preprocessed %s/%s (%d samples) from %s", dataset, split_name,
+                         len(samples), cache_file.name)
+                return imgs, masks
+            log.warning("Preprocessing cache %s is inconsistent; rebuilding", cache_file.name)
+        except Exception as exc:
+            log.warning("Preprocessing cache %s unreadable (%s); rebuilding", cache_file.name, exc)
     n = len(samples)
     imgs = np.zeros((n, size_hw[0], size_hw[1], 3), dtype=np.uint8)
     masks = np.zeros((n, size_hw[0], size_hw[1]), dtype=np.uint8)
@@ -89,10 +86,9 @@ def preload_split(samples: Sequence[Sample], size_hw: Tuple[int, int], threshold
         timer.step()
         if (i + 1) % max(1, n // 5) == 0 or i + 1 == n:
             log.info("  preprocessing %s/%s: %d/%d | %s", dataset, split_name, i + 1, n, timer.summary())
-    if cache_file is not None:
-        tmp = cache_file.with_name(cache_file.stem + ".tmp.npz")
-        np.savez_compressed(tmp, images=imgs, masks=masks)
-        retry_on_lock(os.replace, tmp, cache_file)
+    tmp = cache_file.with_name(cache_file.stem + ".tmp.npz")
+    np.savez_compressed(tmp, images=imgs, masks=masks)
+    retry_on_lock(os.replace, tmp, cache_file)
     return imgs, masks
 
 

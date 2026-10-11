@@ -1,109 +1,118 @@
-"""Publication figures for every QENAS stage (PNG at 300 dpi + vector PDF)."""
+"""Publication figures for every QENAS stage (PNG at 300 dpi)."""
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from scipy.stats import spearmanr
 
-from .style import (AXIS, GRID, INK, INK_2, MARKERS, MUTED, NEUTRAL_FILL, SEQ_BLUE, SERIES, apply_style, plt,
-                    save, series_color)
+from .style import AXIS, INK, INK_2, MARKERS, MUTED, NEUTRAL_FILL, SERIES, apply_style, plt, save, series_color
 
-F2_LABEL = "SynFlow objective  f₂ = 1 / (1 + ln(1+S))   (lower is better)"
-LOGS_LABEL = "log-SynFlow  ln(1 + S)   (higher is better)"
+PARAMS_LABEL = "Trainable parameters (M)   (lower is better)"
+LOGS_LABEL = "ln(1 + SynFlow)   (higher is better)"
+ZICO_LABEL = "ZiCo   (higher is better)"
+# (x key, y key, x label, y label) of the three pairwise projections of the objective space.
+PAIRS = [("params", "synflow_log", PARAMS_LABEL, LOGS_LABEL), ("params", "zico", PARAMS_LABEL, ZICO_LABEL),
+         ("synflow_log", "zico", LOGS_LABEL, ZICO_LABEL)]
 
 
-def _staircase(points: np.ndarray) -> np.ndarray:
-    """Attainment staircase through a minimisation front sorted by f1."""
-    p = points[np.argsort(points[:, 0])]
-    xs, ys = [p[0, 0]], [p[0, 1]]
-    for a, b in p[1:]:
-        xs += [a, a]
-        ys += [ys[-1], b]
-    return np.column_stack([xs, ys])
+def _v(r: Dict[str, Any], key: str) -> float:
+    return r[key] / 1e6 if key == "params" else r[key]
+
+
+def _xy(rows: List[Dict[str, Any]], kx: str, ky: str) -> np.ndarray:
+    return np.array([[_v(r, kx), _v(r, ky)] for r in rows], dtype=float).reshape(-1, 2)
 
 
 # ---------------------------------------------------------------------------------------------- search
 def plot_pareto_population(pop_rows: List[Dict[str, Any]], archive_rows: List[Dict[str, Any]], generation: int,
                            n_generations: int, path: Path, highlight: Optional[List[Dict[str, Any]]] = None,
                            title: Optional[str] = None, candidate_epochs: int = 20) -> None:
+    """Population of one generation in the three pairwise projections of the 3-objective space.
+    'non-dominated' refers to dominance in all three objectives."""
     apply_style()
-    fig, ax = plt.subplots(figsize=(6.4, 4.4))
-    if archive_rows:
-        a = np.array([[r["params"] / 1e6, r["f2_synflow"]] for r in archive_rows])
-        ax.scatter(a[:, 0], a[:, 1], s=14, color=NEUTRAL_FILL, edgecolor="none", label="evaluated so far", zorder=1)
-    pop = np.array([[r["params"] / 1e6, r["f2_synflow"]] for r in pop_rows])
-    nd = np.array([r["nondominated"] for r in pop_rows])
-    if (~nd).any():
-        ax.scatter(pop[~nd, 0], pop[~nd, 1], s=26, color=MUTED, edgecolor="white", linewidth=0.8,
-                   label="population (dominated)", zorder=2)
-    if nd.any():
-        st = _staircase(pop[nd])
-        ax.plot(st[:, 0], st[:, 1], color=SERIES[0], linewidth=1.2, alpha=0.8, zorder=3)
-        ax.scatter(pop[nd, 0], pop[nd, 1], s=40, color=SERIES[0], edgecolor="white", linewidth=1.0,
-                   label=f"non-dominated (rank 0): {int(nd.sum())}", zorder=4)
-    if highlight:
-        h = np.array([[r["params"] / 1e6, r["f2_synflow"]] for r in highlight])
-        ax.scatter(h[:, 0], h[:, 1], s=110, facecolor="none", edgecolor=SERIES[1], linewidth=1.6,
-                   label=f"selected for {candidate_epochs}-epoch evaluation", zorder=5)
-        for r in highlight:
-            ax.annotate(f"C{r['candidate_id']}", (r["params"] / 1e6, r["f2_synflow"]), textcoords="offset points",
-                        xytext=(6, 5), fontsize=8, color=INK_2)
-    ax.set_xlabel("Trainable parameters (millions)   (lower is better)")
-    ax.set_ylabel(F2_LABEL)
+    fig, axs = plt.subplots(1, 3, figsize=(15.5, 4.6))
+    nd = np.array([r["nondominated"] for r in pop_rows], dtype=bool)
+    for ax, (kx, ky, lx, ly) in zip(axs, PAIRS):
+        if archive_rows:
+            a = _xy(archive_rows, kx, ky)
+            ax.scatter(a[:, 0], a[:, 1], s=12, color=NEUTRAL_FILL, edgecolor="none", label="evaluated so far", zorder=1)
+        p = _xy(pop_rows, kx, ky)
+        if (~nd).any():
+            ax.scatter(p[~nd, 0], p[~nd, 1], s=26, color=MUTED, edgecolor="white", linewidth=0.8,
+                       label="population (dominated)", zorder=2)
+        if nd.any():
+            ax.scatter(p[nd, 0], p[nd, 1], s=40, color=SERIES[0], edgecolor="white", linewidth=1.0,
+                       label=f"non-dominated (3 objectives): {int(nd.sum())}", zorder=4)
+        if highlight:
+            h = _xy(highlight, kx, ky)
+            ax.scatter(h[:, 0], h[:, 1], s=110, facecolor="none", edgecolor=SERIES[1], linewidth=1.6,
+                       label=f"selected for {candidate_epochs}-epoch evaluation", zorder=5)
+            for r, (x, y) in zip(highlight, h):
+                ax.annotate(f"C{r['candidate_id']}", (x, y), textcoords="offset points", xytext=(6, 5), fontsize=8,
+                            color=INK_2)
+        ax.set_xlabel(lx)
+        ax.set_ylabel(ly)
+    axs[0].legend(loc="lower right")
     gen_txt = "initial population (generation 0)" if generation == 0 else f"generation {generation}/{n_generations}"
-    ax.set_title(title or f"NSGA-II population — {gen_txt}")
-    ax.legend(loc="upper right")
+    fig.suptitle(title or f"NSGA-II population — {gen_txt}", fontsize=11, weight="semibold")
+    fig.tight_layout()
     save(fig, path)
 
 
-def plot_pareto_evolution(history: List[Dict[str, Any]], n_generations: int, path: Path) -> None:
+def plot_search_progress(history: List[Dict[str, Any]], gen_table: List[Dict[str, Any]], path: Path) -> None:
+    """Hypervolume of each generation's non-dominated set and the population's objective distribution."""
     apply_style()
-    fig, ax = plt.subplots(figsize=(6.4, 4.4))
-    gens = sorted({r["generation"] for r in history})
-    idx = np.linspace(0, len(SEQ_BLUE) - 1, num=max(1, len(gens))).round().astype(int)
-    for k, g in enumerate(gens):
-        rows = [r for r in history if r["generation"] == g and r["nondominated"]]
-        if not rows:
-            continue
-        p = np.array([[r["params"] / 1e6, r["f2_synflow"]] for r in rows])
-        st = _staircase(p)
-        c = SEQ_BLUE[idx[k]]
-        last = g == gens[-1]
-        ax.plot(st[:, 0], st[:, 1], color=c, linewidth=2.0 if last else 1.1, zorder=2 + k)
-        ax.scatter(p[:, 0], p[:, 1], s=34 if last else 16, color=c, edgecolor="white", linewidth=0.7, zorder=2 + k,
-                   label=("gen 0 (initial)" if g == 0 else f"gen {g}") if (g in (gens[0], gens[-1]) or
-                                                                           len(gens) <= 6 or k % 2 == 0) else None)
-    ax.set_xlabel("Trainable parameters (millions)   (lower is better)")
-    ax.set_ylabel(F2_LABEL)
-    ax.set_title("Pareto-front evolution across generations")
-    ax.legend(title="non-dominated front", loc="upper right", ncol=2 if len(gens) > 6 else 1)
+    fig, axs = plt.subplots(2, 2, figsize=(10.5, 7.2))
+    gens = [g["generation"] for g in gen_table]
+    axs[0, 0].plot(gens, [g["hypervolume"] for g in gen_table], color=SERIES[0], marker="o", markersize=4)
+    axs[0, 0].set_ylabel("Hypervolume (normalised objectives, ref. 1.1)")
+    axs[0, 0].set_title("Non-dominated set quality")
+    for ax, key, label in ((axs[0, 1], "params", "Parameters (M)"), (axs[1, 0], "synflow_log", "ln(1 + SynFlow)"),
+                           (axs[1, 1], "zico", "ZiCo")):
+        med, q1, q3 = [], [], []
+        for g in gens:
+            v = np.array([_v(r, key) for r in history if r["generation"] == g])
+            med.append(np.median(v))
+            q1.append(np.percentile(v, 25))
+            q3.append(np.percentile(v, 75))
+        ax.fill_between(gens, q1, q3, color=SERIES[0], alpha=0.18, linewidth=0, label="population IQR")
+        ax.plot(gens, med, color=SERIES[0], marker="o", markersize=3.5, label="population median")
+        ax.set_ylabel(label)
+        ax.set_title(f"{label} of the surviving population")
+        ax.legend(loc="best")
+    from matplotlib.ticker import MaxNLocator
+    for ax in axs.flat:
+        ax.set_xlabel("Generation")
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    fig.suptitle("Training-free NSGA-II search progress", fontsize=11, weight="semibold")
+    fig.tight_layout()
     save(fig, path)
 
 
-def plot_front_log_synflow(front: List[Dict[str, Any]], archive_rows: List[Dict[str, Any]], path: Path,
-                           candidates: Optional[List[Dict[str, Any]]] = None) -> None:
-    """Same final front on the interpretable log-SynFlow scale (monotone transform of f2)."""
+def plot_front_3d(front: List[Dict[str, Any]], archive_rows: List[Dict[str, Any]], path: Path,
+                  candidates: Optional[List[Dict[str, Any]]] = None) -> None:
+    """Final non-dominated set in the 3-D objective space (interpretable scales)."""
     apply_style()
-    fig, ax = plt.subplots(figsize=(6.4, 4.4))
-    a = np.array([[r["params"] / 1e6, r["synflow_log"]] for r in archive_rows])
-    ax.scatter(a[:, 0], a[:, 1], s=14, color=NEUTRAL_FILL, edgecolor="none", label="all evaluated architectures")
-    f = np.array([[r["params"] / 1e6, r["synflow_log"]] for r in front])
-    o = np.argsort(f[:, 0])
-    ax.plot(f[o, 0], f[o, 1], color=SERIES[0], linewidth=1.2)
-    ax.scatter(f[:, 0], f[:, 1], s=40, color=SERIES[0], edgecolor="white", linewidth=1.0, label="final Pareto front")
+    fig = plt.figure(figsize=(7.4, 6.2))
+    ax = fig.add_subplot(111, projection="3d")
+    a = np.array([[_v(r, "params"), r["synflow_log"], r["zico"]] for r in archive_rows])
+    ax.scatter(a[:, 0], a[:, 1], a[:, 2], s=8, color=NEUTRAL_FILL, depthshade=False, label="all evaluated")
+    f = np.array([[_v(r, "params"), r["synflow_log"], r["zico"]] for r in front])
+    ax.scatter(f[:, 0], f[:, 1], f[:, 2], s=36, color=SERIES[0], depthshade=False, label="final Pareto front")
     if candidates:
-        for r in candidates:
-            ax.scatter([r["params"] / 1e6], [r["synflow_log"]], s=110, facecolor="none", edgecolor=SERIES[1],
-                       linewidth=1.6)
-            ax.annotate(f"C{r['candidate_id']}", (r["params"] / 1e6, r["synflow_log"]), textcoords="offset points",
-                        xytext=(6, -10), fontsize=8, color=INK_2)
-    ax.set_xlabel("Trainable parameters (millions)")
-    ax.set_ylabel(LOGS_LABEL)
-    ax.set_title("Final Pareto front on the log-SynFlow scale")
-    ax.legend(loc="lower right")
+        c = np.array([[_v(r, "params"), r["synflow_log"], r["zico"]] for r in candidates])
+        ax.scatter(c[:, 0], c[:, 1], c[:, 2], s=110, facecolor="none", edgecolor=SERIES[1], linewidth=1.6,
+                   depthshade=False, label="candidates")
+        for r, (x, y, z) in zip(candidates, c):
+            ax.text(x, y, z, f" C{r['candidate_id']}", fontsize=8, color=INK_2)
+    ax.set_xlabel("Parameters (M)")
+    ax.set_ylabel("ln(1 + SynFlow)")
+    ax.set_zlabel("ZiCo")
+    ax.set_title("Final Pareto front (minimise parameters, maximise SynFlow and ZiCo)")
+    ax.legend(loc="upper left")
     save(fig, path)
 
 
@@ -253,22 +262,27 @@ def plot_final_curves(history: List[Dict[str, Any]], best_epoch: int, out_dir: P
     apply_style()
     e = [h["epoch"] for h in history]
 
-    def panel(ax, key, ylabel):
-        ax.plot(e, [h[f"train_{key}"] for h in history], color=SERIES[0], label="train")
+    def panel(ax, key, ylabel, train=True):
+        if train:
+            ax.plot(e, [h[f"train_{key}"] for h in history], color=SERIES[0], label="train")
         ax.plot(e, [h[f"val_{key}"] for h in history], color=SERIES[1], label="validation")
         ax.axvline(best_epoch, color=MUTED, linestyle="--", linewidth=0.9)
         ax.set_xlabel("Epoch")
         ax.set_ylabel(ylabel)
         ax.legend(loc="best")
 
-    fig, axs = plt.subplots(2, 2, figsize=(10, 7))
+    fig, axs = plt.subplots(2, 3, figsize=(14, 7))
     panel(axs[0, 0], "loss", "Loss (α·BCE + β·soft-mIoU)")
     panel(axs[0, 1], "dice", "Dice")
-    panel(axs[1, 0], "iou", "IoU (foreground)")
-    axs[1, 1].plot(e, [h["learning_rate"] for h in history], color=SERIES[2])
-    axs[1, 1].set_xlabel("Epoch")
-    axs[1, 1].set_ylabel("Learning rate (end of epoch)")
-    axs[1, 1].set_yscale("log")
+    panel(axs[0, 2], "miou", "mIoU (class mean)")
+    panel(axs[1, 0], "sensitivity", "Sensitivity (recall)")
+    panel(axs[1, 1], "hd95", "HD95 (pixels, lower is better)", train=False)
+    axs[1, 2].plot(e, [h["learning_rate"] for h in history], color=SERIES[2])
+    axs[1, 2].set_xlabel("Epoch")
+    axs[1, 2].set_ylabel("Learning rate (end of epoch)")
+    from matplotlib.ticker import MaxNLocator
+    for ax in axs.flat:
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     fig.suptitle(f"Final training of the selected architecture (best validation Dice at epoch {best_epoch}, dashed)",
                  fontsize=11, weight="semibold")
     fig.tight_layout()

@@ -1,10 +1,10 @@
 """Cache of training-free evaluations.
 
 Key = SHA-256 of every factor that influences the objectives: chromosome, the full
-architecture signature (channels, scale, DARTS genotype definition, network
-version), the SynFlow configuration (dtype, input shape, initialisation seed,
-batch size, objective version) and the PyTorch version. One small JSON file per
-key, written atomically -> safe to share between concurrent runs and experiments.
+architecture signature (channels, scale, DARTS genotype definition, network version)
+and the objective signature (objective version, input size, initialisation seed, the
+SHA-256 of the exact ZiCo training batches, PyTorch version). One small JSON file per
+key, written atomically -> safe to share between runs and experiments.
 """
 
 from __future__ import annotations
@@ -17,6 +17,7 @@ from typing import Any, Dict, Optional, Sequence
 
 from ..utils.io import load_json, save_json
 from ..utils.logging_utils import get_logger
+from .objectives import OBJECTIVE_NAMES
 
 log = get_logger()
 
@@ -48,7 +49,7 @@ class EvaluationCache:
             res = rec["result"]
             if rec.get("key") != k or [int(g) for g in res["chromosome"]] != [int(g) for g in chromosome]:
                 raise ValueError("cache record does not match its key")
-            for f in ("f1_params", "f2_synflow", "synflow_raw"):
+            for f in OBJECTIVE_NAMES + ("synflow_raw", "zico"):
                 v = float(res[f])
                 if not math.isfinite(v):
                     raise ValueError(f"non-finite cached value {f}={v}")

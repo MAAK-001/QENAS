@@ -71,15 +71,6 @@ def make_splits(disc: DiscoveryResult, cfg: Dict[str, Any]) -> Dict[str, List[Sa
         if not lst:
             raise DatasetError(f"{disc.dataset}: '{name}' split is empty — check fractions/data.")
     check_no_leakage(splits)
-
-    ms = cfg["data"].get("max_samples")
-    if ms:  # smoke tests only: deterministic subset
-        for name in splits:
-            n = ms.get(name) if isinstance(ms, dict) else int(ms)
-            if n:
-                rng_s = np.random.default_rng(derive_seed(seed, disc.dataset, "subset", name))
-                idx = sorted(rng_s.permutation(len(splits[name]))[: int(n)])
-                splits[name] = [splits[name][i] for i in idx]
     return splits
 
 

@@ -8,16 +8,15 @@ Layout::
         environment.json      Python / PyTorch / CUDA / device information
         ...                   stage outputs (CSV / JSON / Markdown)
         checkpoints/          resumable checkpoints of every stage
-        figures/              publication figures (PNG + PDF)
+        figures/              publication figures (PNG)
         logs/run.log
 
 Resume policy
-* default: the most recent *unfinished* experiment of the dataset is resumed if its
-  configuration fingerprint equals the current one; if it differs the run stops and
-  lists the differing keys (never mixes configurations);
-* ``--no-resume``: always start a new experiment directory;
-* ``--experiment-dir``: resume exactly that directory;
-* completed experiments are never modified — a new directory is created instead.
+* default: the most recent experiment of the dataset with the identical configuration
+  fingerprint is opened - an unfinished one is resumed, a finished one is reported and never
+  modified. Otherwise the most recent *unfinished* experiment is opened, which stops with the
+  list of differing keys (configurations are never mixed);
+* ``--no-resume``: always start a new experiment directory.
 """
 
 from __future__ import annotations
@@ -26,7 +25,7 @@ import datetime as _dt
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from .config import QENAS_ROOT, diff_configs
+from .config import diff_configs
 from .utils.io import load_json, save_json
 
 
@@ -75,21 +74,17 @@ class Experiment:
     # ------------------------------------------------------------------ discovery
     @staticmethod
     def dataset_dir(cfg: Dict[str, Any]) -> Path:
-        return QENAS_ROOT / "results" / cfg["data"]["dataset"]
-
-    @staticmethod
-    def _prefix(cfg: Dict[str, Any]) -> str:
-        return "smoke_" if cfg.get("smoke_test") else "experiment_"
+        return Path(cfg["paths"]["results"]) / cfg["data"]["dataset"]
 
     @classmethod
     def create(cls, cfg: Dict[str, Any], fingerprint: str) -> "Experiment":
         base = cls.dataset_dir(cfg)
         base.mkdir(parents=True, exist_ok=True)
         stamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-        d = base / f"{cls._prefix(cfg)}{stamp}"
+        d = base / f"experiment_{stamp}"
         k = 1
         while d.exists():
-            d = base / f"{cls._prefix(cfg)}{stamp}_{k}"
+            d = base / f"experiment_{stamp}_{k}"
             k += 1
         d.mkdir(parents=True)
         return cls(d, cfg, fingerprint)
@@ -97,30 +92,34 @@ class Experiment:
     @classmethod
     def open_existing(cls, directory: Path, cfg: Dict[str, Any], fingerprint: str) -> "Experiment":
         directory = Path(directory)
-        if not (directory / "state.json").exists():
-            raise ResumeConflict(f"{directory} is not a QENAS experiment directory (no state.json)")
         st = load_json(directory / "state.json")
         if st.get("fingerprint") != fingerprint:
             old_cfg = load_json(directory / "config.json")["config"] if (directory / "config.json").exists() else {}
             diffs = diff_configs(old_cfg, cfg)
             lines = "\n".join(f"    {k}: experiment={a!r}  current={b!r}" for k, (a, b) in diffs.items())
-            raise ResumeConflict(f"Configuration differs from experiment {directory.name}; refusing to resume.\n"
-                                 f"{lines}\n  Re-run with the original options, or use --no-resume to start "
-                                 f"a new experiment.")
+            raise ResumeConflict(f"Configuration differs from the unfinished experiment {directory.name}; refusing to "
+                                 f"resume.\n{lines}\n  Use --no-resume to start a new experiment.")
         return cls(directory, cfg, fingerprint)
 
     @classmethod
-    def find_resumable(cls, cfg: Dict[str, Any]) -> Optional[Path]:
+    def find_resumable(cls, cfg: Dict[str, Any], fingerprint: str) -> Optional[Path]:
+        """Most recent experiment with the identical fingerprint, finished or not. Otherwise the most recent
+        *unfinished* experiment (opening it reports the configuration conflict), else None."""
         base = cls.dataset_dir(cfg)
         if not base.exists():
             return None
-        cands = sorted([p for p in base.iterdir() if p.is_dir() and p.name.startswith(cls._prefix(cfg))
+        cands = sorted([p for p in base.iterdir() if p.is_dir() and p.name.startswith("experiment_")
                         and (p / "state.json").exists()], key=lambda p: p.name)
+        states = []
         for p in reversed(cands):
             try:
-                st = load_json(p / "state.json")
+                states.append((p, load_json(p / "state.json")))
             except Exception:
                 continue
+        for p, st in states:
+            if st.get("fingerprint") == fingerprint:
+                return p
+        for p, st in states:
             if st.get("status") != "completed":
                 return p
         return None

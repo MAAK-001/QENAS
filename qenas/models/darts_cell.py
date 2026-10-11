@@ -53,33 +53,14 @@ GENOTYPES: Dict[str, Genotype] = {
               ("down_dil_conv", 1), ("down_dep_conv", 1), ("dil_conv", 4)], down_concat=range(2, 6),
         up=[("cweight", 0), ("up_cweight", 1), ("up_cweight", 1), ("identity", 0), ("cweight", 2), ("identity", 0),
             ("dil_conv", 0), ("dil_conv", 4)], up_concat=range(2, 6)),
-    "darts_cell_polyp": Genotype(
-        down=[("down_cweight", 1), ("avg_pool", 0), ("down_cweight", 0), ("dil_conv", 2), ("down_dil_conv", 1),
-              ("conv", 3), ("down_conv", 1), ("dep_conv", 2)], down_concat=range(2, 6),
-        up=[("up_dil_conv", 1), ("shuffle_conv", 0), ("dil_conv", 2), ("dil_conv", 0), ("conv", 3), ("up_cweight", 1),
-            ("dep_conv", 2), ("dil_conv", 0)], up_concat=range(2, 6)),
-    "darts_unet": Genotype(
-        down=[("max_pool", 1), ("down_conv", 0), ("max_pool", 1), ("down_conv", 0), ("dep_conv", 3),
-              ("down_dep_conv", 0), ("down_dil_conv", 0), ("dep_conv", 2)], down_concat=range(2, 6),
-        up=[("shuffle_conv", 0), ("up_dil_conv", 1), ("conv", 0), ("up_dil_conv", 1), ("up_dil_conv", 1),
-            ("dep_conv", 3), ("dep_conv", 2), ("shuffle_conv", 0)], up_concat=range(2, 6)),
-    # NAS-Unet genotype (searched on PROMISE12 by the NAS-Unet authors): dataset-independent option.
-    "nasunet": Genotype(
-        down=[("max_pool", 1), ("down_dil_conv", 0), ("cweight", 2), ("down_cweight", 0), ("down_dil_conv", 1),
-              ("dil_conv", 3), ("dil_conv", 4), ("avg_pool", 0)], down_concat=range(2, 6),
-        up=[("up_dil_conv", 1), ("dep_conv", 0), ("up_cweight", 1), ("shuffle_conv", 0), ("up_dil_conv", 1),
-            ("dil_conv", 0), ("up_dil_conv", 1), ("shuffle_conv", 0)], up_concat=range(2, 6)),
 }
 
 DATASET_GENOTYPE = {"BUSI": "darts_cell_busi", "CVC": "darts_cell_cvc", "IDRID": "darts_cell_idrid"}
 
 
-def resolve_genotype_name(name: str, dataset: str) -> str:
-    if name == "auto":
-        return DATASET_GENOTYPE[dataset.upper()]
-    if name not in GENOTYPES:
-        raise ValueError(f"Unknown DARTS genotype '{name}'. Available: {sorted(GENOTYPES)}")
-    return name
+def genotype_name_for(dataset: str) -> str:
+    """The official Mixed-GGNAS genotype derived for ``dataset`` (DESIGN_DECISIONS D5)."""
+    return DATASET_GENOTYPE[dataset.upper()]
 
 
 def validate_genotype(g: Genotype) -> None:

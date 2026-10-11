@@ -42,7 +42,7 @@ def environment_info(device: torch.device) -> Dict[str, Any]:
         idx = device.index if device.index is not None else torch.cuda.current_device()
         info["gpu_name"] = torch.cuda.get_device_name(idx)
         info["gpu_memory_gb"] = round(torch.cuda.get_device_properties(idx).total_memory / 1024**3, 2)
-    for mod in ("pymoo", "scipy", "PIL", "matplotlib", "yaml"):
+    for mod in ("pymoo", "scipy", "PIL", "matplotlib"):
         try:
             m = __import__(mod)
             info[f"{mod}_version"] = getattr(m, "__version__", "unknown")

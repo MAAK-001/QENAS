@@ -11,6 +11,10 @@ python scripts/inspect_datasets.py --tree
 Every experiment also stores the full discovery report (`dataset_report.json`) and the exact split
 (`split.json`, list of sample IDs and file paths per split).
 
+Use of the splits: the NSGA-II search sees only two training batches (ZiCo); candidate training, loss-weight
+selection, final training, early stopping, checkpoint selection and the TTA decision use train + validation; the
+test split is loaded once, by the final test stage.
+
 ## BUSI — `Datasets/BUSI (Breast Ultrasound Image)/`
 
 ```
@@ -70,8 +74,8 @@ class_dict.csv     background (0,0,0), polyp (255,255,255)
 (`B. Disease Grading` and `C. Localization` belong to other IDRiD sub-challenges and are not used.)
 
 * Masks: palette TIFs with indices {0, 1}; a missing lesion file means the lesion is absent.
-* Target: **optic disc** (default; complete for all 81 images). `--idrid-target MA|HE|EX|SE|LESIONS`
-  selects a lesion or the union of the four lesion types.
+* Target: **optic disc** (complete for all 81 images). It is the only IDRiD target compatible with the Dice
+  that Mixed-GGNAS reports for IDRiD (DESIGN_DECISIONS D34); the lesion masks are not used.
 * Official split kept; validation carved from the official training set. No patient IDs.
 
 | split | images |

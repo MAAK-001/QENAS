@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from qenas.config import QENAS_ROOT, SUPPORTED_DATASETS, build_config  # noqa: E402
+from qenas.config import SUPPORTED_DATASETS, build_config  # noqa: E402
 from qenas.datasets.discovery import discover  # noqa: E402
 from qenas.datasets.splits import make_splits, split_summary  # noqa: E402
 from qenas.utils.io import save_json  # noqa: E402
@@ -61,7 +61,7 @@ def main() -> None:
             label = {"train": "Train", "val": "Validation", "test": "Test"}[name]
             print(f"{label}: {s['n']}  (groups {s['n_groups']}, {s['fraction']:.1%}, {s['per_stratum']})")
         if args.save:
-            out = QENAS_ROOT / "results" / ds / "dataset_report.json"
+            out = Path(cfg["paths"]["results"]) / ds / "dataset_report.json"
             save_json(out, {"report": rep, "split_summary": summ,
                             "splits": {k: [x.sample_id for x in v] for k, v in splits.items()}})
             print(f"saved {out}")

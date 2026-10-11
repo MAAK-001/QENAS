@@ -1,0 +1,81 @@
+{
+  "dataset": "BUSI",
+  "n_architectures": 65,
+  "kendall_tau_minimised_objectives": {
+    "f1 params vs f2 SynFlow": {
+      "tau": -0.4557692307692308,
+      "p": 8.006009973501729e-08,
+      "relation": "conflict (trade-off)"
+    },
+    "f1 params vs f3 ZiCo": {
+      "tau": -0.03365384615384616,
+      "p": 0.6918859681811715,
+      "relation": "conflict (trade-off)"
+    },
+    "f2 SynFlow vs f3 ZiCo": {
+      "tau": 0.3740384615384616,
+      "p": 1.0599994373834817e-05,
+      "relation": "harmony"
+    }
+  },
+  "synflow_vs_zico_given_params": {
+    "tau": 0.4134615384615385,
+    "p": 1.1228294351787742e-06
+  },
+  "ln(1+SynFlow) vs params": {
+    "tau": 0.4557692307692308,
+    "p": 8.006009973501729e-08
+  },
+  "ZiCo vs params": {
+    "tau": 0.03365384615384616,
+    "p": 0.6918859681811715
+  },
+  "block_type_effects": {
+    "params_M": {
+      "intercept (all Residual)": 1.893974646996676,
+      "+1 Dense gene (vs Residual)": -0.018353097232379767,
+      "+1 Inception gene (vs Residual)": 0.20001481697056955,
+      "+1 ConvNeXt gene (vs Residual)": 0.4048516310238719,
+      "+1 DARTS gene (vs Residual)": -0.025245706943013202,
+      "R2": 0.4529477576029687
+    },
+    "ln(1+SynFlow)": {
+      "intercept (all Residual)": 57.07631207637892,
+      "+1 Dense gene (vs Residual)": 0.46753274705343806,
+      "+1 Inception gene (vs Residual)": 3.0377388851741087,
+      "+1 ConvNeXt gene (vs Residual)": 3.805896036996927,
+      "+1 DARTS gene (vs Residual)": 2.5769947514608935,
+      "R2": 0.9053079704045094
+    },
+    "ZiCo": {
+      "intercept (all Residual)": 428.6028137057482,
+      "+1 Dense gene (vs Residual)": 20.98219654862804,
+      "+1 Inception gene (vs Residual)": 61.877616223599496,
+      "+1 ConvNeXt gene (vs Residual)": 27.672888776721976,
+      "+1 DARTS gene (vs Residual)": 90.76470108671154,
+      "R2": 0.8199066364369271
+    }
+  },
+  "nondominated_fraction_of_random_population": {
+    "10": {
+      "2 objectives (params, SynFlow)": 0.44480000000000003,
+      "3 objectives (+ ZiCo)": 0.5141
+    },
+    "20": {
+      "2 objectives (params, SynFlow)": 0.2759,
+      "3 objectives (+ ZiCo)": 0.331475
+    },
+    "30": {
+      "2 objectives (params, SynFlow)": 0.19808333333333333,
+      "3 objectives (+ ZiCo)": 0.2374
+    },
+    "40": {
+      "2 objectives (params, SynFlow)": 0.15030000000000002,
+      "3 objectives (+ ZiCo)": 0.17764999999999997
+    }
+  },
+  "timing_seconds_mean": {
+    "synflow": 7.571861538461539,
+    "zico": 50.855
+  }
+}

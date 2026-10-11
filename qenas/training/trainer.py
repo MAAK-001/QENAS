@@ -1,4 +1,4 @@
-"""Generic supervised trainer used by candidate evaluation, loss-weight selection and final training.
+"""Supervised trainer used by candidate evaluation, loss-weight selection and final training.
 
 Guarantees
 * checkpoint after **every** epoch (model, optimiser, scheduler, AMP scaler, epoch,
@@ -11,7 +11,8 @@ Guarantees
 * progress (percentage, elapsed time, ETA) is logged during and after every epoch.
 
 Training metrics are measured on the augmented mini-batches in train mode (standard
-practice); validation metrics in eval mode without augmentation.
+practice); validation metrics in eval mode without augmentation. AMP (fp16 + loss scaling)
+is used on CUDA and never on the CPU; losses and metrics are always computed in float32/64.
 """
 
 from __future__ import annotations
@@ -37,31 +38,43 @@ from .optim import build_optimizer, build_scheduler
 log = get_logger()
 
 HISTORY_FIELDS = ["epoch", "train_loss", "val_loss", "train_dice", "val_dice", "train_iou", "val_iou",
-                  "train_miou", "val_miou", "learning_rate", "epoch_seconds"]
+                  "train_miou", "val_miou", "train_sensitivity", "val_sensitivity", "val_hd95",
+                  "learning_rate", "epoch_seconds"]
 
 
 class NumericalError(RuntimeError):
     """Non-finite loss or metric during training/evaluation."""
 
 
-def amp_enabled(spec: Any, device: torch.device) -> bool:
-    if isinstance(spec, str):
-        spec = spec.lower()
-        if spec == "auto":
-            return device.type == "cuda"
-        return spec in ("true", "1", "yes", "on")
-    return bool(spec) and device.type == "cuda"
+def use_amp(device: torch.device) -> bool:
+    return device.type == "cuda"
 
 
 @torch.no_grad()
-def evaluate(model: nn.Module, loader, loss_fn: BCESoftMIoULoss, device: torch.device, use_amp: bool = False) -> Dict[str, float]:
+def predict_logits(model: nn.Module, x: torch.Tensor, amp: bool = False, tta: bool = False) -> torch.Tensor:
+    """Logits of ``model`` for ``x``. With ``tta`` the foreground probabilities of the image and of its
+    horizontal mirror (prediction flipped back) are averaged and returned as logits, so loss, metrics and
+    the 0.5 threshold are applied to the averaged probability."""
+    with torch.autocast(device_type=x.device.type, dtype=torch.float16, enabled=amp):
+        logits = model(x)
+        if not tta:
+            return logits.float()
+        logits_m = model(x.flip(-1)).flip(-1)
+    p = 0.5 * (torch.sigmoid(logits.float()) + torch.sigmoid(logits_m.float()))
+    return torch.logit(p, eps=1e-6)
+
+
+@torch.no_grad()
+def evaluate(model: nn.Module, loader, loss_fn: BCESoftMIoULoss, device: torch.device,
+             tta: bool = False) -> Dict[str, float]:
+    """Loss, Dice, IoU, mIoU, sensitivity and HD95 of ``model`` on ``loader`` (eval mode, no augmentation)."""
     model.eval()
-    acc = MetricAccumulator()
+    acc = MetricAccumulator(boundary=True)
+    amp = use_amp(device)
     for x, y in loader:
         x = x.to(device, non_blocking=True)
         y = y.to(device, non_blocking=True)
-        with torch.autocast(device_type=device.type, dtype=torch.float16, enabled=use_amp):
-            logits = model(x)
+        logits = predict_logits(model, x, amp, tta)
         per_sample, _ = loss_fn.per_sample(logits, y)
         if not torch.isfinite(per_sample).all():
             raise NumericalError("non-finite loss during evaluation")
@@ -98,10 +111,9 @@ class Trainer:
         self.val_loader = data.val_loader(self.batch_size)
         self.optimizer = build_optimizer(self.model, tcfg)
         self.scheduler = build_scheduler(self.optimizer, tcfg, steps_per_epoch=len(self.train_loader))
-        self.use_amp = amp_enabled(tcfg.get("amp", "auto"), device)
-        self.scaler = torch.amp.GradScaler("cuda", enabled=self.use_amp)
-        self.grad_clip = tcfg.get("grad_clip")
-        self.stopper = OverfittingEarlyStopping(early_stopping)
+        self.amp = use_amp(device)
+        self.scaler = torch.amp.GradScaler("cuda", enabled=self.amp)
+        self.stopper = OverfittingEarlyStopping(early_stopping) if early_stopping else None
         self.history: List[Dict[str, Any]] = []
         self.best_val_dice = -1.0
         self.best_epoch = -1
@@ -162,10 +174,10 @@ class Trainer:
         return f"{self.prefix} | " if self.prefix else ""
 
     # ------------------------------------------------------------------ training
-    def _train_epoch(self, epoch: int, run_timer: ProgressTimer) -> Dict[str, float]:
+    def _train_epoch(self, epoch: int) -> Dict[str, float]:
         self.model.train()
         set_loader_epoch(self.train_loader, epoch)
-        acc = MetricAccumulator()
+        acc = MetricAccumulator(boundary=False)
         n_batches = len(self.train_loader)
         report_every = max(1, n_batches // 4)
         t0 = time.time()
@@ -174,7 +186,7 @@ class Trainer:
             y = y.to(self.device, non_blocking=True)
             try:
                 self.optimizer.zero_grad(set_to_none=True)
-                with torch.autocast(device_type=self.device.type, dtype=torch.float16, enabled=self.use_amp):
+                with torch.autocast(device_type=self.device.type, dtype=torch.float16, enabled=self.amp):
                     logits = self.model(x)
                 per_sample, _ = self.loss_fn.per_sample(logits, y)
                 loss = per_sample.mean()
@@ -182,17 +194,13 @@ class Trainer:
                     raise NumericalError(f"{self.tag}: non-finite training loss ({loss.item()}) at epoch {epoch + 1}, "
                                          f"batch {b + 1}/{n_batches}")
                 self.scaler.scale(loss).backward()
-                if self.grad_clip:
-                    self.scaler.unscale_(self.optimizer)
-                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), float(self.grad_clip))
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
                 if self.scheduler is not None:
                     self.scheduler.step()
             except RuntimeError as exc:
                 if is_oom_error(exc):
-                    raise RuntimeError(f"Out of memory while training {self.tag} (batch size {self.batch_size}). "
-                                       f"Reduce --batch-size or the image size.") from exc
+                    raise RuntimeError(f"Out of memory while training {self.tag} (batch size {self.batch_size}).") from exc
                 raise
             acc.update(per_sample.detach(), logits.detach().float(), y)
             if (b + 1) % report_every == 0 and b + 1 < n_batches:
@@ -211,17 +219,20 @@ class Trainer:
         timer = ProgressTimer(self.epochs, done_before=start)
         for epoch in range(start, self.epochs):
             t0 = time.time()
-            tr = self._train_epoch(epoch, timer)
-            va = evaluate(self.model, self.val_loader, self.loss_fn, self.device, self.use_amp)
-            for k, v in list(tr.items()) + list(va.items()):
-                if v != v or v in (float("inf"), float("-inf")):
-                    raise NumericalError(f"{self.tag}: non-finite metric {k}={v} at epoch {epoch + 1}")
+            tr = self._train_epoch(epoch)
+            va = evaluate(self.model, self.val_loader, self.loss_fn, self.device)
+            for k in ("loss", "dice", "iou", "miou"):
+                for v in (tr[k], va[k]):
+                    if v != v or v in (float("inf"), float("-inf")):
+                        raise NumericalError(f"{self.tag}: non-finite metric {k}={v} at epoch {epoch + 1}")
             row = {
                 "epoch": epoch + 1,
                 "train_loss": tr["loss"], "val_loss": va["loss"],
                 "train_dice": tr["dice"], "val_dice": va["dice"],
                 "train_iou": tr["iou"], "val_iou": va["iou"],
                 "train_miou": tr["miou"], "val_miou": va["miou"],
+                "train_sensitivity": tr["sensitivity"], "val_sensitivity": va["sensitivity"],
+                "val_hd95": va["hd95"],
                 "learning_rate": self.optimizer.param_groups[0]["lr"],
                 "epoch_seconds": round(time.time() - t0, 2),
             }
@@ -232,7 +243,7 @@ class Trainer:
                 save_checkpoint(self.ckpt_dir / "best.pt", {"tag": self.tag, "fingerprint": self.fingerprint,
                                                             "epoch": epoch + 1, "model": self.model.state_dict(),
                                                             "metrics": row})
-            stop = self.stopper.should_stop(self.history)
+            stop = self.stopper is not None and self.stopper.should_stop(self.history)
             if stop:
                 self.stop_reason = self.stopper.reason
             self.completed = stop or (epoch + 1 == self.epochs)
@@ -241,9 +252,9 @@ class Trainer:
                 save_csv(self.history_csv, self.history, HISTORY_FIELDS)
             timer.step()
             log.info("%sEpoch %d/%d | Progress: %5.1f%% | Train Loss: %.4f | Val Loss: %.4f | Train Dice: %.4f | "
-                     "Val Dice: %.4f | Train IoU: %.4f | Val IoU: %.4f | LR: %.2e | epoch %s | Elapsed: %s | ETA: %s%s",
+                     "Val Dice: %.4f | Val IoU: %.4f | Val HD95: %.2f px | LR: %.2e | epoch %s | Elapsed: %s | ETA: %s%s",
                      self._p(), epoch + 1, self.epochs, timer.percent, row["train_loss"], row["val_loss"],
-                     row["train_dice"], row["val_dice"], row["train_iou"], row["val_iou"], row["learning_rate"],
+                     row["train_dice"], row["val_dice"], row["val_iou"], row["val_hd95"], row["learning_rate"],
                      format_seconds(row["epoch_seconds"]), format_seconds(timer.elapsed), format_seconds(timer.eta),
                      "  *best*" if improved else "")
             if stop:

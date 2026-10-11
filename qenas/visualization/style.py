@@ -66,7 +66,7 @@ def series_color(i: int) -> str:
     return SERIES[i % len(SERIES)]
 
 
-def save(fig, path: Path, formats: Iterable[str] = ("png", "pdf")) -> None:
+def save(fig, path: Path, formats: Iterable[str] = ("png",)) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     for fmt in formats:
