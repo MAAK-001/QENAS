@@ -11,6 +11,9 @@ python scripts/inspect_datasets.py --tree
 Every experiment also stores the full discovery report (`dataset_report.json`) and the exact split
 (`split.json`, list of sample IDs and file paths per split).
 
+The split is fixed (`data.split_seed = 42`): every method and every run seed of the evaluation study uses exactly
+these splits.
+
 Use of the splits: the NSGA-II search sees only two training batches (ZiCo); candidate training, loss-weight
 selection, final training, early stopping, checkpoint selection and the TTA decision use train + validation; the
 test split is loaded once, by the final test stage.
@@ -83,3 +86,27 @@ class_dict.csv     background (0,0,0), polyp (255,255,255)
 | Train | 43 |
 | Validation | 11 |
 | Test (official) | 27 |
+
+## Kvasir-SEG — `Datasets/Kvasir-SEG/`
+
+```
+Kvasir-SEG/images/          1000 JPG  (332 x 487 ... 1920 x 1072 RGB, 333 distinct sizes)
+Kvasir-SEG/masks/           1000 JPG  (greyscale; JPEG edge artefacts, at most 2.1 % grey pixels)
+Kvasir-SEG/bbox/, annotated_images/   bounding boxes / overlays (unused)
+Kvasir-SEG/train.txt        880 image ids   (official split "for fair comparison")
+Kvasir-SEG/val.txt          120 image ids
+```
+
+(Discovery accepts these files directly in the dataset folder or one level below it: it looks for the single
+folder that contains `images/`, `masks/`, `train.txt` and `val.txt`.)
+
+* Pairing: identical file names `<id>.jpg`; all 1000 matched.
+* Masks binarised at > 127. No exact duplicate images (pixel hash). No patient IDs.
+* Official split kept: `val.txt` is the test split; validation is carved from `train.txt` (image-level).
+* Resolution: 256 x 256 (as CVC-ClinicDB); vertical flips in the augmentation (endoscopy).
+
+| split | images |
+|---|---:|
+| Train | 704 |
+| Validation | 176 |
+| Test (official `val.txt`) | 120 |

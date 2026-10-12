@@ -30,11 +30,12 @@ from .objectives import OBJECTIVE_NAMES
 
 
 class QENASProblem(Problem):
-    """Three objectives, all minimised: f1 = #parameters, f2 = 1/(1 + ln(1 + SynFlow)), f3 = 1/(1 + ZiCo)."""
+    """All objectives minimised. QENAS: f1 = #parameters, f2 = 1/(1 + ln(1 + SynFlow)), f3 = 1/(1 + ZiCo);
+    the study's objective ablations pass two of them."""
 
-    def __init__(self) -> None:
+    def __init__(self, n_obj: int = len(OBJECTIVE_NAMES)) -> None:
         super().__init__(
-            n_var=CHROMOSOME_LENGTH, n_obj=len(OBJECTIVE_NAMES), n_ieq_constr=0,
+            n_var=CHROMOSOME_LENGTH, n_obj=n_obj, n_ieq_constr=0,
             xl=np.zeros(CHROMOSOME_LENGTH, dtype=int), xu=np.full(CHROMOSOME_LENGTH, N_BLOCK_TYPES - 1, dtype=int),
             vtype=int,
             vars={f"g{i + 1}": Choice(options=list(range(N_BLOCK_TYPES))) for i in range(CHROMOSOME_LENGTH)},

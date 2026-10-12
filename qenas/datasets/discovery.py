@@ -15,6 +15,8 @@ CVC    ``CVC-ClinicD (Polyp)/PNG/{Original,Ground Truth}/<frame>.png`` and
 IDRID  ``IDRID/A.%20Segmentation/A. Segmentation/1. Original Images/{a. Training Set,b. Testing Set}``
        with masks in ``2. All Segmentation Groundtruths/<split>/<k. Lesion>/IDRiD_xx_<CODE>.tif``
        (CODE in MA, HE, EX, SE, OD). Official 54/27 train/test split.
+KVASIR ``Kvasir-SEG/images/<id>.jpg`` + ``Kvasir-SEG/masks/<id>.jpg`` (JPEG masks) and the official split
+       files ``train.txt`` (880) / ``val.txt`` (120). No patient IDs, no exact duplicates.
 
 Discovery never decides anything based on image *content* except integrity
 (readability, size agreement, binary-mask validity) and exact-duplicate grouping,
@@ -350,10 +352,14 @@ def discover_cvc(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
     missing_files = sorted(set(seq_of) - set(imgs))
     if missing_meta or missing_files:
         raise DatasetError(f"CVC: frames without metadata {missing_meta[:10]}; metadata without files {missing_files[:10]}")
-    samples = [Sample(sample_id=f"frame_{fid}", image=imgs[fid], masks=[gts[fid]], group=f"seq_{seq_of[fid]}",
+    # Leakage unit: the colonoscopy sequence. Only the CVC leakage study of study.py (data.split_unit = "image")
+    # splits frames individually, to measure how much a random frame split inflates the scores (D35).
+    by_frame = cfg["data"]["split_unit"] == "image"
+    samples = [Sample(sample_id=f"frame_{fid}", image=imgs[fid], masks=[gts[fid]],
+                      group=f"frame_{fid}" if by_frame else f"seq_{seq_of[fid]}",
                       stratum="", meta={"frame_id": int(fid), "sequence_id": int(seq_of[fid])})
                for fid in sorted(imgs, key=lambda x: int(x))]
-    seq_sizes = Counter(s.group for s in samples)
+    seq_sizes = Counter(f"seq_{s.meta['sequence_id']}" for s in samples)
     report = {
         "layout": "PNG/Original/<frame>.png paired with PNG/Ground Truth/<frame>.png; metadata.csv frame->sequence",
         "directory": str(root),
@@ -363,7 +369,8 @@ def discover_cvc(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
         "frames_per_sequence": dict(sorted(seq_sizes.items(), key=lambda kv: int(kv[0].split("_")[1]))),
         "tif_copies": "ignored (not decodable by Pillow; PNG copies are lossless and identical in content)",
         "official_split": None,
-        "leakage_unit": "sequence (all frames of one colonoscopy sequence stay in one split)",
+        "leakage_unit": ("frame (CVC leakage study: frames of one sequence can be in different splits)" if by_frame
+                         else "sequence (all frames of one colonoscopy sequence stay in one split)"),
     }
     report["validation"] = _validate_pairs(samples, threshold, allow_empty=False)
     return DiscoveryResult("CVC", str(root), samples, False, report)
@@ -441,7 +448,64 @@ def discover_idrid(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
     return DiscoveryResult("IDRID", str(seg), samples, True, report)
 
 
-DISCOVERERS = {"BUSI": discover_busi, "CVC": discover_cvc, "IDRID": discover_idrid}
+# --------------------------------------------------------------------------------------
+# Kvasir-SEG
+# --------------------------------------------------------------------------------------
+
+def discover_kvasir(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
+    """Kvasir-SEG (Jha et al., MMM 2020): 1000 polyp images, ``images/<id>.jpg`` + ``masks/<id>.jpg``, and the
+    official split files ``train.txt`` (880) / ``val.txt`` (120) published "for fair comparison". The official
+    120 evaluation images are the test split; validation is carved from the 880 training images."""
+    root = _find_dataset_dir(data_root, "KVASIR")
+    threshold = int(cfg["data"]["mask_threshold"])
+
+    def is_home(p: Path) -> bool:
+        return (p / "images").is_dir() and (p / "masks").is_dir()
+
+    homes = [root] if is_home(root) else _walk_find(root, is_home)
+    if len(homes) != 1:
+        raise DatasetError(f"Kvasir-SEG: expected exactly one folder with 'images/' and 'masks/', found {homes}")
+    home = homes[0]
+    imgs = {Path(f).stem: str(home / "images" / f) for f in os.listdir(home / "images")
+            if Path(f).suffix.lower() in IMAGE_EXTS}
+    masks = {Path(f).stem: str(home / "masks" / f) for f in os.listdir(home / "masks")
+             if Path(f).suffix.lower() in IMAGE_EXTS}
+    unmatched = sorted(set(imgs) ^ set(masks))
+    if unmatched:
+        raise DatasetError(f"Kvasir-SEG: unmatched image/mask names: {unmatched[:10]}")
+    official = {}
+    for split, fname in (("train", "train.txt"), ("test", "val.txt")):
+        f = home / fname
+        if not f.is_file():
+            raise DatasetError(f"Kvasir-SEG: official split file {f} not found")
+        for line in f.read_text(encoding="utf-8").split():
+            official[Path(line.strip()).stem] = split
+    if set(official) != set(imgs):
+        raise DatasetError(f"Kvasir-SEG: official split files do not cover the images exactly "
+                           f"({len(set(imgs) - set(official))} unlisted, {len(set(official) - set(imgs))} unknown)")
+    samples = [Sample(sample_id=k, image=imgs[k], masks=[masks[k]], group=k, stratum="", official_split=official[k])
+               for k in sorted(imgs)]
+    hashes: Dict[str, List[str]] = defaultdict(list)
+    for s in samples:
+        with Image.open(s.image) as im:
+            hashes[hashlib.md5(np.asarray(im.convert("L")).tobytes()).hexdigest()].append(s.sample_id)
+    dups = [v for v in hashes.values() if len(v) > 1]
+    if dups:
+        raise DatasetError(f"Kvasir-SEG: exact duplicate images {dups[:5]} would need a leakage group")
+    report = {
+        "layout": "images/<id>.jpg paired with masks/<id>.jpg (JPEG masks, binarised); official train.txt / val.txt",
+        "directory": str(home),
+        "tree": _tree(root),
+        "extensions": _ext_counts(root),
+        "official_split": "880 train.txt / 120 val.txt (val.txt = test split; validation carved from train.txt)",
+        "exact_duplicates": "none (pixel hash)",
+        "patient_metadata": "none available -> image-level validation split (documented limitation)",
+    }
+    report["validation"] = _validate_pairs(samples, threshold, allow_empty=False)
+    return DiscoveryResult("KVASIR", str(home), samples, True, report)
+
+
+DISCOVERERS = {"BUSI": discover_busi, "CVC": discover_cvc, "IDRID": discover_idrid, "KVASIR": discover_kvasir}
 
 
 # --------------------------------------------------------------------------------------

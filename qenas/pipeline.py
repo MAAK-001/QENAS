@@ -1,9 +1,15 @@
-"""The QENAS pipeline - one fixed sequence of stages:
+"""The QENAS pipeline and the study conditions that share its code.
+
+QENAS (``method = "qenas"``, the only method of ``main.py``) is one fixed sequence of stages:
 
     split -> search (NSGA-II, training-free: params, SynFlow, ZiCo) -> pareto (representative subset)
           -> candidates (20-epoch supervised runs) -> selection (learning capability)
           -> loss_weights (alpha on validation) -> final (supervised training with validation;
              best checkpoint and flip-TTA decision fixed on validation) -> test (once) -> report
+
+The comparison conditions of the evaluation study (``qenas/methods.py``) run a subset of the *same* stage code:
+objective ablations change only the optimised objectives, selection ablations only the selection rule, baselines
+skip the search and train a fixed network with QENAS' own protocol, random search only replaces NSGA-II.
 
 Every stage is idempotent and resumable; completed stages are skipped on re-run.
 The test split is first materialised in ``stage_test`` and nowhere else.
@@ -11,6 +17,7 @@ The test split is first materialised in ``stage_test`` and nowhere else.
 
 from __future__ import annotations
 
+import shutil
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -21,26 +28,34 @@ import torch
 from .datasets.dataset import DataBundle
 from .datasets.discovery import DatasetError, Sample, discover, rebase_path, relative_to_root
 from .datasets.splits import check_no_leakage, make_splits, split_summary
-from .experiment import Experiment
+from .experiment import Experiment, experiment_dir
+from .methods import method_spec, stages_for
+from .models.baselines import build_baseline
 from .models.chromosome import SEARCH_SPACE_SIZE, chromosome_key, chromosome_to_str, decode
-from .models.network import build_model, count_parameters
-from .models.summary import model_summary, summary_text
-from .search.nsga2_search import NSGA2Search
+from .models.network import QENASNet, build_model, count_parameters
+from .models.summary import cost_summary, model_summary, summary_text
+from .search.nsga2_search import NSGA2Search, RandomSearch
 from .search.objectives import ZICO_BATCHES, ZICO_LOSS_ALPHA, zico_batches_digest
 from .search.pareto import select_pareto_candidates
 from .training.losses import BCESoftMIoULoss
 from .training.selection import select_by_learning_capability
-from .training.trainer import NumericalError, Trainer, evaluate, load_best_weights
+from .training.trainer import NumericalError, Trainer, evaluate, inference_time_ms, load_best_weights
 from .utils.env import environment_info
 from .utils.io import load_json, save_csv, save_json, save_markdown_table
 from .utils.logging_utils import format_seconds, get_logger
+from .utils.seed import derive_seed
 from .visualization import plots
 from .visualization.architecture import plot_architecture
 
 log = get_logger()
 
-STAGES = ["split", "search", "pareto", "candidates", "selection", "loss_weights", "final", "test", "report"]
+STAGES = stages_for("qenas")   # the QENAS method
 OBJ_COLS = ["params", "synflow_raw", "synflow_log", "zico", "f1_params", "f2_synflow", "f3_zico"]
+# Files of the parent QENAS experiment re-used by the selection ablations (stage "inherit").
+INHERITED_FILES = ["search_results.csv", "search_results.json", "search_population_history.csv",
+                   "search_population_history.json", "nsga2_generations.csv", "nsga2_generations.json",
+                   "search_summary.json", "pareto_front.csv", "pareto_front.json", "pareto_candidates.csv",
+                   "pareto_candidates.json", "candidate_results.json", "candidate_training.csv"]
 
 
 class Pipeline:
@@ -50,6 +65,9 @@ class Pipeline:
         self.device = device
         self.fp = exp.fingerprint
         self.seed = int(cfg["seed"])
+        self.method_name = cfg["method"]
+        self.method = method_spec(self.method_name)
+        self.stages = stages_for(self.method_name)
         self._data: Optional[DataBundle] = None
         self._splits: Optional[Dict[str, List[Sample]]] = None
 
@@ -57,12 +75,23 @@ class Pipeline:
     def path(self, name: str) -> Path:
         return self.exp.dir / name
 
-    def init_model(self, chromosome: List[int]) -> torch.nn.Module:
-        """Same seeded initialisation as the zero-cost evaluation: the scored network is the trained network."""
+    @property
+    def objectives(self):
+        return self.method["objectives"]
+
+    def init_model(self, arch: Dict[str, Any]) -> torch.nn.Module:
+        """Seeded initialisation; for QENAS architectures identical to the zero-cost evaluation (the scored
+        network is the trained network)."""
         devs = [self.device] if self.device.type == "cuda" else []
         with torch.random.fork_rng(devices=devs):
             torch.manual_seed(self.seed)
-            return build_model(chromosome, self.cfg)
+            return self.build(arch)
+
+    def build(self, arch: Dict[str, Any]) -> torch.nn.Module:
+        if arch["type"] == "qenas":
+            return build_model(arch["chromosome"], self.cfg)
+        return build_baseline(arch["network"], int(self.cfg["data"]["in_channels"]),
+                              int(self.cfg["model"]["num_classes"]))
 
     @property
     def splits(self) -> Dict[str, List[Sample]]:
@@ -94,11 +123,18 @@ class Pipeline:
                      [round(x, 4) for x in self._data.mean], [round(x, 4) for x in self._data.std])
         return self._data
 
+    def parent_dir(self) -> Path:
+        """Directory of the QENAS experiment (same dataset, seed, split) a selection ablation builds on."""
+        pcfg = dict(self.cfg)
+        pcfg["method"] = self.method["parent"]
+        return experiment_dir(pcfg)
+
     # ================================================================== driver
     def run(self, stop_after: Optional[str] = None) -> None:
-        if stop_after is not None and stop_after not in STAGES:
-            raise ValueError(f"--stop-after must be one of {STAGES}")
-        for stage in STAGES:
+        if stop_after is not None and stop_after not in self.stages:
+            raise ValueError(f"--stop-after must be one of {self.stages}")
+        log.info("Method %s (%s) | stages: %s", self.method_name, self.method["doc"], " -> ".join(self.stages))
+        for stage in self.stages:
             if self.exp.is_done(stage):
                 log.info("Stage '%s' already completed — skipping", stage)
             else:
@@ -108,12 +144,29 @@ class Pipeline:
                 info = getattr(self, f"stage_{stage}")() or {}
                 info["seconds"] = round(time.time() - t0, 1)
                 self.exp.mark_done(stage, info)
+                self._prune(stage)
                 log.info("Stage '%s' finished in %s", stage, format_seconds(info["seconds"]))
             if stop_after == stage:
                 log.info("Stopping after stage '%s' as requested (resume later with the same command).", stage)
                 return
         self.exp.mark_completed()
-        print(self.path("summary.txt").read_text(encoding="utf-8"))
+        self._prune("completed")
+        if self.path("summary.txt").exists():
+            print(self.path("summary.txt").read_text(encoding="utf-8"))
+
+    def _prune(self, stage: str) -> None:
+        """Delete checkpoints that no completed stage will ever read again (their results are in the stage's
+        JSON/CSV outputs). A finished experiment keeps only its final best-validation weights."""
+        ck = self.exp.checkpoints
+        targets = {"search": [ck / "search_state.pt", ck / "search_state.pt.prev"],
+                   "candidates": [ck / "candidates"], "loss_weights": [ck / "loss_weights"]}.get(stage, [])
+        if stage == "completed":
+            targets = [p for p in ck.iterdir() if p.name != "final"] +                       [p for p in (ck / "final").glob("*") if p.name != "best.pt"] if ck.exists() else []
+        for p in targets:
+            if p.is_dir():
+                shutil.rmtree(p, ignore_errors=True)
+            elif p.exists():
+                p.unlink()
 
     # ================================================================== 1. split
     def stage_split(self) -> Dict[str, Any]:
@@ -130,14 +183,14 @@ class Pipeline:
             return d
 
         save_json(self.path("split.json"), {
-            "dataset": disc.dataset, "seed": self.seed, "summary": summ, "data_root": root,
+            "dataset": disc.dataset, "split_seed": int(self.cfg["data"]["split_seed"]),
+            "split_unit": self.cfg["data"]["split_unit"], "summary": summ, "data_root": root,
             "paths": "relative to data_root (re-based onto --data-root when resumed elsewhere)",
             "splits": {k: [portable(s) for s in v] for k, v in splits.items()},
         })
         self._splits = splits
-        ds = self.cfg["data"]["dataset"]
         log.info("Dataset structure: %s", disc.report["layout"])
-        log.info("\n%s\nTrain: %d\nValidation: %d\nTest: %d", ds, summ["train"]["n"], summ["val"]["n"],
+        log.info("\n%s\nTrain: %d\nValidation: %d\nTest: %d", disc.dataset, summ["train"]["n"], summ["val"]["n"],
                  summ["test"]["n"])
         return {"train": summ["train"]["n"], "val": summ["val"]["n"], "test": summ["test"]["n"]}
 
@@ -145,16 +198,24 @@ class Pipeline:
     def stage_search(self) -> Dict[str, Any]:
         s = self.cfg["search"]
         bs = int(self.cfg["candidate_training"]["batch_size"])
-        log.info("Training-free NSGA-II | search space 5^8 = %s | population %d | generations %d | "
-                 "crossover p=%.2f | mutation p_var=%.3f | objectives: f1 = #params, f2 = 1/(1+ln(1+SynFlow)), "
-                 "f3 = 1/(1+ZiCo)", f"{SEARCH_SPACE_SIZE:,}", s["population_size"], s["generations"],
-                 s["crossover_prob"], s["mutation_prob_var"])
+        random_search = self.method["kind"] == "search_only"
+        log.info("Training-free %s | search space 5^8 = %s | population %d | generations %d | "
+                 "crossover p=%.2f | mutation p_var=%.3f | optimised objectives: %s",
+                 "random search" if random_search else "NSGA-II", f"{SEARCH_SPACE_SIZE:,}", s["population_size"],
+                 s["generations"], s["crossover_prob"], s["mutation_prob_var"], ", ".join(self.objectives))
         zb = self.data.zico_batches(bs, ZICO_BATCHES, self.seed)
         digest = zico_batches_digest(zb)
         log.info("ZiCo data: the first %d augmented training batches of epoch 0 (batch size %d, sha256 %s); "
                  "loss alpha=%.2f; validation and test images are not used by the search", ZICO_BATCHES, bs, digest,
                  ZICO_LOSS_ALPHA)
-        search = NSGA2Search(self.cfg, self.exp.dir, self.device, self.fp, zb)
+        if random_search:
+            res = RandomSearch(self.cfg, self.exp.dir, self.device, self.fp, zb, self.objectives).run()
+            info = {"unique_evaluations": len(res["archive"]), "final_front_size": len(res["pareto_front"]),
+                    "cache_hits": res["cache_hits"], "cache_misses": res["cache_misses"],
+                    "objectives": list(self.objectives), "zico_batches_sha256": digest}
+            save_json(self.path("search_summary.json"), info)
+            return {k: v for k, v in info.items() if k != "zico_batches_sha256"}
+        search = NSGA2Search(self.cfg, self.exp.dir, self.device, self.fp, zb, self.objectives)
         every = max(1, int(s["plot_every"]))
 
         def on_generation(srch: NSGA2Search) -> None:
@@ -174,6 +235,7 @@ class Pipeline:
         plots.plot_search_progress(hist, table, self.exp.figures / "search_progress")
         info = {"unique_evaluations": len(res["archive"]), "final_front_size": len(res["pareto_front"]),
                 "cache_hits": res["cache_hits"], "cache_misses": res["cache_misses"],
+                "objectives": list(self.objectives),
                 "hypervolume_generation_0": table[0]["hypervolume"], "hypervolume_final": table[-1]["hypervolume"],
                 "zico_batches_sha256": digest}
         save_json(self.path("search_summary.json"), info)
@@ -186,7 +248,7 @@ class Pipeline:
     def stage_pareto(self) -> Dict[str, Any]:
         front = load_json(self.path("pareto_front.json"))
         k = int(self.cfg["pareto"]["max_candidates"])
-        cands = select_pareto_candidates(front, k)
+        cands = select_pareto_candidates(front, k, self.objectives)
         for i, c in enumerate(cands, 1):
             c["candidate_id"] = i
         save_json(self.path("pareto_candidates.json"), cands)
@@ -210,6 +272,23 @@ class Pipeline:
                      c["selection_reason"])
         return {"front_size": len(front), "n_candidates": len(cands)}
 
+    # ================================================================== 2'. inherit (selection ablations)
+    def stage_inherit(self) -> Dict[str, Any]:
+        """Re-use the search, Pareto subset and candidate runs of the parent QENAS experiment (same dataset, seed
+        and split), so that the selection ablation differs from QENAS only in the selection rule."""
+        src = self.parent_dir()
+        st = load_json(src / "state.json") if (src / "state.json").exists() else {}
+        if st.get("stages", {}).get("candidates", {}).get("status") != "done":
+            raise RuntimeError(f"Parent experiment {src} has not finished its candidate stage yet.")
+        if load_json(src / "split.json")["splits"] != load_json(self.path("split.json"))["splits"]:
+            raise RuntimeError(f"Split of {src} differs from this experiment's split.")
+        for f in INHERITED_FILES:
+            shutil.copy2(src / f, self.path(f))
+        shutil.copytree(src / "candidate_histories", self.path("candidate_histories"), dirs_exist_ok=True)
+        log.info("Inherited search, Pareto subset and %d candidate runs from %s",
+                 len(load_json(self.path("candidate_results.json"))), src)
+        return {"inherited_from": str(src)}
+
     # ================================================================== 4. candidate training
     def stage_candidates(self) -> Dict[str, Any]:
         cands = load_json(self.path("pareto_candidates.json"))
@@ -231,7 +310,7 @@ class Pipeline:
                 results.append(rec)
                 log.warning("Candidate %d previously diverged: %s", cid, rec.get("divergence"))
                 continue
-            model = self.init_model(c["chromosome"])
+            model = self.init_model({"type": "qenas", "chromosome": c["chromosome"]})
             assert count_parameters(model) == c["params"], "parameter count mismatch between search and training"
             trainer = Trainer(model=model, data=data, tcfg=tcfg, alpha=float(tcfg["loss_alpha"]), device=self.device,
                               ckpt_dir=ckpt, seed=self.seed, fingerprint=self.fp,
@@ -269,6 +348,27 @@ class Pipeline:
         sc = self.cfg["selection"]
         sel = select_by_learning_capability(results, self.data.val_trivial_dice, float(sc["significance"]),
                                             int(sc["noise_window"]))
+        rule = self.method["selection"]
+        sel["selection_rule"] = rule
+        if rule != "learning_capability":
+            # Selection ablations: same candidates and the same learning-capability analysis (kept for reporting),
+            # but the final architecture is chosen by another rule.
+            sel["learning_capability_choice"] = sel["selected_id"]
+            pool = [a for a in sel["analysis"] if not a["diverged"]]
+            if rule == "random":
+                rng = np.random.default_rng(derive_seed(self.seed, "random-pareto-candidate"))
+                pick = pool[int(rng.integers(len(pool)))]
+                why = f"uniformly random Pareto candidate (rng seed {self.seed})"
+            elif rule == "max_zico":
+                pick = sorted(pool, key=lambda a: (-a["zico"], a["params"]))[0]
+                why = "highest ZiCo among the Pareto candidates (zero-shot rule, no training used)"
+            else:
+                raise ValueError(f"unknown selection rule {rule}")
+            sel["selected_id"] = pick["candidate_id"]
+            for a in sel["analysis"]:
+                a["selected"] = a["candidate_id"] == pick["candidate_id"]
+            sel["reason"] = (f"Candidate {pick['candidate_id']} selected: {why}. Learning-capability selection would "
+                             f"have chosen candidate {sel['learning_capability_choice']}.")
         save_json(self.path("selection.json"), sel)
         E = int(self.cfg["candidate_training"]["epochs"])
         rows = []
@@ -309,14 +409,23 @@ class Pipeline:
                                    f / "zico_vs_val_dice")
         plots.plot_capability_ranking(sel, f / "learning_capability_ranking")
         log.info(sel["reason"])
-        return {"selected_candidate": sel["selected_id"], "relaxed_gates": sel["relaxed_gates"]}
+        return {"selected_candidate": sel["selected_id"], "rule": rule, "relaxed_gates": sel["relaxed_gates"]}
 
     def selected(self) -> Dict[str, Any]:
+        """The architecture trained by loss_weights/final/test: the selected QENAS candidate or the baseline."""
+        if self.method["kind"] == "baseline":
+            return {"arch": {"type": "baseline", "network": self.method["network"]}, "label": self.method["label"],
+                    "history": None, "diverged": False}
         sel = load_json(self.path("selection.json"))
         results = load_json(self.path("candidate_results.json"))
         rec = next(r for r in results if r["candidate_id"] == sel["selected_id"])
         ana = next(a for a in sel["analysis"] if a["candidate_id"] == sel["selected_id"])
-        return {**rec, "analysis": ana, "reason": sel["reason"]}
+        return {**rec, "arch": {"type": "qenas", "chromosome": rec["chromosome"]},
+                "label": chromosome_to_str(rec["chromosome"]), "analysis": ana, "reason": sel["reason"]}
+
+    def arch_key(self, best: Dict[str, Any]) -> str:
+        a = best["arch"]
+        return chromosome_key(a["chromosome"]) if a["type"] == "qenas" else a["network"]
 
     # ================================================================== 6. loss weights
     def stage_loss_weights(self) -> Dict[str, Any]:
@@ -330,17 +439,17 @@ class Pipeline:
         for i, a in enumerate(alphas, 1):
             log.info("=" * 100)
             log.info("Loss-weight run %d/%d | alpha (BCE) = %.3f, beta (soft-mIoU) = %.3f | architecture %s",
-                     i, len(alphas), a, 1 - a, chromosome_to_str(best["chromosome"]))
-            if abs(a - cand_alpha) < 1e-12 and not best.get("diverged"):
+                     i, len(alphas), a, 1 - a, best["label"])
+            if abs(a - cand_alpha) < 1e-12 and best.get("history") and not best.get("diverged"):
                 hist = best["history"]
                 log.info("  identical configuration to the candidate run (same seed, data order, alpha, epochs) — "
                          "reusing its %d-epoch history", len(hist))
                 status = "reused candidate run"
             else:
-                model = self.init_model(best["chromosome"])
+                model = self.init_model(best["arch"])
                 tr = Trainer(model=model, data=self.data, tcfg=tcfg, alpha=a, device=self.device,
                              ckpt_dir=self.exp.checkpoints / "loss_weights" / f"alpha_{a:.3f}", seed=self.seed,
-                             fingerprint=self.fp, tag=f"alpha_{a:.6f}",
+                             fingerprint=self.fp, tag=f"alpha_{a:.6f}_{self.arch_key(best)}",
                              progress_prefix=f"Loss-weight run {i}/{len(alphas)} (alpha={a:.2f})",
                              history_csv=self.exp.dir / "loss_weight_histories" / f"alpha_{a:.3f}.csv")
                 try:
@@ -376,13 +485,13 @@ class Pipeline:
         best = self.selected()
         alpha = float(load_json(self.path("loss_weights.json"))["alpha"])
         fcfg = self.cfg["final_training"]
-        log.info("Final training of %s (%s) for up to %d epochs | alpha=%.3f beta=%.3f | AdamW lr=%.1e wd=%.1e | "
-                 "warm-up + poly schedule | early stopping on overfitting only", chromosome_to_str(best["chromosome"]),
-                 best["blocks"], fcfg["epochs"], alpha, 1 - alpha, fcfg["lr"], fcfg["weight_decay"])
-        model = self.init_model(best["chromosome"])
+        log.info("Final training of %s for up to %d epochs | alpha=%.3f beta=%.3f | AdamW lr=%.1e wd=%.1e | "
+                 "warm-up + poly schedule | early stopping on overfitting only", best["label"], fcfg["epochs"],
+                 alpha, 1 - alpha, fcfg["lr"], fcfg["weight_decay"])
+        model = self.init_model(best["arch"])
         ckpt = self.exp.checkpoints / "final"
         tr = Trainer(model=model, data=self.data, tcfg=fcfg, alpha=alpha, device=self.device, ckpt_dir=ckpt,
-                     seed=self.seed, fingerprint=self.fp, tag=f"final_{chromosome_key(best['chromosome'])}",
+                     seed=self.seed, fingerprint=self.fp, tag=f"final_{self.arch_key(best)}",
                      progress_prefix="Final training", early_stopping=fcfg["early_stopping"],
                      history_csv=self.path("final_training.csv"))
         out = tr.fit()
@@ -413,34 +522,40 @@ class Pipeline:
         if self.exp.state.get("test_evaluated"):
             log.info("Test set already evaluated once for this experiment — not re-evaluating.")
             return {"skipped": True}
-        for s in STAGES[:STAGES.index("test")]:
+        for s in self.stages[:self.stages.index("test")]:
             if not self.exp.is_done(s):
                 raise RuntimeError(f"Test evaluation requested before stage '{s}' finished — refusing (test isolation).")
         best = self.selected()
         fv = load_json(self.path("final_validation.json"))
         fcfg = self.cfg["final_training"]
-        model = build_model(best["chromosome"], self.cfg)
+        model = self.build(best["arch"])
         state = load_best_weights(model, self.exp.checkpoints / "final", self.device)
         model.to(self.device)
         use_tta = bool(fv["tta"]["use_tta"])
         log.info("Evaluating the held-out TEST split exactly once | best validation checkpoint (epoch %d) | flip TTA: %s",
                  state["epoch"], "on" if use_tta else "off")
-        test_m = evaluate(model, self.data.load_test(int(fcfg["batch_size"])), BCESoftMIoULoss(float(fv["alpha"])),
-                          self.device, tta=use_tta)
+        test_m, rows, preds = evaluate(model, self.data.load_test(int(fcfg["batch_size"])),
+                                       BCESoftMIoULoss(float(fv["alpha"])), self.device, tta=use_tta, keep=True)
         self.exp.state["test_evaluated"] = True
         self.exp.state["test_evaluated_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
         self.exp.save_state()
-        summ = model_summary(model, self.cfg["data"]["image_size"], int(self.cfg["data"]["in_channels"]),
-                             int(fcfg["batch_size"]))
+        ids = [s.sample_id for s in self.splits["test"]]
+        save_csv(self.path("test_per_image.csv"), [{"sample_id": i, **r} for i, r in zip(ids, rows)])
+        np.savez_compressed(self.path("test_predictions.npz"), sample_ids=np.array(ids), masks=np.stack(preds))
+        h, w = self.cfg["data"]["image_size"]
+        cin = int(self.cfg["data"]["in_channels"])
+        latency = inference_time_ms(model, [cin, h, w], self.device, use_tta)
+        cost = cost_summary(model, [h, w], cin, int(fcfg["batch_size"]))
         final = {
-            "dataset": self.cfg["data"]["dataset"], "chromosome": best["chromosome"], "blocks": decode(best["chromosome"]),
-            "params": summ["total_params"], "params_m": summ["params_m"],
-            "gflops_mixed_ggnas": summ["gflops_mixed_ggnas"], "gflops_per_image": summ["gflops_per_image"],
-            "flops_batch_size": summ["flops_batch_size"],
-            "synflow_log": best["synflow_log"], "zico": best["zico"], "alpha": fv["alpha"], "beta": fv["beta"],
+            "dataset": self.cfg["data"]["dataset"], "split_unit": self.cfg["data"]["split_unit"],
+            "method": self.method_name, "method_label": self.method["label"], "seed": self.seed,
+            "architecture": best["arch"], "architecture_label": best["label"],
+            "blocks": decode(best["arch"]["chromosome"]) if best["arch"]["type"] == "qenas" else None,
+            **cost, "inference_ms_per_image": latency, "inference_device": str(self.device),
+            "synflow_log": best.get("synflow_log"), "zico": best.get("zico"), "alpha": fv["alpha"], "beta": fv["beta"],
             "best_epoch": fv["best_epoch"], "epochs_run": fv["epochs_run"],
             "train": fv["train_metrics_best_checkpoint"], "validation": fv["val_metrics_best_checkpoint"],
-            "test": test_m, "n_test": len(self.splits["test"]), "test_tta": use_tta,
+            "test": test_m, "n_test": len(ids), "test_tta": use_tta,
         }
         save_json(self.path("final_metrics.json"), final)
         row = final_result_row(final)
@@ -449,9 +564,9 @@ class Pipeline:
         save_markdown_table(self.path("final_result.md"), [row], list(row),
                             title="Final result (test set, evaluated once)", float_fmt="{:.2f}")
         log.info("TEST | Dice (DSC) %.4f | mIoU %.4f | IoU %.4f | Sensitivity %.4f | HD95 %.2f px | Params %.3f M | "
-                 "FLOPs %.2f G (batch of %d; %.2f G per image)", test_m["dice"], test_m["miou"], test_m["iou"],
-                 test_m["sensitivity"], test_m["hd95"], summ["params_m"], summ["gflops_mixed_ggnas"],
-                 summ["flops_batch_size"], summ["gflops_per_image"])
+                 "FLOPs %.2f G (batch of %d; %.2f G per image) | %.2f ms/image", test_m["dice"], test_m["miou"],
+                 test_m["iou"], test_m["sensitivity"], test_m["hd95"], cost["params_m"], cost["gflops_mixed_ggnas"],
+                 cost["flops_batch_size"], cost["gflops_per_image"], latency)
         return {"test_dice": test_m["dice"], "test_miou": test_m["miou"], "test_hd95": test_m["hd95"]}
 
     # ================================================================== 9. report
@@ -459,39 +574,50 @@ class Pipeline:
         cfg = self.cfg
         final = load_json(self.path("final_metrics.json"))
         best = self.selected()
-        model = build_model(best["chromosome"], cfg)
-        summ = model_summary(model, cfg["data"]["image_size"], int(cfg["data"]["in_channels"]),
-                             int(cfg["final_training"]["batch_size"]))
+        model = self.build(best["arch"])
+        h, w = cfg["data"]["image_size"]
+        bs = int(cfg["final_training"]["batch_size"])
+        if isinstance(model, QENASNet):
+            summ = model_summary(model, [h, w], int(cfg["data"]["in_channels"]), bs)
+            plot_architecture(summ, self.exp.figures / "selected_architecture",
+                              title=f"QENAS architecture selected on {cfg['data']['dataset']}")
+            text = summary_text(summ)
+        else:
+            summ = cost_summary(model, [h, w], int(cfg["data"]["in_channels"]), bs)
+            text = (f"{self.method['label']}: {summ['total_params']:,d} parameters ({summ['params_m']:.3f} M) | "
+                    f"FLOPs {summ['gflops_per_image']:.3f} G per image, {summ['gflops_mixed_ggnas']:.2f} G per batch "
+                    f"of {bs}")
         save_json(self.path("model_summary.json"), summ)
-        self.path("model_summary.txt").write_text(summary_text(summ) + "\n\n" + repr(model) + "\n", encoding="utf-8")
-        plot_architecture(summ, self.exp.figures / "selected_architecture",
-                          title=f"QENAS architecture selected on {cfg['data']['dataset']}")
-        gens = load_json(self.path("nsga2_generations.json"))
-        save_markdown_table(self.path("nsga2_generations.md"), [
-            {"Generation": g["generation"], "Population": g["population"], "Pareto size": g["pareto_size"],
-             "Hypervolume": g["hypervolume"], "Best params": g["best_params"],
-             "Best ln(1+SynFlow)": g["best_log_synflow"], "Best ZiCo": g["best_zico"],
-             "New evaluations": g["new_evaluations"]} for g in gens],
-            ["Generation", "Population", "Pareto size", "Hypervolume", "Best params", "Best ln(1+SynFlow)", "Best ZiCo",
-             "New evaluations"], title="NSGA-II population per generation", float_fmt="{:.4f}")
-        front = load_json(self.path("pareto_front.json"))
-        save_markdown_table(self.path("pareto_front.md"), [
-            {"#": r["front_index"], "Chromosome": chromosome_to_str(r["chromosome"]), "Blocks": r["blocks"],
-             "Params": r["params"], "ln(1+SynFlow)": r["synflow_log"], "ZiCo": r["zico"]} for r in front],
-            ["#", "Chromosome", "Blocks", "Params", "ln(1+SynFlow)", "ZiCo"],
-            title="Final Pareto front (non-dominated in parameters, SynFlow and ZiCo)", float_fmt="{:.3f}")
+        self.path("model_summary.txt").write_text(text + "\n\n" + repr(model) + "\n", encoding="utf-8")
+        if self.method["kind"] != "baseline":
+            gens = load_json(self.path("nsga2_generations.json"))
+            save_markdown_table(self.path("nsga2_generations.md"), [
+                {"Generation": g["generation"], "Population": g["population"], "Pareto size": g["pareto_size"],
+                 "Hypervolume": g["hypervolume"], "Best params": g["best_params"],
+                 "Best ln(1+SynFlow)": g["best_log_synflow"], "Best ZiCo": g["best_zico"],
+                 "New evaluations": g["new_evaluations"]} for g in gens],
+                ["Generation", "Population", "Pareto size", "Hypervolume", "Best params", "Best ln(1+SynFlow)",
+                 "Best ZiCo", "New evaluations"], title="NSGA-II population per generation", float_fmt="{:.4f}")
+            front = load_json(self.path("pareto_front.json"))
+            save_markdown_table(self.path("pareto_front.md"), [
+                {"#": r["front_index"], "Chromosome": chromosome_to_str(r["chromosome"]), "Blocks": r["blocks"],
+                 "Params": r["params"], "ln(1+SynFlow)": r["synflow_log"], "ZiCo": r["zico"]} for r in front],
+                ["#", "Chromosome", "Blocks", "Params", "ln(1+SynFlow)", "ZiCo"],
+                title="Final Pareto front (non-dominated in the optimised objectives)", float_fmt="{:.3f}")
         repro = {
             "fingerprint": self.fp, "config": cfg, "environment": environment_info(self.device),
             "split_summary": load_json(self.path("split.json"))["summary"],
-            "zico_batches_sha256": load_json(self.path("search_summary.json"))["zico_batches_sha256"],
-            "selected_architecture": {"chromosome": best["chromosome"], "blocks": decode(best["chromosome"]),
-                                      "params": summ["total_params"]},
+            "selected_architecture": {"architecture": best["arch"], "params": final["total_params"]},
             "loss_coefficients": {"alpha_bce": final["alpha"], "beta_soft_miou": final["beta"]},
             "test_tta": final["test_tta"], "stages": self.exp.state["stages"],
         }
+        if self.path("search_summary.json").exists():
+            repro["zico_batches_sha256"] = load_json(self.path("search_summary.json")).get("zico_batches_sha256")
         save_json(self.path("reproducibility.json"), repro)
-        text = research_summary(cfg, best, final, load_json(self.path("final_validation.json")),
-                                load_json(self.path("search_summary.json")), len(load_json(self.path("pareto_candidates.json"))))
+        text = research_summary(cfg, self.method, best, final, load_json(self.path("final_validation.json")),
+                                load_json(self.path("search_summary.json")) if self.method["kind"] != "baseline" else None,
+                                len(load_json(self.path("pareto_candidates.json")))
+                                if self.method["kind"] != "baseline" else 0)
         self.path("summary.txt").write_text(text, encoding="utf-8")
         return {}
 
@@ -499,37 +625,41 @@ class Pipeline:
 def final_result_row(final: Dict[str, Any]) -> Dict[str, Any]:
     """The final test table: the Mixed-GGNAS metrics (Dice, mIoU, Params, FLOPs) + HD95 and sensitivity."""
     t = final["test"]
-    return {"Dataset": final["dataset"], "Dice / DSC (%)": 100 * t["dice"], "mIoU (%)": 100 * t["miou"],
+    return {"Dataset": final["dataset"], "Method": final["method_label"], "Seed": final["seed"],
+            "Dice / DSC (%)": 100 * t["dice"], "mIoU (%)": 100 * t["miou"],
             "Params (M)": final["params_m"], f"FLOPs (G, batch {final['flops_batch_size']})": final["gflops_mixed_ggnas"],
             "HD95 (px)": t["hd95"], "Sensitivity (%)": 100 * t["sensitivity"], "IoU (%)": 100 * t["iou"],
-            "GFLOPs / image": final["gflops_per_image"], "Flip TTA": "yes" if final["test_tta"] else "no"}
+            "GFLOPs / image": final["gflops_per_image"], "ms / image": final["inference_ms_per_image"],
+            "Flip TTA": "yes" if final["test_tta"] else "no"}
 
 
-def research_summary(cfg: Dict[str, Any], best: Dict[str, Any], final: Dict[str, Any], fv: Dict[str, Any],
-                     search: Dict[str, Any], n_cands: int) -> str:
-    a = best["analysis"]
-    E = int(cfg["candidate_training"]["epochs"])
+def research_summary(cfg: Dict[str, Any], method: Dict[str, Any], best: Dict[str, Any], final: Dict[str, Any],
+                     fv: Dict[str, Any], search: Optional[Dict[str, Any]], n_cands: int) -> str:
     v = fv["val_metrics_best_checkpoint"]
     t = final["test"]
-    return "\n".join([
-        "================ QENAS RESULT ================", "",
-        f"Dataset: {cfg['data']['dataset']}", "",
-        "Search (training-free NSGA-II; objectives: parameters, SynFlow, ZiCo):",
-        f"Population: {cfg['search']['population_size']}",
-        f"Generations: {cfg['search']['generations']}",
-        f"Unique architectures evaluated: {search['unique_evaluations']}",
-        f"Hypervolume: {search['hypervolume_generation_0']:.4f} (generation 0) -> {search['hypervolume_final']:.4f} (final)",
-        f"Final Pareto front size: {search['final_front_size']}",
-        f"Pareto candidates trained: {n_cands}", "",
-        "Selected architecture:",
-        f"Chromosome: {chromosome_to_str(best['chromosome'])}",
-        f"Block sequence: {decode(best['chromosome'])}",
-        f"ln(1+SynFlow): {best['synflow_log']:.3f}   ZiCo: {best['zico']:.3f}", "",
-        f"{E}-epoch capability:",
-        f"Epoch-1 Dice: {a['epoch1_val_dice']:.4f}",
-        f"Epoch-{E} Dice: {a['final_val_dice']:.4f}",
-        f"ΔDice: {a['delta_dice']:+.4f}",
-        f"Selection: {best['reason']}", "",
+    lines = ["================ QENAS RESULT ================", "",
+             f"Dataset: {cfg['data']['dataset']}" + (" (frame-level split: CVC leakage study)"
+                                                     if cfg["data"]["split_unit"] == "image" else ""),
+             f"Method: {method['label']} — {method['doc']}", f"Seed: {cfg['seed']}", ""]
+    if search is not None:
+        E = int(cfg["candidate_training"]["epochs"])
+        a = best["analysis"]
+        lines += [
+            f"Search (training-free NSGA-II; optimised objectives: {', '.join(search['objectives'])}):",
+            f"Population: {cfg['search']['population_size']}   Generations: {cfg['search']['generations']}",
+            f"Unique architectures evaluated: {search['unique_evaluations']}",
+            f"Hypervolume: {search['hypervolume_generation_0']:.4f} (generation 0) -> {search['hypervolume_final']:.4f} (final)",
+            f"Final Pareto front size: {search['final_front_size']}   Pareto candidates trained: {n_cands}", "",
+            "Selected architecture:",
+            f"Chromosome: {best['label']}",
+            f"Block sequence: {decode(best['arch']['chromosome'])}",
+            f"ln(1+SynFlow): {best['synflow_log']:.3f}   ZiCo: {best['zico']:.3f}", "",
+            f"{E}-epoch capability: Epoch-1 Dice {a['epoch1_val_dice']:.4f} | Epoch-{E} Dice {a['final_val_dice']:.4f} | "
+            f"ΔDice {a['delta_dice']:+.4f}",
+            f"Selection: {best['reason']}", ""]
+    else:
+        lines += [f"Architecture: {best['label']} (fixed baseline, no search)", ""]
+    lines += [
         "Loss coefficients:",
         f"alpha (BCE): {final['alpha']:.3f}   beta (soft-mIoU): {final['beta']:.3f}", "",
         "Final training:",
@@ -547,6 +677,18 @@ def research_summary(cfg: Dict[str, Any], best: Dict[str, Any], final: Dict[str,
                                                     if t.get("hd95_empty_pred") else ""),
         f"Sensitivity:       {100 * t['sensitivity']:.2f} %",
         f"IoU (foreground):  {100 * t['iou']:.2f} %",
+        f"Inference:         {final['inference_ms_per_image']:.2f} ms per image on {final['inference_device']}",
         f"Test loss:         {t['loss']:.4f}", "",
         "================================================", "",
-    ])
+    ]
+    return "\n".join(lines)
+
+
+def study_config(dataset: str, method: str, seed: int, overrides: Optional[Dict[str, Any]] = None,
+                 split_unit: str = "dataset") -> Dict[str, Any]:
+    """Configuration of one study experiment (used by study.py and its tests)."""
+    from .config import build_config
+    ov = {"method": method, "seed": seed, "data.split_unit": split_unit}
+    ov.update(overrides or {})
+    return build_config(dataset, overrides=ov)
+

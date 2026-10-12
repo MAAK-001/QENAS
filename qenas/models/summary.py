@@ -48,6 +48,8 @@ def thop_flops(model: nn.Module, input_shape: Sequence[int]) -> int:
         elif isinstance(m, nn.AdaptiveAvgPool2d):
             k = (x.shape[2] // out.shape[2]) * (x.shape[3] // out.shape[3])
             total[0] += (k + 1) * out.numel()
+        elif isinstance(m, nn.Upsample):
+            total[0] += out.numel() * {"nearest": 1, "linear": 5, "bilinear": 11}.get(m.mode, 0)
 
     hooks = [m.register_forward_hook(hook) for m in model.modules() if len(list(m.children())) == 0]
     was_training = model.training
@@ -60,10 +62,17 @@ def thop_flops(model: nn.Module, input_shape: Sequence[int]) -> int:
     return int(total[0])
 
 
-def model_summary(model: QENASNet, input_hw: Sequence[int], in_channels: int, batch_size: int) -> Dict[str, Any]:
-    rows = model.position_info(input_hw)
+def cost_summary(model: nn.Module, input_hw: Sequence[int], in_channels: int, batch_size: int) -> Dict[str, Any]:
+    """Parameters and FLOPs (thop convention, per training batch and per image) of any network."""
     flops_batch = thop_flops(model, [batch_size, in_channels, int(input_hw[0]), int(input_hw[1])])
     params = count_parameters(model)
+    return {"total_params": params, "params_m": params / 1e6, "flops_batch_size": int(batch_size),
+            "gflops_mixed_ggnas": flops_batch / 1e9, "gflops_per_image": flops_batch / batch_size / 1e9}
+
+
+def model_summary(model: QENASNet, input_hw: Sequence[int], in_channels: int, batch_size: int) -> Dict[str, Any]:
+    rows = model.position_info(input_hw)
+    cost = cost_summary(model, input_hw, in_channels, batch_size)
     return {
         "chromosome": model.chromosome,
         "blocks": decode(model.chromosome),
@@ -74,11 +83,7 @@ def model_summary(model: QENASNet, input_hw: Sequence[int], in_channels: int, ba
         "stem_params": count_parameters(model.stem),
         "head_params": count_parameters(model.head),
         "positions": rows,
-        "total_params": params,
-        "params_m": params / 1e6,
-        "flops_batch_size": int(batch_size),
-        "gflops_mixed_ggnas": flops_batch / 1e9,          # per training batch, as in the Mixed-GGNAS tables
-        "gflops_per_image": flops_batch / batch_size / 1e9,
+        **cost,                                            # gflops_mixed_ggnas: per training batch, as Mixed-GGNAS
     }
 
 

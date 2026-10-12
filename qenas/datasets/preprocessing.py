@@ -86,7 +86,7 @@ def preload_split(samples: Sequence[Sample], size_hw: Tuple[int, int], threshold
         timer.step()
         if (i + 1) % max(1, n // 5) == 0 or i + 1 == n:
             log.info("  preprocessing %s/%s: %d/%d | %s", dataset, split_name, i + 1, n, timer.summary())
-    tmp = cache_file.with_name(cache_file.stem + ".tmp.npz")
+    tmp = cache_file.with_name(f"{cache_file.stem}.{os.getpid()}.tmp.npz")   # unique: parallel study jobs
     np.savez_compressed(tmp, images=imgs, masks=masks)
     retry_on_lock(os.replace, tmp, cache_file)
     return imgs, masks

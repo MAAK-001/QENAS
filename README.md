@@ -23,14 +23,26 @@ After the search:
    checkpoint is kept, and the validation set decides whether flip test-time augmentation is used.
 5. It is tested **once**. The test reports:
    * the Mixed-GGNAS metrics: **Dice (= DSC)**, **mIoU**, **Params**, **FLOPs**;
-   * **HD95** (boundary);
-   * **Sensitivity** (clinical).
+   * **HD95** (boundary) and **Sensitivity** (clinical);
+   * the inference time.
 
-There is **one pipeline and one protocol**. The method has no options, modes or alternative paths.
+QENAS is **one pipeline with one protocol** (`main.py`). The **evaluation study** of the paper is run by
+`study.py`:
 
-* Method: [METHODOLOGY.md](METHODOLOGY.md)
-* Every decision, with reasons and evidence: [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
-* Dataset structure and splits: [DATASETS.md](DATASETS.md)
+* comparison with U-Net and Attention U-Net on identical splits;
+* ablations;
+* random search;
+* 3 seeds per experiment;
+* external validation;
+* the CVC split study.
+
+| document | contents |
+|---|---|
+| [METHODOLOGY.md](METHODOLOGY.md) | the method |
+| [STUDY.md](STUDY.md) | the experimental protocol of the evaluation study |
+| [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) | every decision, with reasons and evidence |
+| [PAPER_POSITIONING.md](PAPER_POSITIONING.md) | related work and what QENAS adds |
+| [DATASETS.md](DATASETS.md) | dataset structure and splits |
 
 ---
 
@@ -38,28 +50,27 @@ There is **one pipeline and one protocol**. The method has no options, modes or 
 
 ```
 GGNAS/
-├── Datasets/                      BUSI (Breast Ultrasound Image)/  CVC-ClinicD (Polyp)/  IDRID/
+├── Datasets/          BUSI (Breast Ultrasound Image)/  CVC-ClinicD (Polyp)/  IDRID/  Kvasir-SEG/
 └── QENAS/
-    ├── main.py                    command-line entry point (the whole pipeline)
+    ├── main.py        QENAS: one dataset, one seed, the whole pipeline
+    ├── study.py       the evaluation study: run / status / analyse / figures / archive
     ├── qenas/
-    │   ├── config.py              the QENAS protocol (one fixed configuration) + per-dataset data facts
-    │   ├── experiment.py          experiment directories, stage state, safe resume
-    │   ├── pipeline.py            the nine stages (split → … → report)
-    │   ├── datasets/              discovery (per dataset), leakage-free splits, preprocessing, augmentation, loaders
-    │   ├── models/                official Mixed-GGNAS blocks, NAS-Unet DARTS ops/cells + genotypes, QENASNet,
-    │   │                          chromosome encoding, model summary (params, FLOPs)
-    │   ├── search/                objectives (params, SynFlow, ZiCo), cache, pymoo problem/operators,
-    │   │                          NSGA-II ask/tell loop with checkpoints and hypervolume, Pareto subset selection
-    │   ├── training/              loss (BCE + soft mIoU), metrics (Dice, IoU, mIoU, sensitivity, HD95), optimiser,
-    │   │                          trainer, overfitting-based early stopping, learning-capability selection
-    │   ├── visualization/         publication figures, architecture diagram
-    │   └── utils/                 atomic I/O, checkpoints, seeding, environment, logging/ETA
+    │   ├── config.py      the QENAS protocol (one fixed configuration) + per-dataset data facts
+    │   ├── methods.py     QENAS and the study conditions (baselines, ablations, random search)
+    │   ├── runner.py      runs one experiment from start to end (timer included)
+    │   ├── experiment.py  experiment folders results/<DATASET>/<method>/seed_<s>/, stage state, safe resume
+    │   ├── pipeline.py    the stages (split → … → report), shared by all conditions
+    │   ├── datasets/      discovery (per dataset), leakage-free splits, preprocessing, augmentation, loaders
+    │   ├── models/        Mixed-GGNAS blocks, DARTS cells, QENASNet, U-Net / Attention U-Net, params & FLOPs
+    │   ├── search/        objectives (params, SynFlow, ZiCo), cache, NSGA-II, random search, Pareto subset
+    │   ├── training/      loss, metrics (Dice, IoU, mIoU, sensitivity, HD95), trainer, early stopping, selection
+    │   ├── study/         study plan, GPU scheduler, external validation, analysis (tables, tests, figures)
+    │   ├── visualization/ figures
+    │   └── utils/         atomic I/O, checkpoints, seeding, environment, logging/ETA
     ├── scripts/inspect_datasets.py   dataset inspection (no model, no training)
-    ├── tests/                     unit tests + an end-to-end pipeline test (pytest)
-    ├── evidence/                  one-off studies behind design decisions (not part of the pipeline)
-    ├── results/<DATASET>/experiment_YYYYMMDD_HHMMSS/   created by runs of this version
-    ├── old results/               runs of the previous (two-objective) version — kept for reference only
-    └── cache/                     zero-cost evaluation cache, preprocessed-image cache (created by runs)
+    ├── tests/         unit tests + end-to-end tests of QENAS and of the whole study (pytest)
+    ├── results/       created by runs (not in this branch; the study's results are on the kaggle-study branch)
+    └── cache/         zero-cost evaluation cache, preprocessed-image cache (created by runs)
 ```
 
 ## 2. Installation
@@ -71,18 +82,18 @@ pip install -r requirements.txt
 ```
 
 The datasets must be in `GGNAS/Datasets/` (default) or another folder given with `--data-root`. The folder names
-only need to *start with* `BUSI`, `CVC` and `IDRID`.
+only need to *start with* `BUSI`, `CVC`, `IDRID` and `Kvasir`.
 
 ## 3. Verify the installation
 
-Run the unit tests and the end-to-end pipeline test (all nine stages on a small synthetic dataset; a few minutes
-on a CPU):
+The unit tests and the end-to-end tests run all of QENAS and every study condition on small synthetic datasets.
+They take about 10 minutes on a CPU:
 
 ```bash
 python -m pytest -q tests
 ```
 
-Inspect the three datasets (structure, pairing, integrity, resulting splits; no model is built):
+Inspect the four datasets (structure, pairing, integrity, resulting splits; no model is built):
 
 ```bash
 python scripts/inspect_datasets.py
@@ -90,7 +101,7 @@ python scripts/inspect_datasets.py
 
 ## 4. Running QENAS
 
-Each command runs the complete pipeline for one dataset, from the split to the final test and report:
+Each command runs the complete QENAS pipeline for one dataset, from the split to the final test and report:
 
 ```bash
 python main.py --dataset BUSI
@@ -104,135 +115,279 @@ python main.py --dataset CVC
 python main.py --dataset IDRID
 ```
 
-The results are written to `results/<DATASET>/experiment_YYYYMMDD_HHMMSS/`. The research summary (`summary.txt`)
-is printed at the end.
+```bash
+python main.py --dataset KVASIR
+```
+
+Results go to `results/<DATASET>/qenas/seed_<seed>/`. The research summary (`summary.txt`) is printed at the
+end; its last line is the time QENAS took on the dataset from start to end.
 
 | Stage | What happens | Main outputs |
 |---|---|---|
-| `split` | dataset discovery, integrity checks, deterministic leakage-free split | `dataset_report.json`, `split.json` |
-| `search` | training-free NSGA-II (params, SynFlow, ZiCo), population 20, generation 0 + 10 generations | `search_results.csv/.json`, `search_population_history.csv/.json`, `nsga2_generations.csv/.json/.md` (incl. hypervolume), `pareto_front.csv/.json/.md`, `search_summary.json`, Pareto and progress figures |
-| `pareto` | representative subset of the final front (≤ 8) | `pareto_candidates.csv/.json`, 3-D front figure |
+| `split` | dataset discovery, integrity checks, fixed leakage-free split | `dataset_report.json`, `split.json` |
+| `search` | training-free NSGA-II (params, SynFlow, ZiCo), population 20, generation 0 + 10 generations | `search_results.*`, `search_population_history.*`, `nsga2_generations.*` (incl. hypervolume), `pareto_front.*`, `search_summary.json` |
+| `pareto` | representative subset of the final front (≤ 8) | `pareto_candidates.*` |
 | `candidates` | 20-epoch supervised training of each candidate | `candidate_training.csv`, `candidate_histories/` |
-| `selection` | learning-capability selection | `selection.json`, `candidate_comparison.csv/.json/.md`, candidate figures |
-| `loss_weights` | α/β grid on validation (α = 0.5 run reused) | `loss_weights.csv/.json`, figure |
-| `final` | supervised training with validation (100 epochs), best-validation checkpoint restored, flip-TTA decision on validation | `final_training.csv`, `final_validation.json`, curves |
-| `test` | **single** test evaluation of the best-validation checkpoint | `final_metrics.json`, `final_result.csv/.json/.md` |
-| `report` | model summary, architecture figure, tables, reproducibility record, research summary | `model_summary.txt/.json`, `reproducibility.json`, `summary.txt` |
+| `selection` | learning-capability selection | `selection.json`, `candidate_comparison.*` |
+| `loss_weights` | α/β grid on validation (α = 0.5 run reused) | `loss_weights.*` |
+| `final` | supervised training with validation (100 epochs), best checkpoint, flip-TTA decision on validation | `final_training.csv`, `final_validation.json` |
+| `test` | **single** test evaluation | `final_metrics.json`, `final_result.*`, `test_per_image.csv`, `test_predictions.npz` |
+| `report` | model summary, architecture figure, tables, reproducibility record, research summary | `model_summary.*`, `reproducibility.json`, `summary.txt` |
 
 ### Run settings
 
-The method is fixed in `qenas/config.py`. The command line only takes run settings, which never change the
-method:
+The method is fixed in `qenas/config.py`. The command line only takes run settings:
 
 | option | meaning |
 |---|---|
-| `--dataset BUSI\|CVC\|IDRID` | dataset (required) |
+| `--dataset BUSI\|CVC\|IDRID\|KVASIR` | dataset (required) |
 | `--data-root PATH` | folder containing the dataset folders (default `../Datasets`; Kaggle's `/kaggle/input` is searched automatically) |
-| `--device auto\|cpu\|cuda\|cuda:N` | device (default `auto`: CUDA when available) |
+| `--device auto\|cpu\|cuda\|cuda:N` | device (default `auto`) |
 | `--num-workers N` | data-loader worker processes (default 0) |
-| `--seed N` | random seed (default 42). Different seeds give independent repetitions of the same method |
-| `--no-resume` | start a new experiment instead of resuming or reporting the latest one |
+| `--seed N` | run seed (default 42); the split is the same for every seed |
 | `--stop-after STAGE` | stop cleanly after a stage; the same command without it continues from there |
 
-Examples:
-
-Run on a GPU:
+For example, QENAS on BUSI with seed 43 on a GPU:
 
 ```bash
-python main.py --dataset BUSI --device cuda
+python main.py --dataset BUSI --seed 43 --device cuda
 ```
 
-Data stored elsewhere:
+## 5. The evaluation study (`study.py`)
+
+STUDY.md describes the research questions, the conditions and the statistics. The plan has 78 experiments:
+
+* QENAS, U-Net and Attention U-Net on 4 datasets;
+* 4 ablations on BUSI and Kvasir-SEG;
+* random search on 4 datasets;
+* the CVC frame-split study;
+* each with seeds 42, 43 and 44;
+* plus external validation inside the Kvasir-SEG jobs.
+
+Run or resume the whole plan (one job per listed GPU):
 
 ```bash
-python main.py --dataset CVC --data-root /path/to/Datasets
+python study.py run --gpus 0
 ```
 
-Search only (e.g. on a CPU machine), then continue the same experiment later (e.g. on a GPU machine):
+Show which experiments are done:
 
 ```bash
-python main.py --dataset IDRID --stop-after search
+python study.py status
+```
+
+Write all paper tables, statistical tests and figures to `results/analysis/` (`--data-root` enables the
+qualitative figures):
+
+```bash
+python study.py analyse --data-root ../Datasets
+```
+
+Regenerate every experiment's figures from its saved results (PNG files are not stored on GitHub):
+
+```bash
+python study.py figures
+```
+
+Zip all results without model checkpoints:
+
+```bash
+python study.py archive QENAS_results.zip
+```
+
+On Kaggle, use the cell of §6, which runs the plan on both T4 GPUs and saves everything to GitHub.
+
+## 6. Running the study on Kaggle
+
+### One-time setup
+
+1. The code must be on GitHub `main`: commit and push from your PC.
+2. GitHub token (fine-grained, only the QENAS repository, **Contents: Read and write**) stored as the Kaggle
+   secret `GITHUB_TOKEN`, switched on for the notebook.
+3. Notebook settings: **Accelerator GPU T4 x2**, **Internet on**, and the dataset input containing `BUSI…`,
+   `CVC…`, `IDRID…` and `Kvasir-SEG`.
+
+### Every session
+
+Paste the cell, then **Save Version → Save & Run All (Commit)**. Repeat with the same cell until
+`[study] … 78/78 jobs done` appears in the log.
+
+* Each session takes the latest code from `main`.
+* It continues the results of the branch `kaggle-study`: finished experiments are skipped and unfinished ones
+  resume from their last checkpoint.
+* It starts no job that cannot finish before the 12-hour limit.
+
+```python
+import os, subprocess, threading, time
+
+# ---------------- settings ----------------
+REPO_PATH   = "github.com/MAAK-001/QENAS.git"
+CODE_BRANCH = "main"               # code: always the latest main
+RUN_BRANCH  = "kaggle-study"       # results only; main is never touched
+GPUS        = ["0", "1"]           # Kaggle "GPU T4 x2"
+SESSION_H   = 11.0                 # no job is started that would not finish within this time of the session
+SYNC_EVERY  = 30 * 60              # push results every 30 minutes
+WORK        = "/kaggle/working"
+CODE        = f"{WORK}/QENAS"
+RES         = f"{WORK}/QENAS_results"   # git repository of the results branch
+# ------------------------------------------
+T0 = time.time()
+os.environ["GIT_TERMINAL_PROMPT"] = "0"
+from kaggle_secrets import UserSecretsClient
+token = UserSecretsClient().get_secret("GITHUB_TOKEN").strip()
+url = f"https://x-access-token:{token}@{REPO_PATH}"
+
+def sh(cmd, cwd=None, check=True):
+    r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+    if check and r.returncode != 0:
+        raise RuntimeError(f"{' '.join(cmd[:3])} failed: {r.stderr.replace(token, '***')[-600:]}")
+    return r
+
+def log(text):
+    line = time.strftime("%Y-%m-%d %H:%M:%S ") + text
+    print(line, flush=True)
+    os.makedirs(RES, exist_ok=True)
+    with open(f"{RES}/kaggle_notebook.log", "a") as f:
+        f.write(line + "\n")
+
+# 1) Code (latest main) and results (branch kaggle-study, created on the first session)
+if not os.path.exists(CODE):
+    sh(["git", "clone", "--depth", "1", "--branch", CODE_BRANCH, url, CODE])
+if not os.path.exists(f"{RES}/.git"):
+    r = sh(["git", "clone", "--depth", "1", "--single-branch", "--branch", RUN_BRANCH, url, RES], check=False)
+    if r.returncode != 0:                          # first session: new, empty results branch
+        os.makedirs(RES, exist_ok=True)
+        sh(["git", "init", "-q"], RES)
+        sh(["git", "checkout", "-q", "-b", RUN_BRANCH], RES)
+        sh(["git", "remote", "add", "origin", url], RES)
+sh(["git", "config", "user.email", "kaggle@run"], RES)
+sh(["git", "config", "user.name", "Kaggle run"], RES)
+with open(f"{RES}/.git/info/exclude", "w") as f:   # never pushed: images, checkpoint backups, baseline weights
+    f.write("*.png\n*.pdf\n*.prev\nresults/*/unet/*/checkpoints/\nresults/*/attention_unet/*/checkpoints/\n")
+sh(["pip", "install", "-q", "pymoo>=0.6.2,<0.7"])
+
+# 2) Push the results (one amended commit, so the branch keeps only the latest state)
+lock = threading.Lock()
+def push(note=""):
+    with lock:
+        sh(["git", "add", "-A"], RES, check=False)
+        staged = sh(["git", "diff", "--cached", "--name-only"], RES, check=False).stdout.split()
+        big = [p for p in staged if os.path.isfile(f"{RES}/{p}") and os.path.getsize(f"{RES}/{p}") > 95e6]
+        for p in big:                              # GitHub rejects files > 100 MB
+            sh(["git", "rm", "-q", "--cached", p], RES, check=False)
+            with open(f"{RES}/.git/info/exclude", "a") as f:
+                f.write(p + "\n")
+        first = sh(["git", "log", "-1", "--format=%s"], RES, check=False).stdout.strip() != "Study results"
+        sh(["git", "commit", "-q", "--allow-empty", "-m", "Study results"] + ([] if first else ["--amend"]), RES,
+           check=False)
+        r = sh(["git", "push", "-q", "-f", "origin", RUN_BRANCH], RES, check=False)
+        log(f"{note} " + ("results pushed" if r.returncode == 0 else "PUSH FAILED: " + r.stderr.replace(token, "***")[-300:]))
+        return r.returncode == 0
+
+if not push("[start check]"):
+    raise RuntimeError("Pushing to GitHub does not work - check the GITHUB_TOKEN secret")
+stop = threading.Event()
+def periodic():
+    while not stop.wait(SYNC_EVERY):
+        push("[periodic]")
+threading.Thread(target=periodic, daemon=True).start()
+
+# 3) Run the study plan on both GPUs
+data_root = sh(["python", "-c", "from qenas.datasets.discovery import locate_data_root; "
+                "print(locate_data_root('/nonexistent', 'BUSI'))"], CODE).stdout.strip()
+hours = SESSION_H - (time.time() - T0) / 3600
+log(f"data root {data_root} | study budget {hours:.2f} h")
+proc = subprocess.run(["python", "study.py", "run", "--gpus", *GPUS, "--hours", f"{hours:.2f}",
+                       "--results", f"{RES}/results", "--data-root", data_root], cwd=CODE)
+log(f"study session finished (exit {proc.returncode})")
+
+# 4) Paper tables + figures, final push, and a zip of everything (with figures, without weights) in Output
+subprocess.run(["python", "study.py", "analyse", "--results", f"{RES}/results", "--data-root", data_root], cwd=CODE)
+subprocess.run(["python", "study.py", "status", "--results", f"{RES}/results"], cwd=CODE)
+stop.set()
+push("[session end]")
+subprocess.run(["python", "study.py", "archive", f"{WORK}/QENAS_study_results.zip", "--results", f"{RES}/results"],
+               cwd=CODE)
+log("Done. Results: GitHub branch kaggle-study, and Output: QENAS_study_results.zip")
+```
+
+### Getting the results onto your PC
+
+Fetch the results branch:
+
+```bash
+git fetch origin kaggle-study
+```
+
+Copy its `results/` folder into the working tree:
+
+```bash
+git checkout origin/kaggle-study -- results
+```
+
+Regenerate the figures and the paper tables locally:
+
+```bash
+python study.py figures
 ```
 
 ```bash
-python main.py --dataset IDRID --device cuda
+python study.py analyse --data-root ../Datasets
 ```
 
-An independent repetition with another seed:
+The Kaggle version's Output also contains `QENAS_study_results.zip` with all figures.
 
-```bash
-python main.py --dataset BUSI --seed 1
-```
+**What is not on GitHub:**
 
-A new experiment with the default seed after a finished one:
+* PNG figures (regenerate them with the commands above);
+* the U-Net / Attention U-Net weights (larger than GitHub's file limit; their predictions and metrics are saved).
 
-```bash
-python main.py --dataset BUSI --no-resume
-```
-
-`python main.py --help` lists the options. Each run's `config.json` contains the fully resolved configuration.
-
-## 5. Interruptions and resume
+## 7. Interruptions and resume
 
 Nothing long runs without a checkpoint:
 
 * the search is checkpointed after every generation;
-* every training run (candidates, α runs, final training) is checkpointed after every epoch, including
-  optimiser, scheduler, scaler and RNG states.
+* every training run is checkpointed after every epoch (optimiser, scheduler, scaler and RNG states included).
 
-If a run stops for any reason, **run the same command again**. The experiment with the same configuration is
-found and resumed from the last completed generation or epoch.
+Re-run the same command (or the Kaggle cell), and the experiment continues from the last checkpoint.
 
-* A finished experiment is never modified: re-running the same command prints its summary.
-* If the configuration changed (a different code version or seed) and the latest experiment is unfinished,
-  QENAS refuses to resume it and lists the differing keys. Use `--no-resume` to start a new experiment.
-* The device and the data root are not part of the configuration fingerprint. You can therefore run the search
-  on a CPU and continue training on a GPU machine: copy `QENAS/` and `Datasets/` together.
+* A finished experiment is never modified: re-running reports it.
+* An experiment whose configuration changed (a different code version that affects results) is refused with the
+  list of differing keys. Delete its folder to run it again.
+* The device and the data root are not part of the configuration, so an experiment can move between machines.
+* Checkpoints a finished stage no longer needs are deleted; a finished experiment keeps only its final weights.
 
-## 6. Compute time
+## 8. Compute time
 
-* **Search.** On the development CPU (measured under full load), ZiCo takes about 51 s per architecture on
-  average (two forward/backward passes at 256×256, batch 8) and SynFlow about 8 s. That makes about 3–4 hours
-  for the ≤ 220 evaluations of the search. On a GPU the search takes minutes.
-* **Supervised training.** It dominates the cost:
-  * on a CPU, one BUSI epoch takes several minutes, and the full pipeline (8 × 20 candidate epochs, 4 × 20 α
-    epochs, 100 final epochs) takes days;
-  * a CUDA GPU turns this into hours and is strongly recommended.
+* **QENAS on a Kaggle T4** (single run, measured with the two-objective predecessor and estimated for the
+  current version): about 30 min (IDRiD) to 3 h (Kvasir-SEG). The search itself takes minutes; supervised
+  training dominates.
+* **The whole study:** about 120 GPU-hours, i.e. about 60 hours with two GPUs, which is 5–6 Kaggle sessions.
+* **On a CPU:** the search alone takes hours and the supervised stages days.
 
 **OneDrive:** this project lives in a OneDrive folder. Sync clients briefly lock new files. QENAS retries locked
-writes automatically, but long runs produce many checkpoint writes. Pausing sync during long runs, or excluding
-`QENAS/results` and `QENAS/cache` from sync, is recommended.
+writes automatically, but pausing sync during long local runs is recommended.
 
-## 7. Outputs of one experiment
+## 9. Outputs of one experiment
 
 ```
-results/BUSI/experiment_YYYYMMDD_HHMMSS/
+results/BUSI/qenas/seed_42/
 ├── config.json  environment.json  state.json  reproducibility.json  summary.txt
 ├── dataset_report.json  split.json
-├── search_results.csv/.json  search_population_history.csv/.json  search_summary.json
-├── nsga2_generations.csv/.json/.md  pareto_front.csv/.json/.md  pareto_candidates.csv/.json
+├── search_results.*  search_population_history.*  search_summary.json  nsga2_generations.*
+├── pareto_front.*  pareto_candidates.*
 ├── candidate_training.csv  candidate_results.json  candidate_histories/
-├── selection.json  candidate_comparison.csv/.json/.md
-├── loss_weights.csv/.json  loss_weight_histories/
+├── selection.json  candidate_comparison.*
+├── loss_weights.*  loss_weight_histories/
 ├── final_training.csv  final_validation.json
-├── final_metrics.json  final_result.csv/.json/.md
-├── model_summary.txt/.json
-├── checkpoints/   search_state.pt, candidates/cand_XX/{last,best}.pt, loss_weights/…, final/{last,best}.pt
-├── figures/       (PNG, 300 dpi)
-│   pareto_initial_population, pareto_generation_XXX, pareto_front_final, search_progress, pareto_front_3d,
-│   pareto_front_final_with_candidates, candidates_val_dice, candidates_val_loss, candidates_delta_dice,
-│   params_vs_val_dice, synflow_vs_val_dice, zico_vs_val_dice, learning_capability_ranking,
-│   loss_weight_selection, final_training_curves, train_vs_val_dice, train_vs_val_loss, selected_architecture
+├── final_metrics.json  final_result.*  test_per_image.csv  test_predictions.npz
+├── model_summary.*
+├── checkpoints/final/best.pt
+├── figures/   (PNG, 300 dpi)
 └── logs/run.log
 ```
 
-`final_result.md` holds the final table:
-
-* Dice / DSC (%), mIoU (%), Params (M), FLOPs (G, per training batch as in Mixed-GGNAS);
-* HD95 (px), Sensitivity (%);
-* IoU (%), GFLOPs per image, and whether flip TTA was used.
-
-## 8. Scientific safeguards (summary)
+## 10. Scientific safeguards (summary)
 
 * **Search:** training-free; no weight is ever updated.
   * Three objectives (parameters, SynFlow, ZiCo). No TOPSIS, no weighted sum, no proxy combination.
@@ -240,24 +395,23 @@ results/BUSI/experiment_YYYYMMDD_HHMMSS/
     validation or test images.
 * **Isolation:** the test split is loaded only by the final test stage, exactly once. Nothing is ever selected
   on test data.
-* **Splits:** leakage-free:
+* **Splits:** leakage-free and identical for all methods and seeds:
   * CVC is split by colonoscopy sequence;
   * BUSI is stratified, with a conflicting duplicate removed;
-  * IDRiD keeps its official split.
+  * IDRiD and Kvasir-SEG keep their official test splits.
+* **Fair comparisons:** baselines are trained with exactly QENAS' protocol. Ablations differ from QENAS in one
+  component only. Paired tests are run on the same test images.
 * **Consistency:** the same network class and the same initialisation are used for SynFlow, ZiCo, candidate
-  training and final training. There is no scale selection or collapse anywhere.
-* **Selection:** the learning-capability criterion uses falsifiable gates (finite, generalising, not
-  overfitting, significant learning trend, better than trivial) and no hand-tuned weights.
-* **Honesty:** results are reported as they are. Every adaptation of official code and every design choice is
-  documented in DESIGN_DECISIONS.md.
+  training and final training.
+* **Honesty:** results are reported as they are. Every design choice is documented in DESIGN_DECISIONS.md.
 
-## 9. Known limitations
+## 11. Known limitations
 
-* BUSI and IDRiD have no patient identifiers, so their splits are image-level (BUSI exact duplicates are
-  handled).
+* BUSI, IDRiD and Kvasir-SEG have no patient identifiers, so their splits are image-level (BUSI exact
+  duplicates are handled).
 * The dataset-specific DARTS genotypes were derived by the Mixed-GGNAS authors on their own (unknown) split
-  (DESIGN_DECISIONS D5).
-* SynFlow and ZiCo are zero-cost *proxies*. Their correlation with trained segmentation quality is not
-  guaranteed. ZiCo also has a documented bias towards networks with more layers (D14). Every run reports both
-  against the candidates' validation Dice (`synflow_vs_val_dice`, `zico_vs_val_dice`, with Spearman ρ).
+  (DESIGN_DECISIONS D5). Kvasir-SEG uses the CVC-ClinicDB genotype.
+* SynFlow and ZiCo are zero-cost *proxies*; their link to trained quality is measured, not assumed (study T9).
+* Mixed-GGNAS cannot be re-run on these splits (no released architectures/weights; about 26 h of search per
+  dataset). Its published numbers come from its own splits.
 * Bit-exact reproducibility is verified on CPU. Some CUDA kernels may differ in the last bits.

@@ -262,5 +262,29 @@ Added metrics:
   diagonal (counted and reported).
 * **Sensitivity** (recall, clinical) = |P∩G| / |G|.
 
-Empty ground truth and empty prediction count as Dice = IoU = 1. None of the three datasets has empty ground
+Empty ground truth and empty prediction count as Dice = IoU = 1. None of the four datasets has empty ground
 truths.
+
+Also recorded:
+
+* the inference time per image (median of 50 forward passes, batch 1, including flip TTA if used);
+* every test image's metrics (`test_per_image.csv`) and binary prediction (`test_predictions.npz`), for paired
+  statistics and qualitative figures.
+
+## 10. Datasets and splits
+
+| dataset | images | train / validation / test | split unit |
+|---|---:|---|---|
+| BUSI (benign + malignant) | 645 | 413 / 103 / 129, stratified by class | image (exact duplicates handled) |
+| CVC-ClinicDB | 612 | 395 / 96 / 121 | colonoscopy sequence |
+| IDRiD, optic disc | 81 | 43 / 11 / 27 (official test split) | image |
+| Kvasir-SEG | 1000 | 704 / 176 / 120 (official `val.txt` = test split) | image |
+
+The split is fixed (`data.split_seed = 42`); the run seed changes only the search, initialisation, data order and
+augmentation. Results of a run are in `results/<DATASET>/qenas/seed_<seed>/`. DATASETS.md documents the folder
+layouts and integrity checks.
+
+## 11. Evaluation study
+
+The comparison with hand-designed networks, the ablations, random search, repeated seeds, external validation
+and the CVC split study are described in STUDY.md and run by `study.py`. They do not change QENAS.

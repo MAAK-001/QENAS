@@ -4,7 +4,9 @@ The protocol is shrunk only in size (resolution, widths, population, epochs) so 
 on a CPU; the code path is exactly the one of ``python main.py --dataset BUSI``.
 """
 
+import csv
 import json
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -43,7 +45,7 @@ def finished_run(tmp_path_factory):
         "final_training.epochs": 3, "final_training.batch_size": 4,
         "final_training.early_stopping": {"patience": 2, "min_epochs": 2, "significance": 0.05},
     })
-    exp = Experiment.create(cfg, config_fingerprint(cfg))
+    exp = Experiment.open(cfg, config_fingerprint(cfg))
     Pipeline(cfg, exp, torch.device("cpu")).run()
     return cfg, exp
 
@@ -52,7 +54,10 @@ def test_all_stages_complete_in_order(finished_run):
     cfg, exp = finished_run
     assert exp.completed and exp.state["test_evaluated"]
     assert [s for s in exp.state["stages"]] == STAGES
-    assert str(exp.dir).startswith(cfg["paths"]["results"])
+    assert exp.dir == Path(cfg["paths"]["results"]) / "BUSI" / "qenas" / "seed_42"
+    # a finished experiment keeps only its final best-validation weights
+    kept = [p.relative_to(exp.checkpoints).as_posix() for p in exp.checkpoints.rglob("*") if p.is_file()]
+    assert kept == ["final/best.pt"]
 
 
 def test_search_uses_three_objectives_and_records_progress(finished_run):
@@ -74,12 +79,19 @@ def test_final_metrics_contain_mixed_ggnas_and_added_metrics(finished_run):
     assert 0 <= t["dice"] <= 1 and t["hd95"] >= 0
     assert final["params_m"] > 0 and final["gflops_mixed_ggnas"] == pytest.approx(4 * final["gflops_per_image"])
     row = json.loads((exp.dir / "final_result.json").read_text())[0]
-    assert {"Dice / DSC (%)", "mIoU (%)", "Params (M)", "HD95 (px)", "Sensitivity (%)"} <= set(row)
+    assert {"Dice / DSC (%)", "mIoU (%)", "Params (M)", "HD95 (px)", "Sensitivity (%)", "ms / image"} <= set(row)
+    assert final["inference_ms_per_image"] > 0
+    # per-image test metrics and predictions (statistics and qualitative figures of the study)
+    per = list(csv.DictReader(open(exp.dir / "test_per_image.csv", encoding="utf-8")))
+    assert len(per) == final["n_test"]
+    assert abs(np.mean([float(r["dice"]) for r in per]) - t["dice"]) < 1e-9
+    z = np.load(exp.dir / "test_predictions.npz")
+    assert z["masks"].shape == (final["n_test"], 64, 64) and list(z["sample_ids"]) == [r["sample_id"] for r in per]
     assert (exp.dir / "summary.txt").exists() and (exp.dir / "figures" / "pareto_front_3d.png").exists()
 
 
 def test_rerun_skips_everything_and_never_retests(finished_run):
     cfg, exp = finished_run
-    again = Experiment.open_existing(exp.dir, cfg, exp.fingerprint)
+    again = Experiment.open(cfg, exp.fingerprint)
     p = Pipeline(cfg, again, torch.device("cpu"))
     assert p.stage_test() == {"skipped": True}

@@ -1,57 +1,30 @@
 """The FLOPs counter reproduces the Mixed-GGNAS tables (thop 0.1.1 convention, per training batch)."""
 
 import pytest
-import torch
-import torch.nn as nn
 
 from qenas.config import build_config
 from qenas.models.network import build_model
+from qenas.models.baselines import AttentionUNet, UNet
 from qenas.models.summary import model_summary, thop_flops
 
 
-class _DoubleConv(nn.Sequential):
-    def __init__(self, i, o):
-        super().__init__(nn.Conv2d(i, o, 3, padding=1, bias=False), nn.BatchNorm2d(o), nn.ReLU(True),
-                         nn.Conv2d(o, o, 3, padding=1, bias=False), nn.BatchNorm2d(o), nn.ReLU(True))
-
-
-class _Up(nn.Module):
-    def __init__(self, i, o):
-        super().__init__()
-        self.up = nn.ConvTranspose2d(i, i // 2, 2, stride=2)
-        self.conv = _DoubleConv(i, o)
-
-    def forward(self, x1, x2):
-        return self.conv(torch.cat([x2, self.up(x1)], 1))
-
-
-class UNet(nn.Module):
-    """The standard U-Net (31.04 M parameters) used as the U-Net baseline in Mixed-GGNAS Tables 4-7."""
-
-    def __init__(self):
-        super().__init__()
-        self.inc = _DoubleConv(3, 64)
-        self.downs = nn.ModuleList([nn.Sequential(nn.MaxPool2d(2), _DoubleConv(a, b))
-                                    for a, b in ((64, 128), (128, 256), (256, 512), (512, 1024))])
-        self.ups = nn.ModuleList([_Up(a, b) for a, b in ((1024, 512), (512, 256), (256, 128), (128, 64))])
-        self.out = nn.Conv2d(64, 2, 1)
-
-    def forward(self, x):
-        feats = [self.inc(x)]
-        for d in self.downs:
-            feats.append(d(feats[-1]))
-        y = feats[-1]
-        for u, skip in zip(self.ups, reversed(feats[:-1])):
-            y = u(y, skip)
-        return self.out(y)
-
-
 def test_unet_reproduces_mixed_ggnas_table_values():
-    m = UNet()
+    # The Mixed-GGNAS U-Net has a two-class softmax output: Table 4/5 (256 x 256, batch 8) 437.94 G,
+    # Table 7 (IDRiD 512 x 320, batch 4) 547.42 G - reproduced exactly.
+    m = UNet(num_classes=2)
     assert sum(p.numel() for p in m.parameters()) / 1e6 == pytest.approx(31.04, abs=0.01)
-    # Table 4/5 (256 x 256, batch 8): 437.94 G;  Table 7 (IDRiD 512 x 320, batch 4): 547.42 G
     assert thop_flops(m, [8, 3, 256, 256]) / 1e9 == pytest.approx(437.94, abs=0.01)
     assert thop_flops(m, [4, 3, 320, 512]) / 1e9 == pytest.approx(547.42, abs=0.03)
+    # The study's baseline has one logit per pixel (the QENAS loss): the head is 64 parameters smaller.
+    assert thop_flops(UNet(), [8, 3, 256, 256]) / 1e9 == pytest.approx(437.94, abs=0.1)
+
+
+def test_attention_unet_is_the_mixed_ggnas_variant():
+    m = AttentionUNet()
+    assert sum(p.numel() for p in m.parameters()) / 1e6 == pytest.approx(8.73, abs=0.01)
+    # Table 5 (BUSI, 256 x 256, batch 8): 134.25 G; Table 7 (IDRiD, batch 4): 168.19 G  -> within 0.5 %
+    assert thop_flops(m, [8, 3, 256, 256]) / 1e9 == pytest.approx(134.25, rel=5e-3)
+    assert thop_flops(m, [4, 3, 320, 512]) / 1e9 == pytest.approx(168.19, rel=5e-3)
 
 
 def test_model_summary_flops_scale_with_batch():

@@ -16,7 +16,7 @@ other objectives, then the chromosome).
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Sequence
 
 import numpy as np
 
@@ -26,18 +26,20 @@ _EXTREME_REASON = {"f1_params": "extreme: fewest parameters", "f2_synflow": "ext
                    "f3_zico": "extreme: best ZiCo objective"}
 
 
-def select_pareto_candidates(front: List[Dict[str, Any]], k: int) -> List[Dict[str, Any]]:
+def select_pareto_candidates(front: List[Dict[str, Any]], k: int,
+                             objectives: Sequence[str] = OBJECTIVE_NAMES) -> List[Dict[str, Any]]:
+    """``objectives``: the objectives the search optimised (all three for QENAS)."""
     if k <= 0:
         raise ValueError("pareto.max_candidates must be positive")
-    front = sorted(front, key=lambda r: tuple(r[o] for o in OBJECTIVE_NAMES) + (r["chromosome"],))
+    front = sorted(front, key=lambda r: tuple(r[o] for o in objectives) + (r["chromosome"],))
     if len(front) <= k:
         return [dict(r, selection_reason="entire front (|front| <= k)") for r in front]
-    F = np.array([[r[o] for o in OBJECTIVE_NAMES] for r in front], dtype=float)
+    F = np.array([[r[o] for o in objectives] for r in front], dtype=float)
     lo, hi = F.min(0), F.max(0)
     Z = (F - lo) / np.where(hi - lo > 0, hi - lo, 1.0)
     chosen: List[int] = []
     reasons: Dict[int, str] = {}
-    for j, name in enumerate(OBJECTIVE_NAMES):
+    for j, name in enumerate(objectives):
         i = int(np.argmin(F[:, j]))
         if i in reasons:
             reasons[i] += " + " + _EXTREME_REASON[name].split(": ")[1]

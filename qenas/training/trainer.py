@@ -66,10 +66,11 @@ def predict_logits(model: nn.Module, x: torch.Tensor, amp: bool = False, tta: bo
 
 @torch.no_grad()
 def evaluate(model: nn.Module, loader, loss_fn: BCESoftMIoULoss, device: torch.device,
-             tta: bool = False) -> Dict[str, float]:
-    """Loss, Dice, IoU, mIoU, sensitivity and HD95 of ``model`` on ``loader`` (eval mode, no augmentation)."""
+             tta: bool = False, keep: bool = False):
+    """Loss, Dice, IoU, mIoU, sensitivity and HD95 of ``model`` on ``loader`` (eval mode, no augmentation).
+    With ``keep`` returns ``(metrics, per_image_rows, binary_predictions)`` in loader order."""
     model.eval()
-    acc = MetricAccumulator(boundary=True)
+    acc = MetricAccumulator(boundary=True, keep=keep)
     amp = use_amp(device)
     for x, y in loader:
         x = x.to(device, non_blocking=True)
@@ -79,7 +80,28 @@ def evaluate(model: nn.Module, loader, loss_fn: BCESoftMIoULoss, device: torch.d
         if not torch.isfinite(per_sample).all():
             raise NumericalError("non-finite loss during evaluation")
         acc.update(per_sample, logits.float(), y)
+    if keep:
+        return acc.compute(), acc.rows, acc.predictions
     return acc.compute()
+
+
+@torch.no_grad()
+def inference_time_ms(model: nn.Module, input_shape, device: torch.device, tta: bool, repeats: int = 50,
+                      warmup: int = 10) -> float:
+    """Median wall-clock time (ms) of one forward pass (with flip TTA if used) for a single image."""
+    model.eval()
+    x = torch.zeros([1] + list(input_shape), device=device)
+    times = []
+    for i in range(warmup + repeats):
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+        t0 = time.perf_counter()
+        predict_logits(model, x, use_amp(device), tta)
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+        if i >= warmup:
+            times.append(1000.0 * (time.perf_counter() - t0))
+    return float(sorted(times)[len(times) // 2])
 
 
 def load_best_weights(model: nn.Module, ckpt_dir: Path, device: torch.device) -> Dict[str, Any]:

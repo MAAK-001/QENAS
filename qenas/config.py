@@ -6,8 +6,10 @@ Resolution order (later wins):
        meaningful augmentation, the batch size that fits the IDRiD resolution); never tuning;
     3. run settings from the command line: data root, device, data-loader workers, seed.
 
-There are no alternative modes, options or protocol variants. The fully resolved configuration is saved as
-``config.json`` inside every experiment. A *fingerprint* of all scientific keys guarantees that a run is only
+The QENAS method has no alternative modes, options or protocol variants. The comparison conditions of the
+evaluation study (baselines, ablations, random search, the CVC leakage study) are defined in ``qenas/methods.py``
+and set through the keys ``method`` and ``data.split_unit`` by ``study.py`` only. The fully resolved configuration
+is saved as ``config.json`` inside every experiment. A *fingerprint* of all scientific keys guarantees that a run is only
 ever resumed with an identical configuration.
 """
 
@@ -22,13 +24,15 @@ from typing import Any, Dict, Iterable, Optional
 QENAS_ROOT = Path(__file__).resolve().parents[1]          # .../GGNAS/QENAS
 GGNAS_ROOT = QENAS_ROOT.parent                             # .../GGNAS
 
-SUPPORTED_DATASETS = ("BUSI", "CVC", "IDRID")
+SUPPORTED_DATASETS = ("BUSI", "CVC", "IDRID", "KVASIR")
+SPLIT_UNITS = ("dataset", "image")
 
 DEFAULT_CONFIG: Dict[str, Any] = {
-    "seed": 42,
+    "method": "qenas",                     # qenas/methods.py; main.py always runs "qenas", study.py also the rest
+    "seed": 42,                            # search, initialisation, data order and augmentation (NOT the split)
     "device": "auto",
     "paths": {
-        "results": str(QENAS_ROOT / "results"),           # results/<DATASET>/experiment_YYYYMMDD_HHMMSS/
+        "results": str(QENAS_ROOT / "results"),           # results/<DATASET>/<method>/seed_<seed>/
         "cache": str(QENAS_ROOT / "cache"),               # zero-cost evaluations + preprocessed arrays
     },
     "data": {
@@ -38,6 +42,9 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "in_channels": 3,                  # grayscale images are replicated to 3 channels
         "test_fraction": 0.2,              # used only when the dataset has no official test split
         "val_fraction": 0.2,               # fraction of the development (non-test) data used for validation
+        "split_seed": 42,                  # fixed: every method and every seed uses the identical split
+        "split_unit": "dataset",           # "dataset" = the dataset's leakage unit (CVC: sequence);
+                                           # "image" only for the CVC leakage study of study.py
         "mask_threshold": 127,             # 8-bit masks: foreground = value > threshold
         "num_workers": 0,
     },
@@ -98,7 +105,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     },
 }
 
-# Dataset-specific *data facts* (DESIGN_DECISIONS.md D33-D37). No model or optimisation tuning.
+# Dataset-specific *data facts* (DESIGN_DECISIONS.md D33-D38). No model or optimisation tuning.
 DATASET_OVERRIDES: Dict[str, Dict[str, Any]] = {
     "BUSI": {
         "data": {"image_size": [256, 256]},
@@ -115,6 +122,11 @@ DATASET_OVERRIDES: Dict[str, Dict[str, Any]] = {
         "augmentation": {"vflip": 0.0},
         "candidate_training": {"batch_size": 4},
         "final_training": {"batch_size": 4},
+    },
+    "KVASIR": {
+        "data": {"image_size": [256, 256]},   # as CVC-ClinicDB (same modality); native 332x487 ... 1920x1072
+        # Colonoscopy frames have no canonical orientation.
+        "augmentation": {"vflip": 0.5},
     },
 }
 
@@ -150,9 +162,9 @@ def set_by_path(cfg: Dict[str, Any], dotted: str, value: Any) -> None:
 
 
 def build_config(dataset: str, overrides: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """The QENAS configuration for ``dataset``. ``overrides`` ({dotted.key: value}) carries the run
-    settings of the command line (root, device, workers, seed); the unit tests also use it to shrink the
-    protocol for fast end-to-end checks."""
+    """The configuration for ``dataset``. ``overrides`` ({dotted.key: value}) carries the run settings of the
+    command line (root, device, workers, seed) and, for study.py, the study condition (``method``,
+    ``data.split_unit``); the unit tests also use it to shrink the protocol for fast end-to-end checks."""
     dataset = dataset.upper()
     if dataset not in SUPPORTED_DATASETS:
         raise ValueError(f"Unsupported dataset '{dataset}'. Choose from {SUPPORTED_DATASETS}.")
@@ -174,6 +186,12 @@ def validate_config(cfg: Dict[str, Any]) -> None:
         raise ValueError("model.scale must be one of 3, 5, 7 (Mixed-GGNAS Table 1).")
     if cfg["model"]["base_channels"] % 16:
         raise ValueError("model.base_channels must be a multiple of 16 (official blocks use groups=16).")
+    from .methods import method_spec
+    method_spec(cfg["method"])
+    if cfg["data"]["split_unit"] not in SPLIT_UNITS:
+        raise ValueError(f"data.split_unit must be one of {SPLIT_UNITS}")
+    if cfg["data"]["split_unit"] == "image" and cfg["data"]["dataset"] != "CVC":
+        raise ValueError("data.split_unit='image' exists only for the CVC leakage study")
     if not 0.0 < cfg["data"]["val_fraction"] < 1.0 or not 0.0 < cfg["data"]["test_fraction"] < 1.0:
         raise ValueError("data.val_fraction and data.test_fraction must lie in (0, 1)")
     s = cfg["search"]

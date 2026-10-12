@@ -1,8 +1,8 @@
 """Experiment directories, stage bookkeeping and safe resume.
 
-Layout::
+An experiment is identified by (dataset, method, seed) and lives in a fixed directory::
 
-    results/<DATASET>/experiment_YYYYMMDD_HHMMSS/
+    results/<DATASET>/<method>/seed_<seed>/          (CVC leakage study: results/CVC_frame_split/...)
         state.json            stage completion, fingerprint, test-evaluation flag
         config.json           fully resolved configuration (+ fingerprint)
         environment.json      Python / PyTorch / CUDA / device information
@@ -11,12 +11,10 @@ Layout::
         figures/              publication figures (PNG)
         logs/run.log
 
-Resume policy
-* default: the most recent experiment of the dataset with the identical configuration
-  fingerprint is opened - an unfinished one is resumed, a finished one is reported and never
-  modified. Otherwise the most recent *unfinished* experiment is opened, which stops with the
-  list of differing keys (configurations are never mixed);
-* ``--no-resume``: always start a new experiment directory.
+Resume policy: running the same (dataset, method, seed) again opens the same directory. With the identical
+configuration fingerprint an unfinished experiment is resumed and a finished one is reported and never
+modified. A different configuration stops with the list of differing keys (configurations are never mixed);
+delete the directory to start that experiment again.
 """
 
 from __future__ import annotations
@@ -31,6 +29,15 @@ from .utils.io import load_json, save_json
 
 class ResumeConflict(RuntimeError):
     pass
+
+
+def dataset_dirname(cfg: Dict[str, Any]) -> str:
+    ds = cfg["data"]["dataset"]
+    return f"{ds}_frame_split" if cfg["data"]["split_unit"] == "image" else ds
+
+
+def experiment_dir(cfg: Dict[str, Any]) -> Path:
+    return Path(cfg["paths"]["results"]) / dataset_dirname(cfg) / cfg["method"] / f"seed_{int(cfg['seed'])}"
 
 
 class Experiment:
@@ -48,7 +55,8 @@ class Experiment:
             self.state = load_json(self.state_path)
         else:
             self.state = {"fingerprint": fingerprint, "created": _now(), "status": "running", "stages": {},
-                          "test_evaluated": False}
+                          "test_evaluated": False, "method": cfg["method"], "dataset": cfg["data"]["dataset"],
+                          "seed": int(cfg["seed"])}
             self.save_state()
 
     # ------------------------------------------------------------------ state
@@ -71,58 +79,20 @@ class Experiment:
     def completed(self) -> bool:
         return self.state.get("status") == "completed"
 
-    # ------------------------------------------------------------------ discovery
-    @staticmethod
-    def dataset_dir(cfg: Dict[str, Any]) -> Path:
-        return Path(cfg["paths"]["results"]) / cfg["data"]["dataset"]
-
+    # ------------------------------------------------------------------ opening
     @classmethod
-    def create(cls, cfg: Dict[str, Any], fingerprint: str) -> "Experiment":
-        base = cls.dataset_dir(cfg)
-        base.mkdir(parents=True, exist_ok=True)
-        stamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-        d = base / f"experiment_{stamp}"
-        k = 1
-        while d.exists():
-            d = base / f"experiment_{stamp}_{k}"
-            k += 1
-        d.mkdir(parents=True)
+    def open(cls, cfg: Dict[str, Any], fingerprint: str) -> "Experiment":
+        """The experiment of (dataset, method, seed): resumed if it exists with the same configuration."""
+        d = experiment_dir(cfg)
+        if (d / "state.json").exists():
+            st = load_json(d / "state.json")
+            if st.get("fingerprint") != fingerprint:
+                old_cfg = load_json(d / "config.json")["config"] if (d / "config.json").exists() else {}
+                diffs = diff_configs(old_cfg, cfg)
+                lines = "\n".join(f"    {k}: experiment={a!r}  current={b!r}" for k, (a, b) in diffs.items())
+                raise ResumeConflict(f"{d} was created with a different configuration; refusing to resume.\n"
+                                     f"{lines}\n  Delete that directory to run this experiment again.")
         return cls(d, cfg, fingerprint)
-
-    @classmethod
-    def open_existing(cls, directory: Path, cfg: Dict[str, Any], fingerprint: str) -> "Experiment":
-        directory = Path(directory)
-        st = load_json(directory / "state.json")
-        if st.get("fingerprint") != fingerprint:
-            old_cfg = load_json(directory / "config.json")["config"] if (directory / "config.json").exists() else {}
-            diffs = diff_configs(old_cfg, cfg)
-            lines = "\n".join(f"    {k}: experiment={a!r}  current={b!r}" for k, (a, b) in diffs.items())
-            raise ResumeConflict(f"Configuration differs from the unfinished experiment {directory.name}; refusing to "
-                                 f"resume.\n{lines}\n  Use --no-resume to start a new experiment.")
-        return cls(directory, cfg, fingerprint)
-
-    @classmethod
-    def find_resumable(cls, cfg: Dict[str, Any], fingerprint: str) -> Optional[Path]:
-        """Most recent experiment with the identical fingerprint, finished or not. Otherwise the most recent
-        *unfinished* experiment (opening it reports the configuration conflict), else None."""
-        base = cls.dataset_dir(cfg)
-        if not base.exists():
-            return None
-        cands = sorted([p for p in base.iterdir() if p.is_dir() and p.name.startswith("experiment_")
-                        and (p / "state.json").exists()], key=lambda p: p.name)
-        states = []
-        for p in reversed(cands):
-            try:
-                states.append((p, load_json(p / "state.json")))
-            except Exception:
-                continue
-        for p, st in states:
-            if st.get("fingerprint") == fingerprint:
-                return p
-        for p, st in states:
-            if st.get("status") != "completed":
-                return p
-        return None
 
 
 def _now() -> str:

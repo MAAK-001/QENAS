@@ -55,7 +55,10 @@ GENOTYPES: Dict[str, Genotype] = {
             ("dil_conv", 0), ("dil_conv", 4)], up_concat=range(2, 6)),
 }
 
-DATASET_GENOTYPE = {"BUSI": "darts_cell_busi", "CVC": "darts_cell_cvc", "IDRID": "darts_cell_idrid"}
+# Mixed-GGNAS published no genotype for Kvasir-SEG; it uses the genotype derived on CVC-ClinicDB, the same imaging
+# modality (colonoscopy polyps) and the only polyp dataset of the Mixed-GGNAS paper (DESIGN_DECISIONS D5).
+DATASET_GENOTYPE = {"BUSI": "darts_cell_busi", "CVC": "darts_cell_cvc", "IDRID": "darts_cell_idrid",
+                    "KVASIR": "darts_cell_cvc"}
 
 
 def genotype_name_for(dataset: str) -> str:

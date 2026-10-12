@@ -44,6 +44,9 @@ measurement in this project. A merely plausible change is not adopted.
 * **What remains adjustable, and why:**
   * the **seed**, because independent repetitions are needed to report variability;
   * device, workers and data root, which do not affect results (excluded from the configuration fingerprint).
+* **The evaluation study** (baselines, ablations, random search, repeated seeds; STUDY.md) does not add options to
+  the method: its conditions are defined in `qenas/methods.py` and run by `study.py` (D44); `main.py` runs only
+  QENAS.
 * **How the end-to-end check is done now:** the unit tests run the real pipeline on a small synthetic dataset
   (`tests/test_pipeline.py`) instead of a special smoke mode.
 
@@ -94,6 +97,10 @@ measurement in this project. A merely plausible change is not adopted.
   the same datasets, whose membership is unknown. They are a fixed structural prior (16 discrete operation
   choices), not access to our test labels, but a strict reader may see weak information transfer. The previous
   version offered a dataset-independent genotype as an option. Under D1 it was removed; the caveat stays.
+* **Kvasir-SEG** has no published Mixed-GGNAS genotype. It uses `darts_cell_cvc`, the genotype derived on
+  CVC-ClinicDB: the same imaging modality (colonoscopy polyps) and the only polyp dataset of the Mixed-GGNAS
+  paper. Caveat for the external validation (RQ4): this structural prior was derived (by Mixed-GGNAS, on their
+  split) on CVC-ClinicDB, the external test dataset; no CVC-ClinicDB image or weight enters the Kvasir-SEG models.
 
 ### D6 — DARTS cell wiring follows NAS-Unet; resolution handling explicit
 * **Reason:** NAS-Unet feeds a down cell with (two-levels-back feature at 2× resolution, previous feature) and an
@@ -235,47 +242,23 @@ measurement in this project. A merely plausible change is not adopted.
   **Rejected.**
 
 ### D14 — The three objectives work together (measured)
-* **Study:** `evidence/objective_agreement/` — study.py + analyse.py; results in `BUSI/results.json` and
-  `BUSI/analysis.json`. It covers the five homogeneous architectures plus 60 random ones (seeded) on BUSI, with
-  exactly the search's objective code, initialisation and ZiCo batches. Training split only.
-* **Results** (Kendall τ between the *minimised* objectives; τ > 0 = the two improve together, τ < 0 = trade-off):
-
-  | relation of the minimised objectives | Kendall τ | p | meaning |
-  |---|---:|---:|---|
-  | f1 params vs f2 SynFlow | −0.46 | 8·10⁻⁸ | trade-off: SynFlow grows with model size |
-  | f1 params vs f3 ZiCo | −0.03 | 0.69 | ZiCo is independent of model size |
-  | f2 SynFlow vs f3 ZiCo | **+0.37** | 1·10⁻⁵ | harmony |
-  | SynFlow vs ZiCo after removing the effect of size (rank residuals) | **+0.41** | 1·10⁻⁶ | harmony beyond size |
-
-* **Interpretation.**
-  * SynFlow and ZiCo are in **harmony**: architectures that one proxy rates highly the other also tends to rate
-    highly. The agreement is even stronger once model size is removed (+0.41), so it is not merely a shared
-    preference for large networks. They are not two conflicting quality signals that would split the front.
-  * SynFlow is in a **trade-off with the parameter count** — the intended cost-versus-quality conflict that
-    gives NSGA-II a meaningful Pareto front.
-  * ZiCo is **independent of model size** (τ = −0.03, not significant). It ranks architectures by something size
-    does not explain, which SynFlow (τ = 0.46 with size) cannot do. This is the information the third objective
-    adds.
-  * No pair of objectives works against the search for good segmentation networks. Hence no objective needed
-    to be changed or replaced.
-* **Bias measured (reported, not corrected — D12):** per gene, ZiCo rewards DARTS and Inception blocks most —
-  the blocks with the most convolution layers — as expected from ZiCo-BC's finding that ZiCo grows with the
-  number of layers.
-
-  | one gene of … instead of Residual | Δ parameters (M) | Δ ln(1+SynFlow) | Δ ZiCo |
-  |---|---:|---:|---:|
-  | Dense | −0.02 | +0.47 | +21 |
-  | Inception | +0.20 | +3.04 | +62 |
-  | ConvNeXt | +0.40 | +3.81 | +28 |
-  | DARTS | −0.03 | +2.58 | **+91** |
-  | *all-Residual network (reference)* | *1.89* | *57.1* | *429* |
-
-  (least squares on the block counts; R² = 0.45 / 0.91 / 0.82)
-
-  SynFlow rewards ConvNeXt, Inception and DARTS. A DARTS gene is favoured by all three objectives at once (slightly
-  fewer parameters, higher SynFlow, the highest ZiCo), so the front will contain DARTS- and Inception-rich
-  architectures. Whether they segment better is not decided by the proxies: the 20-epoch learning-capability
-  stage trains the front's representatives, and every run reports both proxies against validation Dice.
+* **Question:** do the objectives conflict in a way that harms the search? Only params vs a quality proxy should
+  be a trade-off; two quality proxies working against each other would split the front.
+* **Evidence:** `results/analysis/T6_objective_agreement`, `T7_block_effects` (study, `study.py analyse`). They are
+  computed from the random-search archives: 220 uniformly random architectures per dataset and seed, all four
+  datasets, 3 seeds — an unbiased sample, unlike the NSGA-II archive. The quantities are:
+  * the Kendall τ between every pair of minimised objectives (τ > 0: they improve together; τ < 0: trade-off);
+  * the τ between SynFlow and ZiCo after removing the effect of model size (rank residuals);
+  * the least-squares effect of each block type on each objective.
+* **Decision rule:** an objective is replaced only if two *quality* objectives are in significant conflict
+  (τ(f2, f3) < 0). A pilot measurement on 65 BUSI architectures, taken when ZiCo was added, found harmony
+  (τ(f2, f3) = +0.37; +0.41 after removing size) and ZiCo independent of size. The study re-measures this on all
+  datasets; the decision is revisited if T6 contradicts it. **Numbers: to be filled in from T6/T7 after the
+  study.**
+* **Known bias (reported, not corrected — D12):** ZiCo grows with the number of layers (ZiCo-BC), so it is
+  expected to reward the layer-rich DARTS and Inception blocks (T7). Whether such architectures segment better
+  is decided by the 20-epoch learning-capability stage, not by the proxies. T9 reports both proxies against the
+  trained validation Dice.
 
 ### D15 — The scored network is the trained network
 * **Reason:** SynFlow, ZiCo, candidate training and final training all build the network with the same class and
@@ -294,26 +277,15 @@ measurement in this project. A merely plausible change is not adopted.
   mutation assume an ordinal distance between block types and were rejected.
 * **Population (measured):** NSGA-II selects by non-domination rank first. Once most of the population is rank 0,
   survival and mating are decided by crowding distance alone and the search loses its pressure towards better
-  objectives. Adding an objective makes more points non-dominated. On the measured BUSI objective distribution
-  (D14), the expected non-dominated share of a random population is:
-
-  | population size | 2 objectives (params, SynFlow) | 3 objectives (+ ZiCo) |
-  |---:|---:|---:|
-  | 10 | 44 % | **51 %** |
-  | 20 | 28 % | **33 %** |
-  | 30 | 20 % | 24 % |
-  | 40 | 15 % | 18 % |
-
-  With three objectives, more than half (51 %) of a population of 10 is non-dominated. Population 20 brings
-  the share (33 %) below the level the two-objective search had with 10 (44 %). Doubling the population is
-  the smallest change that achieves this.
+  objectives. Adding an objective makes more points non-dominated. The pilot measurement (D14) found 51 % of a
+  random population of 10 non-dominated with three objectives, but 33 % with 20 — below the 44 % the
+  two-objective search had with 10. Doubling the population is the smallest change that restores the selection
+  pressure. **Evidence of the study:** `results/analysis/T8_nondominated_share` (all datasets, 3 seeds; to be
+  filled in).
 * **Generations: 10**, unchanged from Mixed-GGNAS and the previous version (≤ 220 evaluations). No evidence
-  supports a different number, so none is adopted. Convergence is checked in every run by the hypervolume
-  curve (D17): if it is still rising at the last generation, that is the evidence that more generations would
-  help.
-* **Cost:** measured on the development CPU under full load, SynFlow takes 7.6 s and ZiCo 51 s per architecture
-  on average (`evidence/objective_agreement/BUSI/analysis.json`), i.e. about 3–4 h for the search. On a GPU it
-  takes minutes. Both are small next to the supervised stages.
+  supports a different number, so none is adopted. Convergence is visible in every run's hypervolume curve
+  (D17), and NSGA-II is compared with random search at the same budget (`T5_search_vs_random`).
+* **Cost:** measured per run in `T13_time` (the search stage). On a GPU the search takes minutes; on a CPU, hours.
 
 ### D17 — Search progress measured by hypervolume
 * **Decision:** after the search, the hypervolume of every generation's non-dominated set is computed. It uses
@@ -416,23 +388,24 @@ measurement in this project. A merely plausible change is not adopted.
 * **Decision:** the best checkpoint is evaluated on validation with and without flip TTA (average of the
   foreground probabilities of the image and of its mirror, flipped back). TTA is used for the single test
   evaluation if and only if it increases the validation Dice. There is no forced on/off (D1).
-* **Evidence** (`evidence/refit_tta_busi_128px/`; BUSI, 128×128, 30 epochs, test never loaded): TTA lowered the
-  validation loss and raised IoU/mIoU in 3/3 trained models. Validation Dice rose in 2/3 (+1.27, +0.77) but fell
-  in 1/3 (−0.34). "Always on" is therefore not supported for Dice, while a per-model decision on validation is.
+* **Evidence:** `results/analysis/T11_tta` — for every run of every method, whether TTA was chosen and the
+  validation Dice with and without it (to be filled in). "Always on" would be adopted only if TTA improved the
+  validation Dice in every run; a per-model decision on validation is the rule that never uses test data.
   Horizontal flips are in the training augmentation for every dataset, so mirrored inputs are in-distribution.
 
 ### D28 — No refit on train + validation
 * **Decision:** the final model is the best-validation checkpoint of the run on the training split.
-* **Evidence** (same study): validation Dice grows by +1.4 points from 206 → 310 training images, but only +0.25
-  (best) / +0.09 (last-5 mean) from 310 → 413, below the epoch-to-epoch noise. Adding the 103 validation images
-  therefore has no measurable expected benefit, and a refit model could no longer be checked on held-out data
-  before the test.
-* The previous version offered the refit as an option; under D1 it was removed.
+* **Reason:** a model refitted on train + validation can no longer be checked on any held-out data before the
+  single test, and its stopping epoch would have to be transferred from another run. No measurement supports a
+  gain that would justify that loss of control, so the refit is not part of the method. (An earlier exploratory
+  measurement on BUSI found the validation Dice nearly flat between 310 and 413 training images; it is not
+  repeated in the study.)
 
 ### D29 — Final training length 100 epochs
-* **Evidence:** in the previous full BUSI run (Kaggle GPU) the best validation epoch was 75 of 100, and
-  validation Dice did not improve in the last 25 epochs. No evidence supports a longer schedule. A longer run
-  could not silently overfit anyway: the best checkpoint is restored, and D25 stops on overfitting.
+* **Evidence:** `results/analysis/T12_training` — best epoch, epochs run and early-stopping frequency of every
+  final training (to be filled in). The schedule would only be lengthened if the best epochs cluster at the end
+  of the budget. A longer run could not silently overfit anyway: the best checkpoint is restored, and D25 stops
+  on overfitting.
 
 ---
 
@@ -514,6 +487,11 @@ measurement in this project. A merely plausible change is not adopted.
   near-duplicates, so a random frame split leaks. Whole sequences are assigned to splits → 395 / 96 / 121
   frames (18 / 5 / 6 sequences). This is stricter (and gives lower scores) than the random frame split of the
   Mixed-GGNAS paper.
+* **Evidence that a random frame split inflates the scores** (study RQ5, `results/analysis/T16_cvc_leakage`): QENAS
+  and U-Net are also run with a frame-level split (392 / 98 / 122, `data.split_unit = image`), 3 seeds each.
+  An earlier single run had shown 89.6 % instead of 66.4 % test Dice for QENAS. The random split is leaky
+  (near-duplicate frames of one sequence on both sides), so it is **not adopted**. Its results may only be
+  reported as a labelled comparison with the Mixed-GGNAS protocol.
 * PNG copies are used (the TIFs are not decodable by Pillow and contain the same images). The PNG masks have
   anti-aliasing artefacts, so they are binarised at > 127.
 
@@ -555,6 +533,14 @@ measurement in this project. A merely plausible change is not adopted.
 * A configuration fingerprint guards every resume. Re-running a finished experiment reports it and never
   modifies it.
 
+* **Pruning:** once a stage is done, the checkpoints it alone used are deleted (search state after the search,
+  candidate runs after the candidate stage, α runs after the loss-weight stage), because their results are
+  stored in the stage's JSON/CSV outputs. A finished experiment keeps only `checkpoints/final/best.pt`. This keeps
+  78 study experiments within the Kaggle disk and GitHub file-size limits (a U-Net checkpoint is 124 MB).
+* **Timer:** at the end of every run, the time from start to end (the sum of all stage times, which includes
+  earlier sessions of a resumed run) and the wall-clock time of the current session are logged, stored as
+  `total_seconds` in `state.json`, and appended to `summary.txt`.
+
 ### D40 — Determinism
 * Seeds for Python, NumPy and PyTorch; `torch.use_deterministic_algorithms(True, warn_only=True)`; deterministic
   cuDNN; seeded per-epoch data order and augmentation.
@@ -562,12 +548,56 @@ measurement in this project. A merely plausible change is not adopted.
   the last bits.
 
 ### D41 — Result folders
-* The runs of the previous, two-objective version are kept unchanged in `old results/`. Every run of this version
-  writes to `results/<DATASET>/experiment_YYYYMMDD_HHMMSS/`.
+* Every experiment is identified by (dataset, method, seed) and lives in `results/<DATASET>/<method>/seed_<s>/`
+  (the CVC leakage study in `results/CVC_frame_split/`). Re-running the same command resumes or reports that
+  directory; a changed configuration is refused. Results of earlier versions were deleted before the study.
+
+### D42 — Kvasir-SEG: official split
+* **Decision:** Kvasir-SEG (Jha et al., MMM 2020; 1000 polyp images) is the fourth dataset, at 256 × 256 like
+  CVC-ClinicDB, with vertical flips (endoscopy). The authors publish a train/val split "for fair comparison":
+  `val.txt` (120) is the test split, and 20 % of `train.txt` (880) is the validation split → 704 / 176 / 120.
+* JPEG masks (≤ 2.1 % grey edge pixels) are binarised at > 127. Pixel hashing found no duplicates. There are no
+  patient identifiers, so the split is image-level (as for BUSI).
+* **Reason:** the most widely used polyp benchmark with an official split. It gives the polyp results more
+  statistical power than CVC-ClinicDB's 6 test sequences, and it enables the external validation on
+  CVC-ClinicDB (RQ4).
+
+### D43 — The split does not depend on the run seed
+* **Decision:** `data.split_seed = 42` is fixed; the run seed (`--seed`) changes only the search, initialisation,
+  data order and augmentation.
+* **Reason:** repeated runs measure the variability of the method, and every method and seed is tested on the
+  same images, which makes paired per-image tests possible (D45).
+
+### D44 — Evaluation study: conditions and baselines
+* **Decision:** the study conditions (STUDY.md) are defined in one registry, `qenas/methods.py`, and run by
+  `study.py`; `main.py` runs only QENAS.
+  * The objective ablations change only the optimised objectives. All three objectives are still evaluated and
+    recorded, so the cache and analyses stay complete.
+  * The selection ablations copy QENAS' search and candidate runs of the same seed and change only the
+    selection rule.
+  * Random search keeps NSGA-II's evaluation budget.
+* **Baselines:** U-Net (31.04 M) and Attention U-Net (8.73 M), the exact variants of the Mixed-GGNAS tables
+  (identified by parameters and FLOPs, `tests/test_flops.py`). They are trained with QENAS' own protocol for its
+  selected architecture (α grid on validation → final training → TTA decision → single test). Mixed-GGNAS itself
+  cannot be re-run: its repository has no searched architectures, weights or training instructions, and its
+  search takes about 26 h per dataset. Its published numbers (own splits) are reported for reference.
+* **External validation** (RQ4): the Kvasir-SEG best-validation checkpoint is applied unchanged, with its own
+  preprocessing and TTA decision, to all 612 CVC-ClinicDB frames.
+
+### D45 — Statistics of the study
+* **Decision:**
+  * mean ± SD over 3 seeds;
+  * paired, two-sided Wilcoxon signed-rank tests on per-image Dice (averaged over seeds) of the same test
+    images, with a 95 % bootstrap CI of the mean difference and Holm–Bonferroni correction within each table and
+    dataset;
+  * hypervolume for search quality.
+* **Reason:** with 3 seeds a test across seeds has almost no power, whereas the per-image pairing uses all test
+  images. Wilcoxon makes no normality assumption about Dice, which is bounded and skewed. Holm controls the
+  family-wise error without assuming independence.
 
 ---
 
-## Changes from the previous version (two objectives) and why
+## Changes from the two-objective version and why
 
 | area | previous version | this version | reason |
 |---|---|---|---|
@@ -579,4 +609,6 @@ measurement in this project. A merely plausible change is not adopted.
 | final metrics | Dice, IoU, mIoU, loss | Mixed-GGNAS metrics (Dice = DSC, mIoU, Params, FLOPs) + **HD95** + **Sensitivity** (D30–D32) | requested evaluation |
 | FLOPs | own MAC count per image | thop convention per training batch (= Mixed-GGNAS tables) + per image | comparability, verified on U-Net (D32) |
 | options | refit, reuse-from, TTA on/off, YAML configs, smoke mode, optimiser/scheduler/genotype/target choices, … | **none** (D1) | one pipeline, one protocol |
-| results | `results/` | old runs in `old results/`, new runs in `results/` (D41) | requested |
+| results | `results/` | fixed folders `results/<DATASET>/<method>/seed_<s>/` (D41) | the evaluation study |
+| datasets | BUSI, CVC-ClinicDB, IDRiD | + **Kvasir-SEG** (official split, D42) | polyp benchmark, external validation |
+| evaluation | single runs | study: 3 seeds, baselines, ablations, random search, external validation, leakage study (D43–D45) | paper-level evaluation |

@@ -31,7 +31,7 @@ def plot_pareto_population(pop_rows: List[Dict[str, Any]], archive_rows: List[Di
                            n_generations: int, path: Path, highlight: Optional[List[Dict[str, Any]]] = None,
                            title: Optional[str] = None, candidate_epochs: int = 20) -> None:
     """Population of one generation in the three pairwise projections of the 3-objective space.
-    'non-dominated' refers to dominance in all three objectives."""
+    'non-dominated' refers to dominance in the objectives the search optimised."""
     apply_style()
     fig, axs = plt.subplots(1, 3, figsize=(15.5, 4.6))
     nd = np.array([r["nondominated"] for r in pop_rows], dtype=bool)
@@ -45,7 +45,7 @@ def plot_pareto_population(pop_rows: List[Dict[str, Any]], archive_rows: List[Di
                        label="population (dominated)", zorder=2)
         if nd.any():
             ax.scatter(p[nd, 0], p[nd, 1], s=40, color=SERIES[0], edgecolor="white", linewidth=1.0,
-                       label=f"non-dominated (3 objectives): {int(nd.sum())}", zorder=4)
+                       label=f"non-dominated (optimised objectives): {int(nd.sum())}", zorder=4)
         if highlight:
             h = _xy(highlight, kx, ky)
             ax.scatter(h[:, 0], h[:, 1], s=110, facecolor="none", edgecolor=SERIES[1], linewidth=1.6,

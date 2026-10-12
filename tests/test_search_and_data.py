@@ -64,6 +64,17 @@ def test_pymoo_operators_produce_valid_integer_chromosomes_with_three_objectives
         alg.tell(infills=pop)
 
 
+def test_split_does_not_depend_on_the_run_seed():
+    from qenas.datasets.discovery import Sample
+    from qenas.datasets.splits import make_splits
+    from qenas.datasets.discovery import DiscoveryResult
+    samples = [Sample(f"s{i:03d}", f"img{i}", [], group=f"s{i:03d}") for i in range(50)]
+    disc = DiscoveryResult("BUSI", "", samples, False, {})
+    a = make_splits(disc, build_config("BUSI", overrides={"seed": 42}))
+    b = make_splits(disc, build_config("BUSI", overrides={"seed": 7}))
+    assert {k: [s.sample_id for s in v] for k, v in a.items()} == {k: [s.sample_id for s in v] for k, v in b.items()}
+
+
 def test_config_is_a_single_protocol():
     a = build_config("BUSI")
     b = build_config("BUSI", overrides={"device": "cpu", "data.root": "elsewhere", "data.num_workers": 4})
@@ -76,7 +87,7 @@ def test_config_is_a_single_protocol():
 
 
 @pytest.mark.skipif(not DATA_ROOT.exists(), reason="datasets not available")
-@pytest.mark.parametrize("ds", ["CVC", "IDRID"])
+@pytest.mark.parametrize("ds", ["CVC", "IDRID", "KVASIR"])
 def test_real_splits_have_no_leakage(ds):
     from qenas.datasets.discovery import discover
     from qenas.datasets.splits import make_splits
@@ -85,6 +96,8 @@ def test_real_splits_have_no_leakage(ds):
     check_no_leakage(splits)
     if ds == "IDRID":
         assert len(splits["test"]) == 27 and len(splits["train"]) + len(splits["val"]) == 54
+    if ds == "KVASIR":   # official split: val.txt is the test split, validation carved from train.txt
+        assert len(splits["test"]) == 120 and len(splits["train"]) + len(splits["val"]) == 880
     if ds == "CVC":
         seqs = {k: {s.group for s in v} for k, v in splits.items()}
         assert seqs["train"].isdisjoint(seqs["test"]) and seqs["val"].isdisjoint(seqs["test"])

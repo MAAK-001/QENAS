@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -50,8 +50,10 @@ RECORD_KEYS = ("chromosome", "blocks", "params", "synflow_raw", "synflow_log", "
 
 class NSGA2Search:
     def __init__(self, cfg: Dict[str, Any], exp_dir: Path, device: torch.device, fingerprint: str,
-                 zico_batches: List[Tuple[torch.Tensor, torch.Tensor]]):
+                 zico_batches: List[Tuple[torch.Tensor, torch.Tensor]],
+                 objectives: Sequence[str] = OBJECTIVE_NAMES):
         self.cfg = cfg
+        self.objectives = tuple(objectives)   # optimised objectives; all three are always evaluated and recorded
         self.exp_dir = Path(exp_dir)
         self.device = device
         self.fingerprint = fingerprint
@@ -122,12 +124,12 @@ class NSGA2Search:
         return rec, was_cached
 
     def _evaluate_population(self, X: np.ndarray, generation: int, timer: ProgressTimer) -> np.ndarray:
-        F = np.zeros((X.shape[0], len(OBJECTIVE_NAMES)), dtype=float)
+        F = np.zeros((X.shape[0], len(self.objectives)), dtype=float)
         n = X.shape[0]
         for i, row in enumerate(X):
             ch = validate_chromosome(row)
             rec, cached = self._evaluate_one(ch, generation)
-            F[i] = [rec[o] for o in OBJECTIVE_NAMES]
+            F[i] = [rec[o] for o in self.objectives]
             if not np.all(np.isfinite(F[i])) or np.any(F[i] <= 0):
                 raise ObjectiveError(f"Invalid objective vector {F[i]} for {ch}")
             timer.step()
@@ -172,19 +174,19 @@ class NSGA2Search:
                  len(front), g["best_params"] / 1e6, g["best_log_synflow"], g["best_zico"], format_seconds(gen_seconds))
 
     def _hypervolumes(self) -> None:
-        A = np.array([[r[o] for o in OBJECTIVE_NAMES] for r in self.archive.values()], dtype=float)
+        A = np.array([[r[o] for o in self.objectives] for r in self.archive.values()], dtype=float)
         ideal, nadir = A.min(0), A.max(0)
         span = np.where(nadir - ideal > 0, nadir - ideal, 1.0)
-        hv = HV(ref_point=np.full(len(OBJECTIVE_NAMES), 1.1))
+        hv = HV(ref_point=np.full(len(self.objectives), 1.1))
         for g in self.generation_table:
-            P = np.array([[r[o] for o in OBJECTIVE_NAMES] for r in self.population_history
+            P = np.array([[r[o] for o in self.objectives] for r in self.population_history
                           if r["generation"] == g["generation"] and r["nondominated"]], dtype=float)
             g["hypervolume"] = float(hv((P - ideal) / span))
 
     # ------------------------------------------------------------------ main loop
     def run(self, on_generation=None) -> Dict[str, Any]:
         self._t_start = time.time()
-        problem = QENASProblem()
+        problem = QENASProblem(n_obj=len(self.objectives))
         if not self._try_resume():
             self.algorithm = build_algorithm(self.cfg)
             self.algorithm.setup(problem, termination=("n_gen", self.n_generations + 1),
@@ -237,3 +239,39 @@ class NSGA2Search:
         save_json(d / "nsga2_generations.json", self.generation_table)
         save_csv(d / "pareto_front.csv", front, ["front_index", *RECORD_KEYS])
         save_json(d / "pareto_front.json", front)
+
+
+class RandomSearch(NSGA2Search):
+    """Search baseline of the evaluation study: uniform random sampling of the search space with NSGA-II's
+    evaluation budget (population x (generations + 1) distinct architectures), the same objective code, cache,
+    initialisation and ZiCo batches. Training-free. The non-dominated set is taken over the optimised objectives."""
+
+    def run(self, on_generation=None) -> Dict[str, Any]:
+        from ..models.chromosome import CHROMOSOME_LENGTH, N_BLOCK_TYPES
+        from ..utils.seed import derive_seed
+        budget = self.pop_size * (self.n_generations + 1)
+        rng = np.random.default_rng(derive_seed(int(self.cfg["seed"]), "random-search"))
+        chosen, seen = [], set()
+        while len(chosen) < budget:
+            ch = rng.integers(0, N_BLOCK_TYPES, CHROMOSOME_LENGTH).tolist()
+            if tuple(ch) not in seen:
+                seen.add(tuple(ch))
+                chosen.append(ch)
+        timer = ProgressTimer(budget)
+        log.info("Random search | %d distinct random architectures (budget of NSGA-II: %d x %d)", budget,
+                 self.pop_size, self.n_generations + 1)
+        F = self._evaluate_population(np.array(chosen), 0, timer)
+        nd = NonDominatedSorting().do(F, only_non_dominated_front=True)
+        front = [{k: self.archive[chromosome_key(chosen[i])][k] for k in RECORD_KEYS}
+                 for i in sorted(nd, key=lambda j: tuple(F[j]))]
+        for r, row in enumerate(front, 1):
+            row["front_index"] = r
+        d = self.exp_dir
+        archive_rows = sorted(self.archive.values(), key=lambda r: r["params"])
+        save_csv(d / "search_results.csv", archive_rows,
+                 ["first_generation", *RECORD_KEYS, "synflow_seconds", "zico_seconds", "eval_seconds"])
+        save_json(d / "search_results.json", archive_rows)
+        save_csv(d / "pareto_front.csv", front, ["front_index", *RECORD_KEYS])
+        save_json(d / "pareto_front.json", front)
+        return {"pareto_front": front, "archive": archive_rows, "cache_hits": self.cache.hits,
+                "cache_misses": self.cache.misses}

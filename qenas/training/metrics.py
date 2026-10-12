@@ -27,7 +27,7 @@ Counts are accumulated in float64.
 from __future__ import annotations
 
 import math
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 import torch
@@ -76,14 +76,18 @@ class MetricAccumulator:
     """Accumulates per-image metrics and per-sample losses; reports dataset means.
 
     ``boundary=True`` adds HD95 (computed on the CPU per image; used for every evaluation pass, not for the
-    augmented training batches)."""
+    augmented training batches). ``keep=True`` also keeps every image's metrics (``rows``, in loader order) and
+    binary prediction (``predictions``) - used by the single test evaluation for statistics and figures."""
 
-    def __init__(self, boundary: bool = False) -> None:
+    def __init__(self, boundary: bool = False, keep: bool = False) -> None:
         self.boundary = boundary
+        self.keep = keep
         self.sums: Dict[str, float] = {}
         self.n = 0
         self.n_sens = 0
         self.n_hd_empty_pred = 0
+        self.rows: List[Dict[str, float]] = []
+        self.predictions: List[np.ndarray] = []
 
     def update(self, per_sample_loss: torch.Tensor, logits: torch.Tensor, target: torch.Tensor) -> None:
         m = per_image_metrics(logits, target)
@@ -94,13 +98,25 @@ class MetricAccumulator:
         m["loss"] = per_sample_loss.detach().double()
         for k, v in m.items():
             self.sums[k] = self.sums.get(k, 0.0) + float(v.sum().item())
+        hds: List[float] = []
         if self.boundary:
             p = (logits.detach() > 0).cpu().numpy()[:, 0]
             g = (target.detach() > 0.5).cpu().numpy()[:, 0]
             for pi, gi in zip(p, g):
                 if gi.any() and not pi.any():
                     self.n_hd_empty_pred += 1
-                self.sums["hd95"] = self.sums.get("hd95", 0.0) + hd95(pi, gi)
+                hds.append(hd95(pi, gi))
+            self.sums["hd95"] = self.sums.get("hd95", 0.0) + float(sum(hds))
+        if self.keep:
+            gt = (target.detach() > 0.5).flatten(1).double().mean(1)
+            for i in range(per_sample_loss.shape[0]):
+                row = {k: float(v[i].item()) for k, v in m.items()}
+                row["sensitivity"] = float(sens[i].item())
+                row["foreground_fraction_gt"] = float(gt[i].item())
+                if self.boundary:
+                    row["hd95"] = hds[i]
+                self.rows.append(row)
+            self.predictions.extend((logits.detach() > 0).cpu().numpy()[:, 0].astype(np.uint8))
         self.n += int(per_sample_loss.shape[0])
 
     def compute(self) -> Dict[str, float]:

@@ -52,7 +52,7 @@ def _group_select(samples: Sequence[Sample], fraction: float, rng: np.random.Gen
 
 
 def make_splits(disc: DiscoveryResult, cfg: Dict[str, Any]) -> Dict[str, List[Sample]]:
-    seed = int(cfg["seed"])
+    seed = int(cfg["data"]["split_seed"])   # fixed: identical split for every method and every run seed
     val_frac = float(cfg["data"]["val_fraction"])
     test_frac = float(cfg["data"]["test_fraction"])
     samples = sorted(disc.samples, key=lambda s: s.sample_id)
