@@ -1,0 +1,40 @@
+{
+  "best_epoch": 66,
+  "epochs_run": 95,
+  "stopped_early": true,
+  "stop_reason": "overfitting: val Dice not improved for 29 epochs (best epoch 66); val loss increasing (Kendall tau=0.29, p=0.037) while train loss decreasing (tau=-0.79, p=1.61e-08) over the last 20 epochs",
+  "alpha": 0.4,
+  "beta": 0.6,
+  "train_metrics_best_checkpoint": {
+    "dice": 0.894210462266893,
+    "iou": 0.8257485237925456,
+    "miou": 0.9028365774460976,
+    "loss": 0.08430454942688671,
+    "hd95": 12.382352664968604,
+    "sensitivity": 0.8943599725397184,
+    "hd95_empty_pred": 1
+  },
+  "val_metrics_best_checkpoint": {
+    "dice": 0.7971438185348189,
+    "iou": 0.7121002049431964,
+    "miou": 0.8332691981152108,
+    "loss": 0.1684096980188946,
+    "hd95": 29.14493133729427,
+    "sensitivity": 0.8228934527930595,
+    "hd95_empty_pred": 0
+  },
+  "val_metrics_best_checkpoint_hflip_tta": {
+    "dice": 0.7952426508892498,
+    "iou": 0.7124440999464615,
+    "miou": 0.8337694887007008,
+    "loss": 0.1679859650547354,
+    "hd95": 29.006429058347006,
+    "sensitivity": 0.8136983790958472,
+    "hd95_empty_pred": 0
+  },
+  "tta": {
+    "use_tta": false,
+    "val_dice_no_tta": 0.7971438185348189,
+    "val_dice_hflip_tta": 0.7952426508892498
+  }
+}

@@ -1,0 +1,29 @@
+================ QENAS RESULT ================
+
+Dataset: IDRID
+Method: U-Net — baseline: U-Net (Ronneberger et al. 2015), 31.04 M parameters as in the Mixed-GGNAS tables
+Seed: 42
+
+Architecture: U-Net (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.600   beta (soft-mIoU): 0.400
+
+Final training:
+Epochs run: 100 (best epoch 91)
+Best validation Dice: 0.9305   mIoU: 0.9349   HD95: 29.82 px
+Validation Dice with flip TTA: 0.9308 -> TTA on
+
+Final test (n = 27, evaluated once):
+Dice (DSC):        91.77 %
+mIoU (class mean): 92.75 %
+Params:            31.038 M
+FLOPs:             547.38 G per batch of 4 (Mixed-GGNAS convention; 136.84 G per image)
+HD95:              44.31 px
+Sensitivity:       92.97 %
+IoU (foreground):  85.79 %
+Inference:         45.58 ms per image on cuda
+Test loss:         0.0393
+
+================================================
+QENAS time on IDRID (unet, seed 42): 00:30:11 from start to end (all stages) | this session: 00:30:13

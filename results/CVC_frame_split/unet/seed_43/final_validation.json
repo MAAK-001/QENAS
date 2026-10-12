@@ -1,0 +1,40 @@
+{
+  "best_epoch": 100,
+  "epochs_run": 100,
+  "stopped_early": false,
+  "stop_reason": "",
+  "alpha": 0.4,
+  "beta": 0.6,
+  "train_metrics_best_checkpoint": {
+    "dice": 0.8427015021816323,
+    "iou": 0.7587557182647943,
+    "miou": 0.8677195260098612,
+    "loss": 0.11761896634398371,
+    "hd95": 30.62051267316053,
+    "sensitivity": 0.8406307978617586,
+    "hd95_empty_pred": 6
+  },
+  "val_metrics_best_checkpoint": {
+    "dice": 0.7840698141121981,
+    "iou": 0.6836682754422172,
+    "miou": 0.8245908515924094,
+    "loss": 0.1579200127447138,
+    "hd95": 38.85530449586695,
+    "sensitivity": 0.786592393570747,
+    "hd95_empty_pred": 2
+  },
+  "val_metrics_best_checkpoint_hflip_tta": {
+    "dice": 0.7984932848958698,
+    "iou": 0.7014316850741703,
+    "miou": 0.8341247545936278,
+    "loss": 0.15342029894949222,
+    "hd95": 44.32798737642403,
+    "sensitivity": 0.796197501969159,
+    "hd95_empty_pred": 3
+  },
+  "tta": {
+    "use_tta": true,
+    "val_dice_no_tta": 0.7840698141121981,
+    "val_dice_hflip_tta": 0.7984932848958698
+  }
+}

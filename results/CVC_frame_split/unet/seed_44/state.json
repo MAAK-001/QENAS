@@ -1,0 +1,50 @@
+{
+  "fingerprint": "6d0509b72810eb67",
+  "created": "2026-10-14T08:10:21",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-14T08:10:33",
+      "train": 392,
+      "val": 98,
+      "test": 122,
+      "seconds": 11.0
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-14T08:38:10",
+      "alpha": 0.5,
+      "beta": 0.5,
+      "seconds": 1657.3
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-14T09:06:01",
+      "best_epoch": 93,
+      "best_val_dice": 0.7768160718394853,
+      "tta": true,
+      "seconds": 1670.5
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-14T09:06:07",
+      "test_dice": 0.7642914796602177,
+      "test_miou": 0.817714979018183,
+      "test_hd95": 43.15841823531321,
+      "seconds": 5.6
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-14T09:06:13",
+      "seconds": 6.4
+    }
+  },
+  "test_evaluated": true,
+  "method": "unet",
+  "dataset": "CVC",
+  "seed": 44,
+  "updated": "2026-10-14T09:06:13",
+  "test_evaluated_at": "2026-10-14T09:06:05",
+  "total_seconds": 3350.8
+}

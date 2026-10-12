@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: IDRID
+Method: QENAS — QENAS: NSGA-II on (params, SynFlow, ZiCo) + learning-capability selection
+Seed: 44
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_synflow, f3_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 214
+Hypervolume: 0.7840 (generation 0) -> 0.9680 (final)
+Final Pareto front size: 20   Pareto candidates trained: 8
+
+Selected architecture:
+Chromosome: [3, 2, 0, 0, 3, 3, 3, 3]
+Block sequence: ['ConvNeXt', 'Inception', 'Residual', 'Residual', 'ConvNeXt', 'ConvNeXt', 'ConvNeXt', 'ConvNeXt']
+ln(1+SynFlow): 78.767   ZiCo: 600.876
+
+20-epoch capability: Epoch-1 Dice 0.0067 | Epoch-20 Dice 0.9488 | ΔDice +0.9421
+Selection: Candidate 4 selected: largest ΔDice tier (within measured Dice noise of the leader, 3 tied); tie broken by final validation Dice. ΔDice=0.9421, final val Dice=0.9488, ΔLoss=0.6508, Dice trend tau=0.73 (p=4.2e-07).
+
+Loss coefficients:
+alpha (BCE): 0.200   beta (soft-mIoU): 0.800
+
+Final training:
+Epochs run: 94 (best epoch 20) — overfitting: val Dice not improved for 74 epochs (best epoch 20); val loss increasing (Kendall tau=0.28, p=0.0428) while train loss decreasing (tau=-0.59, p=7.11e-05) over the last 20 epochs
+Best validation Dice: 0.9473   mIoU: 0.9504   HD95: 12.05 px
+Validation Dice with flip TTA: 0.9484 -> TTA on
+
+Final test (n = 27, evaluated once):
+Dice (DSC):        94.58 %
+mIoU (class mean): 94.95 %
+Params:            2.322 M
+FLOPs:             65.87 G per batch of 4 (Mixed-GGNAS convention; 16.47 G per image)
+HD95:              14.06 px
+Sensitivity:       94.88 %
+IoU (foreground):  90.10 %
+Inference:         32.47 ms per image on cuda
+Test loss:         0.0450
+
+================================================
+QENAS time on IDRID (qenas, seed 44): 00:28:58 from start to end (all stages) | this session: 00:29:00

@@ -1,0 +1,123 @@
+{
+  "chromosome": [
+    3,
+    2,
+    2,
+    4,
+    1,
+    2,
+    2,
+    2
+  ],
+  "blocks": [
+    "ConvNeXt",
+    "Inception",
+    "Inception",
+    "DARTS",
+    "Dense",
+    "Inception",
+    "Inception",
+    "Inception"
+  ],
+  "base_channels": 32,
+  "scale": 3,
+  "darts_genotype": "darts_cell_cvc",
+  "input": "3x256x256",
+  "stem_params": 928,
+  "head_params": 33,
+  "positions": [
+    {
+      "position": "enc1",
+      "gene": 3,
+      "block": "ConvNeXt",
+      "in_channels": 32,
+      "out_channels": 64,
+      "in_resolution": "256x256",
+      "out_resolution": "128x128",
+      "kernel_scale": "dw 5x5 -> 4x MLP -> residual -> 1x1",
+      "params": 40448
+    },
+    {
+      "position": "enc2",
+      "gene": 2,
+      "block": "Inception",
+      "in_channels": 64,
+      "out_channels": 128,
+      "in_resolution": "128x128",
+      "out_resolution": "64x64",
+      "kernel_scale": "3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1",
+      "params": 96000
+    },
+    {
+      "position": "enc3",
+      "gene": 2,
+      "block": "Inception",
+      "in_channels": 128,
+      "out_channels": 256,
+      "in_resolution": "64x64",
+      "out_resolution": "32x32",
+      "kernel_scale": "3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1",
+      "params": 379392
+    },
+    {
+      "position": "enc4",
+      "gene": 4,
+      "block": "DARTS",
+      "in_channels": 256,
+      "out_channels": 512,
+      "in_resolution": "32x32",
+      "out_resolution": "16x16",
+      "kernel_scale": "darts_cell_cvc down: n2<-avg_pool(s1), n2<-avg_pool(s0), n3<-avg_pool(s1), n3<-avg_pool(s0), n4<-down_conv(s0), n4<-avg_pool(s1), n5<-down_dep_conv(s1), n5<-avg_pool(s0)",
+      "params": 215168
+    },
+    {
+      "position": "dec1",
+      "gene": 1,
+      "block": "Dense",
+      "in_channels": 512,
+      "out_channels": 256,
+      "in_resolution": "16x16",
+      "out_resolution": "32x32",
+      "kernel_scale": "3 dense layers (3x3 gconv, growth 32) + 1x1",
+      "params": 798400
+    },
+    {
+      "position": "dec2",
+      "gene": 2,
+      "block": "Inception",
+      "in_channels": 256,
+      "out_channels": 128,
+      "in_resolution": "32x32",
+      "out_resolution": "64x64",
+      "kernel_scale": "3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1",
+      "params": 264480
+    },
+    {
+      "position": "dec3",
+      "gene": 2,
+      "block": "Inception",
+      "in_channels": 128,
+      "out_channels": 64,
+      "in_resolution": "64x64",
+      "out_resolution": "128x128",
+      "kernel_scale": "3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1",
+      "params": 66960
+    },
+    {
+      "position": "dec4",
+      "gene": 2,
+      "block": "Inception",
+      "in_channels": 64,
+      "out_channels": 32,
+      "in_resolution": "128x128",
+      "out_resolution": "256x256",
+      "kernel_scale": "3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1",
+      "params": 17160
+    }
+  ],
+  "total_params": 1878969,
+  "params_m": 1.878969,
+  "flops_batch_size": 8,
+  "gflops_mixed_ggnas": 44.752789248,
+  "gflops_per_image": 5.594098656
+}

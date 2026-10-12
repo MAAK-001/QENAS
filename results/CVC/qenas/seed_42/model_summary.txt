@@ -1,0 +1,337 @@
+QENAS architecture  chromosome [3, 2, 2, 2, 2, 2, 4, 4]
+blocks: ConvNeXt -> Inception -> Inception -> Inception -> Inception -> Inception -> DARTS -> DARTS
+input 3x256x256 | base channels 32 | convolution scale 3 | DARTS genotype darts_cell_cvc
+
+pos   block         channels          resolution     params  kernel / scale
+stem  3x3 conv                                          928
+enc1  ConvNeXt     32->64      256x256->128x128       40,448  dw 5x5 -> 4x MLP -> residual -> 1x1
+enc2  Inception    64->128     128x128->64x64         96,000  3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1
+enc3  Inception   128->256       64x64->32x32        379,392  3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1
+enc4  Inception   256->512       32x32->16x16      1,508,352  3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1
+dec1  Inception   512->256       16x16->32x32      1,051,200  3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1
+dec2  Inception   256->128       32x32->64x64        264,480  3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1
+dec3  DARTS       128->64        64x64->128x128       12,304  darts_cell_cvc up: n2<-dep_conv(s0), n2<-up_dil_conv(s1), n3<-dil_conv(n2), n3<-up_dep_conv(s1), n4<-dep_conv(n3), n4<-up_dep_conv(s1), n5<-up_dep_conv(s1), n5<-dil_conv(n2)
+dec4  DARTS        64->32      128x128->256x256        3,336  darts_cell_cvc up: n2<-dep_conv(s0), n2<-up_dil_conv(s1), n3<-dil_conv(n2), n3<-up_dep_conv(s1), n4<-dep_conv(n3), n4<-up_dep_conv(s1), n5<-up_dep_conv(s1), n5<-dil_conv(n2)
+head  1x1 conv                                           33
+
+total trainable parameters: 3,356,473 (3.356 M)
+FLOPs (thop): 4.352 G per image | 34.82 G per training batch of 8 (Mixed-GGNAS convention)
+
+QENASNet(
+  (stem): Sequential(
+    (0): Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): ReLU()
+  )
+  (encoder): ModuleList(
+    (0): EncoderPosition(
+      (transition): Sequential(
+        (0): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (1): AvgPool2d(kernel_size=2, stride=2, padding=0)
+        (2): Conv2d(32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (block): ConvNeXtBlock(
+        (dwconv): Conv2d(64, 64, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=64)
+        (bn0): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (pwconv1): Linear(in_features=64, out_features=256, bias=True)
+        (act): GELU(approximate='none')
+        (pwconv2): Linear(in_features=256, out_features=64, bias=True)
+        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (act1): GELU(approximate='none')
+        (adjust): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (1): EncoderPosition(
+      (transition): Sequential(
+        (0): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (1): AvgPool2d(kernel_size=2, stride=2, padding=0)
+        (2): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (block): InceptionBlock(
+        (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+        (bn0): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu0): ReLU()
+        (branches): ModuleList(
+          (0): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(1, 3), stride=(1, 1), padding=(0, 1), groups=16)
+            (1): Conv2d(128, 128, kernel_size=(3, 1), stride=(1, 1), padding=(1, 0), groups=16)
+            (2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(1, 5), stride=(1, 1), padding=(0, 2), groups=16)
+            (1): Conv2d(128, 128, kernel_size=(5, 1), stride=(1, 1), padding=(2, 0), groups=16)
+            (2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(1, 7), stride=(1, 1), padding=(0, 3), groups=16)
+            (1): Conv2d(128, 128, kernel_size=(7, 1), stride=(1, 1), padding=(3, 0), groups=16)
+            (2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+        )
+        (adjust): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (2): EncoderPosition(
+      (transition): Sequential(
+        (0): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (1): AvgPool2d(kernel_size=2, stride=2, padding=0)
+        (2): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (block): InceptionBlock(
+        (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+        (bn0): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu0): ReLU()
+        (branches): ModuleList(
+          (0): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(1, 3), stride=(1, 1), padding=(0, 1), groups=16)
+            (1): Conv2d(256, 256, kernel_size=(3, 1), stride=(1, 1), padding=(1, 0), groups=16)
+            (2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(1, 5), stride=(1, 1), padding=(0, 2), groups=16)
+            (1): Conv2d(256, 256, kernel_size=(5, 1), stride=(1, 1), padding=(2, 0), groups=16)
+            (2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(1, 7), stride=(1, 1), padding=(0, 3), groups=16)
+            (1): Conv2d(256, 256, kernel_size=(7, 1), stride=(1, 1), padding=(3, 0), groups=16)
+            (2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+        )
+        (adjust): Conv2d(768, 256, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (3): EncoderPosition(
+      (transition): Sequential(
+        (0): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (1): AvgPool2d(kernel_size=2, stride=2, padding=0)
+        (2): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (block): InceptionBlock(
+        (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+        (bn0): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu0): ReLU()
+        (branches): ModuleList(
+          (0): Sequential(
+            (0): Conv2d(512, 512, kernel_size=(1, 3), stride=(1, 1), padding=(0, 1), groups=16)
+            (1): Conv2d(512, 512, kernel_size=(3, 1), stride=(1, 1), padding=(1, 0), groups=16)
+            (2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(512, 512, kernel_size=(1, 5), stride=(1, 1), padding=(0, 2), groups=16)
+            (1): Conv2d(512, 512, kernel_size=(5, 1), stride=(1, 1), padding=(2, 0), groups=16)
+            (2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(512, 512, kernel_size=(1, 7), stride=(1, 1), padding=(0, 3), groups=16)
+            (1): Conv2d(512, 512, kernel_size=(7, 1), stride=(1, 1), padding=(3, 0), groups=16)
+            (2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+        )
+        (adjust): Conv2d(1536, 512, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+  )
+  (decoder): ModuleList(
+    (0): DecoderPosition(
+      (bn_in): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (up): ConvTranspose2d(512, 256, kernel_size=(2, 2), stride=(2, 2))
+      (bn_skip): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (satt): SpatialAttention(
+        (squeeze): Conv2d(256, 1, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      )
+      (catt): ChannelAttention(
+        (pool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1))
+        (conv2): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (fuse): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (block): InceptionBlock(
+        (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+        (bn0): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu0): ReLU()
+        (branches): ModuleList(
+          (0): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(1, 3), stride=(1, 1), padding=(0, 1), groups=16)
+            (1): Conv2d(256, 256, kernel_size=(3, 1), stride=(1, 1), padding=(1, 0), groups=16)
+            (2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(1, 5), stride=(1, 1), padding=(0, 2), groups=16)
+            (1): Conv2d(256, 256, kernel_size=(5, 1), stride=(1, 1), padding=(2, 0), groups=16)
+            (2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(1, 7), stride=(1, 1), padding=(0, 3), groups=16)
+            (1): Conv2d(256, 256, kernel_size=(7, 1), stride=(1, 1), padding=(3, 0), groups=16)
+            (2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+        )
+        (adjust): Conv2d(768, 256, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (1): DecoderPosition(
+      (bn_in): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (up): ConvTranspose2d(256, 128, kernel_size=(2, 2), stride=(2, 2))
+      (bn_skip): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (satt): SpatialAttention(
+        (squeeze): Conv2d(128, 1, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      )
+      (catt): ChannelAttention(
+        (pool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): Conv2d(128, 32, kernel_size=(1, 1), stride=(1, 1))
+        (conv2): Conv2d(32, 128, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (fuse): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (block): InceptionBlock(
+        (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+        (bn0): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu0): ReLU()
+        (branches): ModuleList(
+          (0): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(1, 3), stride=(1, 1), padding=(0, 1), groups=16)
+            (1): Conv2d(128, 128, kernel_size=(3, 1), stride=(1, 1), padding=(1, 0), groups=16)
+            (2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(1, 5), stride=(1, 1), padding=(0, 2), groups=16)
+            (1): Conv2d(128, 128, kernel_size=(5, 1), stride=(1, 1), padding=(2, 0), groups=16)
+            (2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(1, 7), stride=(1, 1), padding=(0, 3), groups=16)
+            (1): Conv2d(128, 128, kernel_size=(7, 1), stride=(1, 1), padding=(3, 0), groups=16)
+            (2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU()
+          )
+        )
+        (adjust): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (2): DartsDecoderPosition(
+      (cell): DartsCell(
+        (preprocess0): ConvOps(
+          (norm): GroupNorm(8, 16, eps=1e-05, affine=True)
+          (activation): ReLU()
+          (conv): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (preprocess1): ConvOps(
+          (norm): GroupNorm(8, 16, eps=1e-05, affine=True)
+          (activation): ReLU()
+          (conv): Conv2d(128, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (ops): ModuleList(
+          (0): ConvOps(
+            (norm): GroupNorm(8, 16, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (depth_conv): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16, bias=False)
+            (point_conv): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (1): ConvOps(
+            (norm): GroupNorm(8, 16, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (conv): ConvTranspose2d(16, 16, kernel_size=(3, 3), stride=(2, 2), padding=(2, 2), dilation=(2, 2), output_padding=(1, 1), bias=False)
+          )
+          (2): ConvOps(
+            (norm): GroupNorm(8, 16, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (conv): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2), bias=False)
+          )
+          (3): ConvOps(
+            (norm): GroupNorm(8, 16, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (depth_conv): ConvTranspose2d(16, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1), groups=16, bias=False)
+            (point_conv): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (4): ConvOps(
+            (norm): GroupNorm(8, 16, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (depth_conv): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16, bias=False)
+            (point_conv): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (5-6): 2 x ConvOps(
+            (norm): GroupNorm(8, 16, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (depth_conv): ConvTranspose2d(16, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1), groups=16, bias=False)
+            (point_conv): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (7): ConvOps(
+            (norm): GroupNorm(8, 16, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (conv): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2), bias=False)
+          )
+        )
+      )
+    )
+    (3): DartsDecoderPosition(
+      (cell): DartsCell(
+        (preprocess0): ConvOps(
+          (norm): GroupNorm(4, 8, eps=1e-05, affine=True)
+          (activation): ReLU()
+          (conv): Conv2d(32, 8, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (preprocess1): ConvOps(
+          (norm): GroupNorm(4, 8, eps=1e-05, affine=True)
+          (activation): ReLU()
+          (conv): Conv2d(64, 8, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (ops): ModuleList(
+          (0): ConvOps(
+            (norm): GroupNorm(4, 8, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (depth_conv): Conv2d(8, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=8, bias=False)
+            (point_conv): Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (1): ConvOps(
+            (norm): GroupNorm(4, 8, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (conv): ConvTranspose2d(8, 8, kernel_size=(3, 3), stride=(2, 2), padding=(2, 2), dilation=(2, 2), output_padding=(1, 1), bias=False)
+          )
+          (2): ConvOps(
+            (norm): GroupNorm(4, 8, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (conv): Conv2d(8, 8, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2), bias=False)
+          )
+          (3): ConvOps(
+            (norm): GroupNorm(4, 8, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (depth_conv): ConvTranspose2d(8, 8, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1), groups=8, bias=False)
+            (point_conv): Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (4): ConvOps(
+            (norm): GroupNorm(4, 8, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (depth_conv): Conv2d(8, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=8, bias=False)
+            (point_conv): Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (5-6): 2 x ConvOps(
+            (norm): GroupNorm(4, 8, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (depth_conv): ConvTranspose2d(8, 8, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1), groups=8, bias=False)
+            (point_conv): Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (7): ConvOps(
+            (norm): GroupNorm(4, 8, eps=1e-05, affine=True)
+            (activation): ReLU(inplace=True)
+            (conv): Conv2d(8, 8, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2), bias=False)
+          )
+        )
+      )
+    )
+  )
+  (head): Conv2d(32, 1, kernel_size=(1, 1), stride=(1, 1))
+)

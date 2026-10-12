@@ -1,0 +1,29 @@
+================ QENAS RESULT ================
+
+Dataset: CVC
+Method: Attention U-Net — baseline: Attention U-Net (Oktay et al. 2018), 8.73 M parameters as in the Mixed-GGNAS tables
+Seed: 42
+
+Architecture: Attention U-Net (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.500   beta (soft-mIoU): 0.500
+
+Final training:
+Epochs run: 100 (best epoch 73)
+Best validation Dice: 0.7278   mIoU: 0.7919   HD95: 64.33 px
+Validation Dice with flip TTA: 0.7166 -> TTA off
+
+Final test (n = 121, evaluated once):
+Dice (DSC):        63.74 %
+mIoU (class mean): 74.23 %
+Params:            8.726 M
+FLOPs:             133.92 G per batch of 8 (Mixed-GGNAS convention; 16.74 G per image)
+HD95:              89.24 px  (6 empty predictions scored as the image diagonal)
+Sensitivity:       69.74 %
+IoU (foreground):  53.22 %
+Inference:         8.55 ms per image on cuda
+Test loss:         0.2223
+
+================================================
+QENAS time on CVC (attention_unet, seed 42): 00:32:45 from start to end (all stages) | this session: 00:32:46

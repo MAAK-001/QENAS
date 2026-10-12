@@ -1,0 +1,64 @@
+{
+  "fingerprint": "10eb33ccb0be8d09",
+  "created": "2026-10-13T12:18:04",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-13T12:18:54",
+      "train": 704,
+      "val": 176,
+      "test": 120,
+      "seconds": 49.0
+    },
+    "inherit": {
+      "status": "done",
+      "finished": "2026-10-13T12:18:54",
+      "inherited_from": "/kaggle/working/QENAS_results/results/KVASIR/qenas/seed_43",
+      "seconds": 0.0
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-13T12:19:01",
+      "selected_candidate": 6,
+      "rule": "random",
+      "relaxed_gates": [],
+      "seconds": 7.2
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-13T12:40:16",
+      "alpha": 0.4,
+      "beta": 0.6,
+      "seconds": 1275.1
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-13T13:07:05",
+      "best_epoch": 87,
+      "best_val_dice": 0.8763351902476612,
+      "tta": false,
+      "seconds": 1609.1
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-13T13:07:14",
+      "test_dice": 0.7963438835514737,
+      "test_miou": 0.8262056448829271,
+      "test_hd95": 41.48726130105466,
+      "seconds": 8.3
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-13T13:07:19",
+      "seconds": 5.7
+    }
+  },
+  "test_evaluated": true,
+  "method": "qenas_random_pick",
+  "dataset": "KVASIR",
+  "seed": 43,
+  "updated": "2026-10-13T13:07:19",
+  "test_evaluated_at": "2026-10-13T13:07:10",
+  "total_seconds": 2954.4
+}

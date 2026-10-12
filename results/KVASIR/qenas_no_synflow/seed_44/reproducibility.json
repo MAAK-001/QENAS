@@ -1,0 +1,229 @@
+{
+  "fingerprint": "f9066e8c2633bd73",
+  "config": {
+    "method": "qenas_no_synflow",
+    "seed": 44,
+    "device": "cuda",
+    "paths": {
+      "results": "/kaggle/working/QENAS_results/results",
+      "cache": "/kaggle/working/QENAS/cache"
+    },
+    "data": {
+      "dataset": "KVASIR",
+      "root": "/kaggle/input/datasets/maak01/e-nas-datasets/Datasets",
+      "image_size": [
+        256,
+        256
+      ],
+      "in_channels": 3,
+      "test_fraction": 0.2,
+      "val_fraction": 0.2,
+      "split_seed": 42,
+      "split_unit": "dataset",
+      "mask_threshold": 127,
+      "num_workers": 1
+    },
+    "augmentation": {
+      "hflip": 0.5,
+      "vflip": 0.5,
+      "affine_p": 0.5,
+      "rotate_deg": 15.0,
+      "scale": [
+        0.9,
+        1.1
+      ],
+      "translate": 0.05,
+      "brightness": 0.1,
+      "contrast": 0.1
+    },
+    "model": {
+      "base_channels": 32,
+      "scale": 3,
+      "num_classes": 1
+    },
+    "search": {
+      "population_size": 20,
+      "generations": 10,
+      "crossover_prob": 0.9,
+      "mutation_prob_var": 0.125,
+      "plot_every": 5
+    },
+    "pareto": {
+      "max_candidates": 8
+    },
+    "candidate_training": {
+      "epochs": 20,
+      "batch_size": 8,
+      "lr": 0.001,
+      "weight_decay": 5e-05,
+      "scheduler": "none",
+      "loss_alpha": 0.5
+    },
+    "selection": {
+      "significance": 0.05,
+      "noise_window": 5
+    },
+    "loss_weights": {
+      "alphas": [
+        0.2,
+        0.4,
+        0.5,
+        0.6,
+        0.8
+      ],
+      "criterion_window": 5
+    },
+    "final_training": {
+      "epochs": 100,
+      "batch_size": 8,
+      "lr": 0.001,
+      "weight_decay": 5e-05,
+      "scheduler": "poly",
+      "warmup_epochs": 1,
+      "poly_power": 0.9,
+      "early_stopping": {
+        "patience": 20,
+        "min_epochs": 30,
+        "significance": 0.05
+      }
+    }
+  },
+  "environment": {
+    "python_version": "3.13.15",
+    "python_implementation": "CPython",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "cpu_count": 4,
+    "torch_version": "2.11.0+cu128",
+    "torch_num_threads": 2,
+    "cuda_available": true,
+    "cuda_version": "12.8",
+    "cudnn_version": 91900,
+    "device": "cuda",
+    "numpy_version": "2.1.3",
+    "gpu_name": "Tesla T4",
+    "gpu_memory_gb": 14.56,
+    "pymoo_version": "0.6.2",
+    "scipy_version": "1.16.3",
+    "PIL_version": "12.3.0",
+    "matplotlib_version": "3.10.0"
+  },
+  "split_summary": {
+    "train": {
+      "n": 704,
+      "n_groups": 704,
+      "per_stratum": {
+        "all": 704
+      },
+      "fraction": 0.704
+    },
+    "val": {
+      "n": 176,
+      "n_groups": 176,
+      "per_stratum": {
+        "all": 176
+      },
+      "fraction": 0.176
+    },
+    "test": {
+      "n": 120,
+      "n_groups": 120,
+      "per_stratum": {
+        "all": 120
+      },
+      "fraction": 0.12
+    }
+  },
+  "selected_architecture": {
+    "architecture": {
+      "type": "qenas",
+      "chromosome": [
+        2,
+        2,
+        1,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    "params": 710457
+  },
+  "loss_coefficients": {
+    "alpha_bce": 0.5,
+    "beta_soft_miou": 0.5
+  },
+  "test_tta": true,
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-14T05:35:39",
+      "train": 704,
+      "val": 176,
+      "test": 120,
+      "seconds": 13.6
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-14T05:40:20",
+      "unique_evaluations": 220,
+      "final_front_size": 13,
+      "cache_hits": 24,
+      "cache_misses": 196,
+      "objectives": [
+        "f1_params",
+        "f3_zico"
+      ],
+      "hypervolume_generation_0": 0.7183615046830195,
+      "hypervolume_final": 1.107626620184199,
+      "seconds": 280.2
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-14T05:40:21",
+      "front_size": 13,
+      "n_candidates": 8,
+      "seconds": 1.7
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-14T06:48:13",
+      "n_candidates": 8,
+      "n_diverged": 0,
+      "seconds": 4071.9
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-14T06:48:16",
+      "selected_candidate": 4,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.7
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-14T07:11:40",
+      "alpha": 0.5,
+      "beta": 0.5,
+      "seconds": 1404.3
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-14T07:41:05",
+      "best_epoch": 99,
+      "best_val_dice": 0.8924000931487918,
+      "tta": true,
+      "seconds": 1764.7
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-14T07:41:12",
+      "test_dice": 0.8548408124076409,
+      "test_miou": 0.8623572541584887,
+      "test_hd95": 29.779324679325615,
+      "seconds": 7.2
+    }
+  },
+  "zico_batches_sha256": "069e01afb6810531f4d94b59"
+}

@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: QENAS — QENAS: NSGA-II on (params, SynFlow, ZiCo) + learning-capability selection
+Seed: 42
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_synflow, f3_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 217
+Hypervolume: 0.7516 (generation 0) -> 1.0214 (final)
+Final Pareto front size: 20   Pareto candidates trained: 8
+
+Selected architecture:
+Chromosome: [2, 2, 2, 2, 4, 4, 3, 4]
+Block sequence: ['Inception', 'Inception', 'Inception', 'Inception', 'DARTS', 'DARTS', 'ConvNeXt', 'DARTS']
+ln(1+SynFlow): 72.081   ZiCo: 864.530
+
+20-epoch capability: Epoch-1 Dice 0.4424 | Epoch-20 Dice 0.8337 | ΔDice +0.3914
+Selection: Candidate 6 selected: largest ΔDice tier (within measured Dice noise of the leader, 2 tied); tie broken by final validation Dice. ΔDice=0.3914, final val Dice=0.8337, ΔLoss=0.2346, Dice trend tau=0.82 (p=2.3e-09).
+
+Loss coefficients:
+alpha (BCE): 0.600   beta (soft-mIoU): 0.400
+
+Final training:
+Epochs run: 83 (best epoch 55) — overfitting: val Dice not improved for 28 epochs (best epoch 55); val loss increasing (Kendall tau=0.29, p=0.037) while train loss decreasing (tau=-0.89, p=6.98e-12) over the last 20 epochs
+Best validation Dice: 0.8821   mIoU: 0.8855   HD95: 23.69 px
+Validation Dice with flip TTA: 0.8912 -> TTA on
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        84.14 %
+mIoU (class mean): 84.99 %
+Params:            2.327 M
+FLOPs:             27.83 G per batch of 8 (Mixed-GGNAS convention; 3.48 G per image)
+HD95:              32.66 px
+Sensitivity:       87.37 %
+IoU (foreground):  76.09 %
+Inference:         36.66 ms per image on cuda
+Test loss:         0.1617
+
+================================================
+QENAS time on KVASIR (qenas, seed 42): 01:41:56 from start to end (all stages) | this session: 01:41:57

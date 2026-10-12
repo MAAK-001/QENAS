@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: CVC
+Method: QENAS — QENAS: NSGA-II on (params, SynFlow, ZiCo) + learning-capability selection
+Seed: 44
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_synflow, f3_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 218
+Hypervolume: 0.6807 (generation 0) -> 0.9724 (final)
+Final Pareto front size: 20   Pareto candidates trained: 8
+
+Selected architecture:
+Chromosome: [3, 1, 4, 4, 4, 4, 4, 4]
+Block sequence: ['ConvNeXt', 'Dense', 'DARTS', 'DARTS', 'DARTS', 'DARTS', 'DARTS', 'DARTS']
+ln(1+SynFlow): 52.861   ZiCo: 671.762
+
+20-epoch capability: Epoch-1 Dice 0.0003 | Epoch-20 Dice 0.6868 | ΔDice +0.6865
+Selection: Candidate 2 selected: largest validation ΔDice among eligible candidates. ΔDice=0.6865, final val Dice=0.6868, ΔLoss=0.1125, Dice trend tau=0.62 (p=2.6e-05).
+
+Loss coefficients:
+alpha (BCE): 0.600   beta (soft-mIoU): 0.400
+
+Final training:
+Epochs run: 100 (best epoch 76)
+Best validation Dice: 0.7175   mIoU: 0.7784   HD95: 36.41 px
+Validation Dice with flip TTA: 0.7358 -> TTA on
+
+Final test (n = 121, evaluated once):
+Dice (DSC):        70.45 %
+mIoU (class mean): 78.12 %
+Params:            0.601 M
+FLOPs:             14.28 G per batch of 8 (Mixed-GGNAS convention; 1.79 G per image)
+HD95:              57.41 px
+Sensitivity:       75.87 %
+IoU (foreground):  60.32 %
+Inference:         31.11 ms per image on cuda
+Test loss:         0.1760
+
+================================================
+QENAS time on CVC (qenas, seed 44): 01:00:49 from start to end (all stages) | this session: 01:00:51

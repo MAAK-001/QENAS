@@ -1,0 +1,50 @@
+{
+  "fingerprint": "79682a6704f6bda4",
+  "created": "2026-10-13T08:56:23",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-13T08:57:08",
+      "train": 413,
+      "val": 103,
+      "test": 129,
+      "seconds": 43.3
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-13T09:13:30",
+      "alpha": 0.5,
+      "beta": 0.5,
+      "seconds": 981.9
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-13T09:27:24",
+      "best_epoch": 64,
+      "best_val_dice": 0.748390876215472,
+      "tta": true,
+      "seconds": 834.9
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-13T09:27:31",
+      "test_dice": 0.7351071486068872,
+      "test_miou": 0.7955298893610775,
+      "test_hd95": 49.751079227644816,
+      "seconds": 5.9
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-13T09:27:36",
+      "seconds": 5.1
+    }
+  },
+  "test_evaluated": true,
+  "method": "attention_unet",
+  "dataset": "BUSI",
+  "seed": 43,
+  "updated": "2026-10-13T09:27:36",
+  "test_evaluated_at": "2026-10-13T09:27:30",
+  "total_seconds": 1871.1
+}

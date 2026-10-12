@@ -1,0 +1,50 @@
+{
+  "fingerprint": "d0966d5d02e72a09",
+  "created": "2026-10-13T09:57:56",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-13T09:58:42",
+      "train": 704,
+      "val": 176,
+      "test": 120,
+      "seconds": 42.1
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-13T10:24:13",
+      "alpha": 0.2,
+      "beta": 0.8,
+      "seconds": 1530.8
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-13T10:49:52",
+      "best_epoch": 89,
+      "best_val_dice": 0.8876859783703641,
+      "tta": true,
+      "seconds": 1539.0
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-13T10:50:00",
+      "test_dice": 0.8445419453777595,
+      "test_miou": 0.8579666395707459,
+      "test_hd95": 33.942376180996476,
+      "seconds": 7.9
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-13T10:50:05",
+      "seconds": 4.8
+    }
+  },
+  "test_evaluated": true,
+  "method": "attention_unet",
+  "dataset": "KVASIR",
+  "seed": 43,
+  "updated": "2026-10-13T10:50:05",
+  "test_evaluated_at": "2026-10-13T10:49:59",
+  "total_seconds": 3124.6
+}

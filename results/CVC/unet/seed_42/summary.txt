@@ -1,0 +1,29 @@
+================ QENAS RESULT ================
+
+Dataset: CVC
+Method: U-Net — baseline: U-Net (Ronneberger et al. 2015), 31.04 M parameters as in the Mixed-GGNAS tables
+Seed: 42
+
+Architecture: U-Net (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.500   beta (soft-mIoU): 0.500
+
+Final training:
+Epochs run: 100 (best epoch 52)
+Best validation Dice: 0.6356   mIoU: 0.7308   HD95: 61.65 px
+Validation Dice with flip TTA: 0.6221 -> TTA off
+
+Final test (n = 121, evaluated once):
+Dice (DSC):        51.40 %
+mIoU (class mean): 67.74 %
+Params:            31.038 M
+FLOPs:             437.90 G per batch of 8 (Mixed-GGNAS convention; 54.74 G per image)
+HD95:              97.60 px  (9 empty predictions scored as the image diagonal)
+Sensitivity:       55.90 %
+IoU (foreground):  41.31 %
+Inference:         11.63 ms per image on cuda
+Test loss:         0.2743
+
+================================================
+QENAS time on CVC (unet, seed 42): 00:58:57 from start to end (all stages) | this session: 00:58:58

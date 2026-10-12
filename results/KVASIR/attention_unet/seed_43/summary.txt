@@ -1,0 +1,29 @@
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: Attention U-Net — baseline: Attention U-Net (Oktay et al. 2018), 8.73 M parameters as in the Mixed-GGNAS tables
+Seed: 43
+
+Architecture: Attention U-Net (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.200   beta (soft-mIoU): 0.800
+
+Final training:
+Epochs run: 100 (best epoch 89)
+Best validation Dice: 0.8877   mIoU: 0.8886   HD95: 26.49 px
+Validation Dice with flip TTA: 0.8930 -> TTA on
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        84.45 %
+mIoU (class mean): 85.80 %
+Params:            8.726 M
+FLOPs:             133.92 G per batch of 8 (Mixed-GGNAS convention; 16.74 G per image)
+HD95:              33.94 px  (1 empty predictions scored as the image diagonal)
+Sensitivity:       84.52 %
+IoU (foreground):  77.39 %
+Inference:         15.34 ms per image on cuda
+Test loss:         0.1724
+
+================================================
+QENAS time on KVASIR (attention_unet, seed 43): 00:52:05 from start to end (all stages) | this session: 00:52:09

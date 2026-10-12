@@ -1,0 +1,88 @@
+{
+  "fingerprint": "64dc5141d30c4635",
+  "created": "2026-10-13T04:48:08",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-13T04:48:37",
+      "train": 413,
+      "val": 103,
+      "test": 129,
+      "seconds": 27.6
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-13T04:55:21",
+      "unique_evaluations": 220,
+      "final_front_size": 20,
+      "cache_hits": 0,
+      "cache_misses": 220,
+      "objectives": [
+        "f1_params",
+        "f2_synflow",
+        "f3_zico"
+      ],
+      "hypervolume_generation_0": 0.6290477045979348,
+      "hypervolume_final": 1.0788826386931851,
+      "seconds": 403.8
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-13T04:55:22",
+      "front_size": 20,
+      "n_candidates": 8,
+      "seconds": 1.4
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-13T05:24:42",
+      "n_candidates": 8,
+      "n_diverged": 0,
+      "seconds": 1759.4
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-13T05:24:44",
+      "selected_candidate": 4,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.5
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-13T05:41:31",
+      "alpha": 0.4,
+      "beta": 0.6,
+      "seconds": 1006.6
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-13T06:00:56",
+      "best_epoch": 72,
+      "best_val_dice": 0.7889220440432246,
+      "tta": false,
+      "seconds": 1164.8
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-13T06:01:05",
+      "test_dice": 0.7894886259591467,
+      "test_miou": 0.8266163334286905,
+      "test_hd95": 26.896396158240353,
+      "seconds": 9.7
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-13T06:01:12",
+      "seconds": 6.3
+    }
+  },
+  "test_evaluated": true,
+  "method": "qenas",
+  "dataset": "BUSI",
+  "seed": 43,
+  "updated": "2026-10-13T06:01:12",
+  "test_evaluated_at": "2026-10-13T06:01:04",
+  "total_seconds": 4382.1
+}

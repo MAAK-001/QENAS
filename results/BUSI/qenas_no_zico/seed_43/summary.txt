@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: BUSI
+Method: QENAS w/o ZiCo — ablation: two objectives (params, SynFlow), i.e. without the data-aware third objective
+Seed: 43
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_synflow):
+Population: 20   Generations: 10
+Unique architectures evaluated: 217
+Hypervolume: 0.7037 (generation 0) -> 1.0291 (final)
+Final Pareto front size: 16   Pareto candidates trained: 8
+
+Selected architecture:
+Chromosome: [3, 3, 3, 2, 3, 3, 3, 3]
+Block sequence: ['ConvNeXt', 'ConvNeXt', 'ConvNeXt', 'Inception', 'ConvNeXt', 'ConvNeXt', 'ConvNeXt', 'ConvNeXt']
+ln(1+SynFlow): 87.210   ZiCo: 692.863
+
+20-epoch capability: Epoch-1 Dice 0.2805 | Epoch-20 Dice 0.7194 | ΔDice +0.4390
+Selection: Candidate 8 selected: largest validation ΔDice among eligible candidates. ΔDice=0.4390, final val Dice=0.7194, ΔLoss=0.4500, Dice trend tau=0.75 (p=1.5e-07).
+
+Loss coefficients:
+alpha (BCE): 0.400   beta (soft-mIoU): 0.600
+
+Final training:
+Epochs run: 100 (best epoch 70)
+Best validation Dice: 0.7960   mIoU: 0.8338   HD95: 29.77 px
+Validation Dice with flip TTA: 0.7926 -> TTA off
+
+Final test (n = 129, evaluated once):
+Dice (DSC):        78.09 %
+mIoU (class mean): 82.34 %
+Params:            4.044 M
+FLOPs:             61.28 G per batch of 8 (Mixed-GGNAS convention; 7.66 G per image)
+HD95:              34.59 px  (2 empty predictions scored as the image diagonal)
+Sensitivity:       77.35 %
+IoU (foreground):  69.58 %
+Inference:         12.81 ms per image on cuda
+Test loss:         0.1886
+
+================================================
+QENAS time on BUSI (qenas_no_zico, seed 43): 00:59:13 from start to end (all stages) | this session: 00:59:15

@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: BUSI
+Method: QENAS, random Pareto candidate — ablation: a uniformly random one of QENAS' Pareto candidates instead of learning-capability selection
+Seed: 42
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_synflow, f3_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 215
+Hypervolume: 0.7376 (generation 0) -> 1.1493 (final)
+Final Pareto front size: 20   Pareto candidates trained: 8
+
+Selected architecture:
+Chromosome: [4, 3, 3, 2, 4, 3, 2, 3]
+Block sequence: ['DARTS', 'ConvNeXt', 'ConvNeXt', 'Inception', 'DARTS', 'ConvNeXt', 'Inception', 'ConvNeXt']
+ln(1+SynFlow): 84.194   ZiCo: 819.286
+
+20-epoch capability: Epoch-1 Dice 0.4856 | Epoch-20 Dice 0.7500 | ΔDice +0.2644
+Selection: Candidate 6 selected: uniformly random Pareto candidate (rng seed 42). Learning-capability selection would have chosen candidate 2.
+
+Loss coefficients:
+alpha (BCE): 0.200   beta (soft-mIoU): 0.800
+
+Final training:
+Epochs run: 100 (best epoch 84)
+Best validation Dice: 0.8025   mIoU: 0.8393   HD95: 27.00 px
+Validation Dice with flip TTA: 0.7952 -> TTA off
+
+Final test (n = 129, evaluated once):
+Dice (DSC):        78.64 %
+mIoU (class mean): 82.42 %
+Params:            3.066 M
+FLOPs:             48.96 G per batch of 8 (Mixed-GGNAS convention; 6.12 G per image)
+HD95:              27.44 px
+Sensitivity:       78.80 %
+IoU (foreground):  69.98 %
+Inference:         19.00 ms per image on cuda
+Test loss:         0.1904
+
+================================================
+QENAS time on BUSI (qenas_random_pick, seed 42): 00:35:52 from start to end (all stages) | this session: 00:35:53

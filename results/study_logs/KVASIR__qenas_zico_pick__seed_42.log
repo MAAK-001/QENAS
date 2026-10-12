@@ -1,0 +1,819 @@
+2026-10-12 19:27:14 | INFO    | QENAS | dataset KVASIR | method qenas_zico_pick | seed 42 | experiment /kaggle/working/QENAS_results/results/KVASIR/qenas_zico_pick/seed_42 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint 5db277b36d75e489
+2026-10-12 19:27:14 | INFO    | Method qenas_zico_pick (ablation / zero-shot NAS rule: the Pareto candidate with the highest ZiCo, chosen without training) | stages: split -> inherit -> selection -> loss_weights -> final -> test -> report
+2026-10-12 19:27:14 | INFO    | ####################################################################################################
+2026-10-12 19:27:14 | INFO    | STAGE: SPLIT
+2026-10-12 19:27:29 | INFO    | Dataset structure: images/<id>.jpg paired with masks/<id>.jpg (JPEG masks, binarised); official train.txt / val.txt
+2026-10-12 19:27:29 | INFO    | 
+KVASIR
+Train: 704
+Validation: 176
+Test: 120
+2026-10-12 19:27:29 | INFO    | Stage 'split' finished in 00:00:14
+2026-10-12 19:27:29 | INFO    | ####################################################################################################
+2026-10-12 19:27:29 | INFO    | STAGE: INHERIT
+2026-10-12 19:27:29 | INFO    | Inherited search, Pareto subset and 8 candidate runs from /kaggle/working/QENAS_results/results/KVASIR/qenas/seed_42
+2026-10-12 19:27:29 | INFO    | Stage 'inherit' finished in 00:00:00
+2026-10-12 19:27:29 | INFO    | ####################################################################################################
+2026-10-12 19:27:29 | INFO    | STAGE: SELECTION
+2026-10-12 19:27:31 | INFO    | Loaded cached preprocessed KVASIR/train (704 samples) from KVASIR_train_256x256_fa68856a68f09d4294e8d081.npz
+2026-10-12 19:27:31 | INFO    | Loaded cached preprocessed KVASIR/val (176 samples) from KVASIR_val_256x256_a492d827cc1e7bd593ad82f4.npz
+2026-10-12 19:27:33 | INFO    | Data ready: train 704, validation 176 (test held out) | normalisation mean [0.5591, 0.3216, 0.2354] std [0.3159, 0.2188, 0.1845]
+2026-10-12 19:27:35 | INFO    | Candidate 7 selected: highest ZiCo among the Pareto candidates (zero-shot rule, no training used). Learning-capability selection would have chosen candidate 6.
+2026-10-12 19:27:36 | INFO    | Stage 'selection' finished in 00:00:07
+2026-10-12 19:27:36 | INFO    | ####################################################################################################
+2026-10-12 19:27:36 | INFO    | STAGE: LOSS_WEIGHTS
+2026-10-12 19:27:36 | INFO    | ====================================================================================================
+2026-10-12 19:27:36 | INFO    | Loss-weight run 1/5 | alpha (BCE) = 0.200, beta (soft-mIoU) = 0.800 | architecture [0, 2, 2, 2, 2, 2, 2, 4]
+2026-10-12 19:27:43 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 1/20 | batch 22/88 (25%) | running loss 0.5420 | epoch elapsed 00:00:07, epoch ETA 00:00:21
+2026-10-12 19:27:47 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 1/20 | batch 44/88 (50%) | running loss 0.5174 | epoch elapsed 00:00:11, epoch ETA 00:00:11
+2026-10-12 19:27:51 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 1/20 | batch 66/88 (75%) | running loss 0.4970 | epoch elapsed 00:00:15, epoch ETA 00:00:05
+2026-10-12 19:27:58 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 1/20 | Progress:   5.0% | Train Loss: 0.4805 | Val Loss: 0.4523 | Train Dice: 0.2778 | Val Dice: 0.4598 | Val IoU: 0.3356 | Val HD95: 80.61 px | LR: 1.00e-03 | epoch 00:00:22 | Elapsed: 00:00:23 | ETA: 00:07:11  *best*
+2026-10-12 19:28:03 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 2/20 | batch 22/88 (25%) | running loss 0.4080 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:28:07 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 2/20 | batch 44/88 (50%) | running loss 0.4035 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:28:12 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 2/20 | batch 66/88 (75%) | running loss 0.4026 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:28:20 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 2/20 | Progress:  10.0% | Train Loss: 0.4003 | Val Loss: 0.3752 | Train Dice: 0.5318 | Val Dice: 0.5581 | Val IoU: 0.4270 | Val HD95: 68.18 px | LR: 1.00e-03 | epoch 00:00:21 | Elapsed: 00:00:44 | ETA: 00:06:34  *best*
+2026-10-12 19:28:24 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 3/20 | batch 22/88 (25%) | running loss 0.3436 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:28:29 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 3/20 | batch 44/88 (50%) | running loss 0.3658 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:28:33 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 3/20 | batch 66/88 (75%) | running loss 0.3696 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:28:41 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 3/20 | Progress:  15.0% | Train Loss: 0.3683 | Val Loss: 0.3439 | Train Dice: 0.5750 | Val Dice: 0.6053 | Val IoU: 0.4795 | Val HD95: 63.84 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:01:05 | ETA: 00:06:08  *best*
+2026-10-12 19:28:45 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 4/20 | batch 22/88 (25%) | running loss 0.3460 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:28:49 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 4/20 | batch 44/88 (50%) | running loss 0.3575 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:28:54 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 4/20 | batch 66/88 (75%) | running loss 0.3451 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:29:01 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 4/20 | Progress:  20.0% | Train Loss: 0.3429 | Val Loss: 0.3153 | Train Dice: 0.6143 | Val Dice: 0.6465 | Val IoU: 0.5240 | Val HD95: 53.28 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:01:25 | ETA: 00:05:40  *best*
+2026-10-12 19:29:05 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 5/20 | batch 22/88 (25%) | running loss 0.3074 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:29:09 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 5/20 | batch 44/88 (50%) | running loss 0.3174 | epoch elapsed 00:00:08, epoch ETA 00:00:08
+2026-10-12 19:29:13 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 5/20 | batch 66/88 (75%) | running loss 0.3198 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:29:21 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 5/20 | Progress:  25.0% | Train Loss: 0.3202 | Val Loss: 0.2992 | Train Dice: 0.6464 | Val Dice: 0.6747 | Val IoU: 0.5615 | Val HD95: 51.60 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:01:45 | ETA: 00:05:15  *best*
+2026-10-12 19:29:25 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 6/20 | batch 22/88 (25%) | running loss 0.3173 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:29:29 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 6/20 | batch 44/88 (50%) | running loss 0.3091 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:29:33 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 6/20 | batch 66/88 (75%) | running loss 0.3103 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:29:41 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 6/20 | Progress:  30.0% | Train Loss: 0.3025 | Val Loss: 0.2906 | Train Dice: 0.6691 | Val Dice: 0.6860 | Val IoU: 0.5678 | Val HD95: 55.56 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:02:05 | ETA: 00:04:51  *best*
+2026-10-12 19:29:45 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 7/20 | batch 22/88 (25%) | running loss 0.2824 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:29:49 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 7/20 | batch 44/88 (50%) | running loss 0.2766 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:29:54 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 7/20 | batch 66/88 (75%) | running loss 0.2806 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:30:01 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 7/20 | Progress:  35.0% | Train Loss: 0.2840 | Val Loss: 0.3306 | Train Dice: 0.6981 | Val Dice: 0.6463 | Val IoU: 0.5242 | Val HD95: 61.73 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:25 | ETA: 00:04:29
+2026-10-12 19:30:05 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 8/20 | batch 22/88 (25%) | running loss 0.2445 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:30:09 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 8/20 | batch 44/88 (50%) | running loss 0.2563 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:30:14 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 8/20 | batch 66/88 (75%) | running loss 0.2676 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:30:21 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 8/20 | Progress:  40.0% | Train Loss: 0.2709 | Val Loss: 0.2545 | Train Dice: 0.7142 | Val Dice: 0.7399 | Val IoU: 0.6358 | Val HD95: 45.58 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:45 | ETA: 00:04:08  *best*
+2026-10-12 19:30:25 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 9/20 | batch 22/88 (25%) | running loss 0.2546 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:30:30 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 9/20 | batch 44/88 (50%) | running loss 0.2503 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:30:34 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 9/20 | batch 66/88 (75%) | running loss 0.2517 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:30:41 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 9/20 | Progress:  45.0% | Train Loss: 0.2514 | Val Loss: 0.2723 | Train Dice: 0.7427 | Val Dice: 0.6999 | Val IoU: 0.6005 | Val HD95: 46.92 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:05 | ETA: 00:03:46
+2026-10-12 19:30:45 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 10/20 | batch 22/88 (25%) | running loss 0.2408 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:30:50 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 10/20 | batch 44/88 (50%) | running loss 0.2424 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:30:54 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 10/20 | batch 66/88 (75%) | running loss 0.2502 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:31:01 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 10/20 | Progress:  50.0% | Train Loss: 0.2504 | Val Loss: 0.2395 | Train Dice: 0.7414 | Val Dice: 0.7532 | Val IoU: 0.6498 | Val HD95: 42.49 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:03:25 | ETA: 00:03:25  *best*
+2026-10-12 19:31:05 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 11/20 | batch 22/88 (25%) | running loss 0.2259 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:31:10 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 11/20 | batch 44/88 (50%) | running loss 0.2424 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:31:14 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 11/20 | batch 66/88 (75%) | running loss 0.2392 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:31:21 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 11/20 | Progress:  55.0% | Train Loss: 0.2428 | Val Loss: 0.2321 | Train Dice: 0.7481 | Val Dice: 0.7702 | Val IoU: 0.6702 | Val HD95: 44.56 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:45 | ETA: 00:03:04  *best*
+2026-10-12 19:31:26 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 12/20 | batch 22/88 (25%) | running loss 0.2316 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:31:30 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 12/20 | batch 44/88 (50%) | running loss 0.2308 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:31:34 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 12/20 | batch 66/88 (75%) | running loss 0.2308 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:31:41 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 12/20 | Progress:  60.0% | Train Loss: 0.2321 | Val Loss: 0.2263 | Train Dice: 0.7677 | Val Dice: 0.7764 | Val IoU: 0.6755 | Val HD95: 46.65 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:06 | ETA: 00:02:44  *best*
+2026-10-12 19:31:46 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 13/20 | batch 22/88 (25%) | running loss 0.2263 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:31:50 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 13/20 | batch 44/88 (50%) | running loss 0.2280 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:31:54 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 13/20 | batch 66/88 (75%) | running loss 0.2296 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:32:02 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 13/20 | Progress:  65.0% | Train Loss: 0.2282 | Val Loss: 0.2119 | Train Dice: 0.7700 | Val Dice: 0.7962 | Val IoU: 0.7019 | Val HD95: 37.00 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:26 | ETA: 00:02:23  *best*
+2026-10-12 19:32:06 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 14/20 | batch 22/88 (25%) | running loss 0.2285 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:32:10 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 14/20 | batch 44/88 (50%) | running loss 0.2245 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:32:14 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 14/20 | batch 66/88 (75%) | running loss 0.2216 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:32:22 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 14/20 | Progress:  70.0% | Train Loss: 0.2209 | Val Loss: 0.1924 | Train Dice: 0.7808 | Val Dice: 0.8148 | Val IoU: 0.7242 | Val HD95: 33.13 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:04:46 | ETA: 00:02:02  *best*
+2026-10-12 19:32:26 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 15/20 | batch 22/88 (25%) | running loss 0.2154 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:32:30 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 15/20 | batch 44/88 (50%) | running loss 0.2258 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:32:34 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 15/20 | batch 66/88 (75%) | running loss 0.2222 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:32:42 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 15/20 | Progress:  75.0% | Train Loss: 0.2155 | Val Loss: 0.1972 | Train Dice: 0.7852 | Val Dice: 0.8065 | Val IoU: 0.7203 | Val HD95: 30.74 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:06 | ETA: 00:01:42
+2026-10-12 19:32:46 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 16/20 | batch 22/88 (25%) | running loss 0.2093 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:32:50 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 16/20 | batch 44/88 (50%) | running loss 0.2107 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:32:54 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 16/20 | batch 66/88 (75%) | running loss 0.2103 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:33:02 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 16/20 | Progress:  80.0% | Train Loss: 0.2088 | Val Loss: 0.1955 | Train Dice: 0.7965 | Val Dice: 0.8151 | Val IoU: 0.7261 | Val HD95: 34.72 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:26 | ETA: 00:01:21  *best*
+2026-10-12 19:33:06 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 17/20 | batch 22/88 (25%) | running loss 0.1991 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:33:10 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 17/20 | batch 44/88 (50%) | running loss 0.2134 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:33:15 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 17/20 | batch 66/88 (75%) | running loss 0.2052 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:33:22 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 17/20 | Progress:  85.0% | Train Loss: 0.2045 | Val Loss: 0.2014 | Train Dice: 0.7978 | Val Dice: 0.7982 | Val IoU: 0.7083 | Val HD95: 37.93 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:46 | ETA: 00:01:01
+2026-10-12 19:33:26 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 18/20 | batch 22/88 (25%) | running loss 0.2070 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:33:30 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 18/20 | batch 44/88 (50%) | running loss 0.2152 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:33:35 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 18/20 | batch 66/88 (75%) | running loss 0.2044 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:33:42 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 18/20 | Progress:  90.0% | Train Loss: 0.2009 | Val Loss: 0.2175 | Train Dice: 0.8037 | Val Dice: 0.7846 | Val IoU: 0.6833 | Val HD95: 42.81 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:06 | ETA: 00:00:41
+2026-10-12 19:33:46 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 19/20 | batch 22/88 (25%) | running loss 0.1730 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:33:50 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 19/20 | batch 44/88 (50%) | running loss 0.1771 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:33:55 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 19/20 | batch 66/88 (75%) | running loss 0.1862 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:34:02 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 19/20 | Progress:  95.0% | Train Loss: 0.1934 | Val Loss: 0.1988 | Train Dice: 0.8055 | Val Dice: 0.8063 | Val IoU: 0.7118 | Val HD95: 42.43 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:26 | ETA: 00:00:20
+2026-10-12 19:34:06 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 20/20 | batch 22/88 (25%) | running loss 0.2040 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:34:10 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 20/20 | batch 44/88 (50%) | running loss 0.1929 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:34:15 | INFO    | Loss-weight run 1/5 (alpha=0.20) |   epoch 20/20 | batch 66/88 (75%) | running loss 0.1892 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:34:22 | INFO    | Loss-weight run 1/5 (alpha=0.20) | Epoch 20/20 | Progress: 100.0% | Train Loss: 0.1896 | Val Loss: 0.1835 | Train Dice: 0.8152 | Val Dice: 0.8265 | Val IoU: 0.7349 | Val HD95: 35.18 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:46 | ETA: 00:00:00  *best*
+2026-10-12 19:34:22 | INFO    |   alpha=0.200 -> mean val Dice over last 5 epochs = 0.8061
+2026-10-12 19:34:22 | INFO    | ====================================================================================================
+2026-10-12 19:34:22 | INFO    | Loss-weight run 2/5 | alpha (BCE) = 0.400, beta (soft-mIoU) = 0.600 | architecture [0, 2, 2, 2, 2, 2, 2, 4]
+2026-10-12 19:34:27 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 1/20 | batch 22/88 (25%) | running loss 0.5023 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:34:31 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 1/20 | batch 44/88 (50%) | running loss 0.4787 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:34:35 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 1/20 | batch 66/88 (75%) | running loss 0.4631 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:34:43 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 1/20 | Progress:   5.0% | Train Loss: 0.4507 | Val Loss: 0.4230 | Train Dice: 0.2603 | Val Dice: 0.4678 | Val IoU: 0.3442 | Val HD95: 80.01 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:00:20 | ETA: 00:06:25  *best*
+2026-10-12 19:34:47 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 2/20 | batch 22/88 (25%) | running loss 0.3911 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:34:51 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 2/20 | batch 44/88 (50%) | running loss 0.3850 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:34:56 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 2/20 | batch 66/88 (75%) | running loss 0.3838 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:35:03 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 2/20 | Progress:  10.0% | Train Loss: 0.3785 | Val Loss: 0.3616 | Train Dice: 0.5441 | Val Dice: 0.5693 | Val IoU: 0.4336 | Val HD95: 62.72 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:00:40 | ETA: 00:06:03  *best*
+2026-10-12 19:35:07 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 3/20 | batch 22/88 (25%) | running loss 0.3213 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:35:11 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 3/20 | batch 44/88 (50%) | running loss 0.3437 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:35:16 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 3/20 | batch 66/88 (75%) | running loss 0.3471 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:35:23 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 3/20 | Progress:  15.0% | Train Loss: 0.3444 | Val Loss: 0.3392 | Train Dice: 0.5956 | Val Dice: 0.5990 | Val IoU: 0.4675 | Val HD95: 64.01 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:01:01 | ETA: 00:05:43  *best*
+2026-10-12 19:35:27 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 4/20 | batch 22/88 (25%) | running loss 0.3265 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:35:32 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 4/20 | batch 44/88 (50%) | running loss 0.3384 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:35:36 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 4/20 | batch 66/88 (75%) | running loss 0.3275 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:35:43 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 4/20 | Progress:  20.0% | Train Loss: 0.3250 | Val Loss: 0.2916 | Train Dice: 0.6308 | Val Dice: 0.6542 | Val IoU: 0.5470 | Val HD95: 46.21 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:01:21 | ETA: 00:05:23  *best*
+2026-10-12 19:35:47 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 5/20 | batch 22/88 (25%) | running loss 0.2791 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:35:52 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 5/20 | batch 44/88 (50%) | running loss 0.2935 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:35:56 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 5/20 | batch 66/88 (75%) | running loss 0.3004 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:36:03 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 5/20 | Progress:  25.0% | Train Loss: 0.3014 | Val Loss: 0.2690 | Train Dice: 0.6652 | Val Dice: 0.7153 | Val IoU: 0.5973 | Val HD95: 47.09 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:01:41 | ETA: 00:05:03  *best*
+2026-10-12 19:36:08 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 6/20 | batch 22/88 (25%) | running loss 0.2941 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:36:12 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 6/20 | batch 44/88 (50%) | running loss 0.2837 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:36:16 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 6/20 | batch 66/88 (75%) | running loss 0.2904 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:36:23 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 6/20 | Progress:  30.0% | Train Loss: 0.2829 | Val Loss: 0.2753 | Train Dice: 0.6907 | Val Dice: 0.6969 | Val IoU: 0.5865 | Val HD95: 51.11 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:01 | ETA: 00:04:42
+2026-10-12 19:36:28 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 7/20 | batch 22/88 (25%) | running loss 0.2703 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:36:32 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 7/20 | batch 44/88 (50%) | running loss 0.2627 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:36:36 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 7/20 | batch 66/88 (75%) | running loss 0.2648 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:36:44 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 7/20 | Progress:  35.0% | Train Loss: 0.2670 | Val Loss: 0.2515 | Train Dice: 0.7145 | Val Dice: 0.7410 | Val IoU: 0.6376 | Val HD95: 48.39 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:21 | ETA: 00:04:22  *best*
+2026-10-12 19:36:48 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 8/20 | batch 22/88 (25%) | running loss 0.2203 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:36:52 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 8/20 | batch 44/88 (50%) | running loss 0.2387 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:36:56 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 8/20 | batch 66/88 (75%) | running loss 0.2535 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:37:04 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 8/20 | Progress:  40.0% | Train Loss: 0.2526 | Val Loss: 0.2615 | Train Dice: 0.7353 | Val Dice: 0.7291 | Val IoU: 0.6272 | Val HD95: 41.40 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:41 | ETA: 00:04:02
+2026-10-12 19:37:08 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 9/20 | batch 22/88 (25%) | running loss 0.2355 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:37:12 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 9/20 | batch 44/88 (50%) | running loss 0.2381 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:37:16 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 9/20 | batch 66/88 (75%) | running loss 0.2372 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:37:24 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 9/20 | Progress:  45.0% | Train Loss: 0.2377 | Val Loss: 0.2481 | Train Dice: 0.7556 | Val Dice: 0.7405 | Val IoU: 0.6413 | Val HD95: 40.91 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:01 | ETA: 00:03:41
+2026-10-12 19:37:28 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 10/20 | batch 22/88 (25%) | running loss 0.2358 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:37:32 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 10/20 | batch 44/88 (50%) | running loss 0.2315 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:37:36 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 10/20 | batch 66/88 (75%) | running loss 0.2365 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:37:44 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 10/20 | Progress:  50.0% | Train Loss: 0.2372 | Val Loss: 0.2907 | Train Dice: 0.7523 | Val Dice: 0.6999 | Val IoU: 0.5798 | Val HD95: 57.07 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:21 | ETA: 00:03:21
+2026-10-12 19:37:48 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 11/20 | batch 22/88 (25%) | running loss 0.2092 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:37:52 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 11/20 | batch 44/88 (50%) | running loss 0.2227 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:37:57 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 11/20 | batch 66/88 (75%) | running loss 0.2246 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:38:04 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 11/20 | Progress:  55.0% | Train Loss: 0.2283 | Val Loss: 0.2170 | Train Dice: 0.7653 | Val Dice: 0.7863 | Val IoU: 0.6863 | Val HD95: 39.20 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:41 | ETA: 00:03:01  *best*
+2026-10-12 19:38:08 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 12/20 | batch 22/88 (25%) | running loss 0.2290 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:38:12 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 12/20 | batch 44/88 (50%) | running loss 0.2172 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:38:17 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 12/20 | batch 66/88 (75%) | running loss 0.2225 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:38:24 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 12/20 | Progress:  60.0% | Train Loss: 0.2215 | Val Loss: 0.2487 | Train Dice: 0.7751 | Val Dice: 0.7495 | Val IoU: 0.6440 | Val HD95: 49.91 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:01 | ETA: 00:02:41
+2026-10-12 19:38:28 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 13/20 | batch 22/88 (25%) | running loss 0.2222 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:38:32 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 13/20 | batch 44/88 (50%) | running loss 0.2187 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:38:37 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 13/20 | batch 66/88 (75%) | running loss 0.2213 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:38:44 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 13/20 | Progress:  65.0% | Train Loss: 0.2180 | Val Loss: 0.2170 | Train Dice: 0.7770 | Val Dice: 0.7896 | Val IoU: 0.6968 | Val HD95: 33.27 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:22 | ETA: 00:02:21  *best*
+2026-10-12 19:38:48 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 14/20 | batch 22/88 (25%) | running loss 0.2111 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:38:53 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 14/20 | batch 44/88 (50%) | running loss 0.2112 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:38:57 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 14/20 | batch 66/88 (75%) | running loss 0.2110 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:39:04 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 14/20 | Progress:  70.0% | Train Loss: 0.2097 | Val Loss: 0.2019 | Train Dice: 0.7901 | Val Dice: 0.7923 | Val IoU: 0.7007 | Val HD95: 44.05 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:42 | ETA: 00:02:01  *best*
+2026-10-12 19:39:09 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 15/20 | batch 22/88 (25%) | running loss 0.1983 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:39:13 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 15/20 | batch 44/88 (50%) | running loss 0.2034 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:39:17 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 15/20 | batch 66/88 (75%) | running loss 0.2038 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:39:25 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 15/20 | Progress:  75.0% | Train Loss: 0.2027 | Val Loss: 0.1860 | Train Dice: 0.7978 | Val Dice: 0.8187 | Val IoU: 0.7330 | Val HD95: 35.46 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:02 | ETA: 00:01:41  *best*
+2026-10-12 19:39:29 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 16/20 | batch 22/88 (25%) | running loss 0.2108 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:39:33 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 16/20 | batch 44/88 (50%) | running loss 0.2090 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:39:37 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 16/20 | batch 66/88 (75%) | running loss 0.2026 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:39:45 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 16/20 | Progress:  80.0% | Train Loss: 0.2015 | Val Loss: 0.1888 | Train Dice: 0.8010 | Val Dice: 0.8101 | Val IoU: 0.7198 | Val HD95: 37.15 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:22 | ETA: 00:01:21
+2026-10-12 19:39:49 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 17/20 | batch 22/88 (25%) | running loss 0.2033 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:39:53 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 17/20 | batch 44/88 (50%) | running loss 0.2027 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:39:57 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 17/20 | batch 66/88 (75%) | running loss 0.1962 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:40:05 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 17/20 | Progress:  85.0% | Train Loss: 0.1919 | Val Loss: 0.1942 | Train Dice: 0.8059 | Val Dice: 0.8149 | Val IoU: 0.7284 | Val HD95: 32.64 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:42 | ETA: 00:01:00
+2026-10-12 19:40:09 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 18/20 | batch 22/88 (25%) | running loss 0.1897 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:40:13 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 18/20 | batch 44/88 (50%) | running loss 0.1963 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:40:17 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 18/20 | batch 66/88 (75%) | running loss 0.1912 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:40:25 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 18/20 | Progress:  90.0% | Train Loss: 0.1895 | Val Loss: 0.1891 | Train Dice: 0.8151 | Val Dice: 0.8132 | Val IoU: 0.7197 | Val HD95: 34.59 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:02 | ETA: 00:00:40
+2026-10-12 19:40:29 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 19/20 | batch 22/88 (25%) | running loss 0.1741 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:40:33 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 19/20 | batch 44/88 (50%) | running loss 0.1720 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:40:37 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 19/20 | batch 66/88 (75%) | running loss 0.1799 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:40:45 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 19/20 | Progress:  95.0% | Train Loss: 0.1802 | Val Loss: 0.1863 | Train Dice: 0.8181 | Val Dice: 0.8205 | Val IoU: 0.7308 | Val HD95: 35.43 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:22 | ETA: 00:00:20  *best*
+2026-10-12 19:40:49 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 20/20 | batch 22/88 (25%) | running loss 0.1834 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:40:53 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 20/20 | batch 44/88 (50%) | running loss 0.1892 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:40:58 | INFO    | Loss-weight run 2/5 (alpha=0.40) |   epoch 20/20 | batch 66/88 (75%) | running loss 0.1869 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:41:05 | INFO    | Loss-weight run 2/5 (alpha=0.40) | Epoch 20/20 | Progress: 100.0% | Train Loss: 0.1862 | Val Loss: 0.2206 | Train Dice: 0.8150 | Val Dice: 0.7742 | Val IoU: 0.6742 | Val HD95: 43.35 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:42 | ETA: 00:00:00
+2026-10-12 19:41:05 | INFO    |   alpha=0.400 -> mean val Dice over last 5 epochs = 0.8066
+2026-10-12 19:41:05 | INFO    | ====================================================================================================
+2026-10-12 19:41:05 | INFO    | Loss-weight run 3/5 | alpha (BCE) = 0.500, beta (soft-mIoU) = 0.500 | architecture [0, 2, 2, 2, 2, 2, 2, 4]
+2026-10-12 19:41:05 | INFO    |   identical configuration to the candidate run (same seed, data order, alpha, epochs) — reusing its 20-epoch history
+2026-10-12 19:41:05 | INFO    |   alpha=0.500 -> mean val Dice over last 5 epochs = 0.8043
+2026-10-12 19:41:05 | INFO    | ====================================================================================================
+2026-10-12 19:41:05 | INFO    | Loss-weight run 4/5 | alpha (BCE) = 0.600, beta (soft-mIoU) = 0.400 | architecture [0, 2, 2, 2, 2, 2, 2, 4]
+2026-10-12 19:41:10 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 1/20 | batch 22/88 (25%) | running loss 0.4628 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:41:14 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 1/20 | batch 44/88 (50%) | running loss 0.4392 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:41:18 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 1/20 | batch 66/88 (75%) | running loss 0.4245 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:41:26 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 1/20 | Progress:   5.0% | Train Loss: 0.4165 | Val Loss: 0.3956 | Train Dice: 0.2466 | Val Dice: 0.4593 | Val IoU: 0.3280 | Val HD95: 72.85 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:00:20 | ETA: 00:06:26  *best*
+2026-10-12 19:41:30 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 2/20 | batch 22/88 (25%) | running loss 0.3735 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:41:34 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 2/20 | batch 44/88 (50%) | running loss 0.3665 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:41:38 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 2/20 | batch 66/88 (75%) | running loss 0.3663 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:41:46 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 2/20 | Progress:  10.0% | Train Loss: 0.3588 | Val Loss: 0.3292 | Train Dice: 0.5243 | Val Dice: 0.5624 | Val IoU: 0.4359 | Val HD95: 57.75 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:00:40 | ETA: 00:06:03  *best*
+2026-10-12 19:41:50 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 3/20 | batch 22/88 (25%) | running loss 0.2958 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:41:54 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 3/20 | batch 44/88 (50%) | running loss 0.3223 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:41:58 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 3/20 | batch 66/88 (75%) | running loss 0.3262 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:42:06 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 3/20 | Progress:  15.0% | Train Loss: 0.3244 | Val Loss: 0.3406 | Train Dice: 0.5827 | Val Dice: 0.5592 | Val IoU: 0.4381 | Val HD95: 63.64 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:01:00 | ETA: 00:05:43
+2026-10-12 19:42:10 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 4/20 | batch 22/88 (25%) | running loss 0.3108 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:42:14 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 4/20 | batch 44/88 (50%) | running loss 0.3192 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:42:19 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 4/20 | batch 66/88 (75%) | running loss 0.3106 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:42:26 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 4/20 | Progress:  20.0% | Train Loss: 0.3098 | Val Loss: 0.2865 | Train Dice: 0.6137 | Val Dice: 0.6322 | Val IoU: 0.5191 | Val HD95: 51.74 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:01:21 | ETA: 00:05:23  *best*
+2026-10-12 19:42:30 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 5/20 | batch 22/88 (25%) | running loss 0.2686 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:42:35 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 5/20 | batch 44/88 (50%) | running loss 0.2785 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:42:39 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 5/20 | batch 66/88 (75%) | running loss 0.2836 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:42:46 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 5/20 | Progress:  25.0% | Train Loss: 0.2850 | Val Loss: 0.2676 | Train Dice: 0.6609 | Val Dice: 0.6914 | Val IoU: 0.5736 | Val HD95: 48.88 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:01:41 | ETA: 00:05:03  *best*
+2026-10-12 19:42:50 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 6/20 | batch 22/88 (25%) | running loss 0.2802 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:42:55 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 6/20 | batch 44/88 (50%) | running loss 0.2771 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:42:59 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 6/20 | batch 66/88 (75%) | running loss 0.2785 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:43:06 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 6/20 | Progress:  30.0% | Train Loss: 0.2706 | Val Loss: 0.2755 | Train Dice: 0.6831 | Val Dice: 0.6675 | Val IoU: 0.5546 | Val HD95: 54.56 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:01 | ETA: 00:04:42
+2026-10-12 19:43:10 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 7/20 | batch 22/88 (25%) | running loss 0.2702 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:43:15 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 7/20 | batch 44/88 (50%) | running loss 0.2593 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:43:19 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 7/20 | batch 66/88 (75%) | running loss 0.2577 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:43:26 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 7/20 | Progress:  35.0% | Train Loss: 0.2604 | Val Loss: 0.2469 | Train Dice: 0.7028 | Val Dice: 0.7177 | Val IoU: 0.6062 | Val HD95: 45.52 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:21 | ETA: 00:04:22  *best*
+2026-10-12 19:43:31 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 8/20 | batch 22/88 (25%) | running loss 0.2254 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:43:35 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 8/20 | batch 44/88 (50%) | running loss 0.2353 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:43:39 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 8/20 | batch 66/88 (75%) | running loss 0.2483 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:43:47 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 8/20 | Progress:  40.0% | Train Loss: 0.2473 | Val Loss: 0.2312 | Train Dice: 0.7246 | Val Dice: 0.7531 | Val IoU: 0.6483 | Val HD95: 44.49 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:41 | ETA: 00:04:02  *best*
+2026-10-12 19:43:51 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 9/20 | batch 22/88 (25%) | running loss 0.2364 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:43:55 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 9/20 | batch 44/88 (50%) | running loss 0.2362 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:43:59 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 9/20 | batch 66/88 (75%) | running loss 0.2324 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:44:07 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 9/20 | Progress:  45.0% | Train Loss: 0.2352 | Val Loss: 0.2240 | Train Dice: 0.7463 | Val Dice: 0.7541 | Val IoU: 0.6559 | Val HD95: 45.06 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:02 | ETA: 00:03:42  *best*
+2026-10-12 19:44:11 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 10/20 | batch 22/88 (25%) | running loss 0.2183 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:44:15 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 10/20 | batch 44/88 (50%) | running loss 0.2233 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:44:20 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 10/20 | batch 66/88 (75%) | running loss 0.2313 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:44:27 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 10/20 | Progress:  50.0% | Train Loss: 0.2327 | Val Loss: 0.2226 | Train Dice: 0.7369 | Val Dice: 0.7640 | Val IoU: 0.6614 | Val HD95: 41.76 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:22 | ETA: 00:03:22  *best*
+2026-10-12 19:44:31 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 11/20 | batch 22/88 (25%) | running loss 0.2002 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:44:36 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 11/20 | batch 44/88 (50%) | running loss 0.2118 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:44:40 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 11/20 | batch 66/88 (75%) | running loss 0.2179 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:44:47 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 11/20 | Progress:  55.0% | Train Loss: 0.2235 | Val Loss: 0.2152 | Train Dice: 0.7565 | Val Dice: 0.7804 | Val IoU: 0.6862 | Val HD95: 39.05 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:42 | ETA: 00:03:02  *best*
+2026-10-12 19:44:52 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 12/20 | batch 22/88 (25%) | running loss 0.2286 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:44:56 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 12/20 | batch 44/88 (50%) | running loss 0.2164 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:45:00 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 12/20 | batch 66/88 (75%) | running loss 0.2223 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:45:07 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 12/20 | Progress:  60.0% | Train Loss: 0.2246 | Val Loss: 0.2362 | Train Dice: 0.7596 | Val Dice: 0.7316 | Val IoU: 0.6342 | Val HD95: 45.11 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:02 | ETA: 00:02:41
+2026-10-12 19:45:11 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 13/20 | batch 22/88 (25%) | running loss 0.2154 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:45:16 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 13/20 | batch 44/88 (50%) | running loss 0.2144 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:45:20 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 13/20 | batch 66/88 (75%) | running loss 0.2192 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:45:27 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 13/20 | Progress:  65.0% | Train Loss: 0.2170 | Val Loss: 0.2099 | Train Dice: 0.7667 | Val Dice: 0.7741 | Val IoU: 0.6853 | Val HD95: 34.12 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:22 | ETA: 00:02:21
+2026-10-12 19:45:32 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 14/20 | batch 22/88 (25%) | running loss 0.2045 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:45:36 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 14/20 | batch 44/88 (50%) | running loss 0.2059 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:45:40 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 14/20 | batch 66/88 (75%) | running loss 0.2029 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:45:47 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 14/20 | Progress:  70.0% | Train Loss: 0.2043 | Val Loss: 0.1888 | Train Dice: 0.7865 | Val Dice: 0.8064 | Val IoU: 0.7143 | Val HD95: 40.54 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:42 | ETA: 00:02:01  *best*
+2026-10-12 19:45:52 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 15/20 | batch 22/88 (25%) | running loss 0.1949 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:45:56 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 15/20 | batch 44/88 (50%) | running loss 0.1999 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:46:00 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 15/20 | batch 66/88 (75%) | running loss 0.2001 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:46:08 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 15/20 | Progress:  75.0% | Train Loss: 0.1964 | Val Loss: 0.1766 | Train Dice: 0.7920 | Val Dice: 0.8167 | Val IoU: 0.7309 | Val HD95: 30.12 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:02 | ETA: 00:01:41  *best*
+2026-10-12 19:46:12 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 16/20 | batch 22/88 (25%) | running loss 0.2006 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:46:16 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 16/20 | batch 44/88 (50%) | running loss 0.1997 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:46:20 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 16/20 | batch 66/88 (75%) | running loss 0.1927 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:46:28 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 16/20 | Progress:  80.0% | Train Loss: 0.1958 | Val Loss: 0.1960 | Train Dice: 0.7934 | Val Dice: 0.7995 | Val IoU: 0.7061 | Val HD95: 42.00 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:22 | ETA: 00:01:21
+2026-10-12 19:46:32 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 17/20 | batch 22/88 (25%) | running loss 0.1887 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:46:36 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 17/20 | batch 44/88 (50%) | running loss 0.1907 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:46:40 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 17/20 | batch 66/88 (75%) | running loss 0.1857 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:46:48 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 17/20 | Progress:  85.0% | Train Loss: 0.1808 | Val Loss: 0.1830 | Train Dice: 0.8065 | Val Dice: 0.8056 | Val IoU: 0.7192 | Val HD95: 34.45 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:05:42 | ETA: 00:01:00
+2026-10-12 19:46:52 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 18/20 | batch 22/88 (25%) | running loss 0.1797 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:46:56 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 18/20 | batch 44/88 (50%) | running loss 0.1902 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:47:00 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 18/20 | batch 66/88 (75%) | running loss 0.1898 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:47:08 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 18/20 | Progress:  90.0% | Train Loss: 0.1869 | Val Loss: 0.1764 | Train Dice: 0.8087 | Val Dice: 0.8214 | Val IoU: 0.7321 | Val HD95: 36.95 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:03 | ETA: 00:00:40  *best*
+2026-10-12 19:47:12 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 19/20 | batch 22/88 (25%) | running loss 0.1630 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:47:16 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 19/20 | batch 44/88 (50%) | running loss 0.1641 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:47:21 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 19/20 | batch 66/88 (75%) | running loss 0.1705 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:47:28 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 19/20 | Progress:  95.0% | Train Loss: 0.1717 | Val Loss: 0.1763 | Train Dice: 0.8159 | Val Dice: 0.8189 | Val IoU: 0.7295 | Val HD95: 36.00 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:22 | ETA: 00:00:20
+2026-10-12 19:47:32 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 20/20 | batch 22/88 (25%) | running loss 0.1665 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:47:36 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 20/20 | batch 44/88 (50%) | running loss 0.1697 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:47:41 | INFO    | Loss-weight run 4/5 (alpha=0.60) |   epoch 20/20 | batch 66/88 (75%) | running loss 0.1680 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:47:48 | INFO    | Loss-weight run 4/5 (alpha=0.60) | Epoch 20/20 | Progress: 100.0% | Train Loss: 0.1728 | Val Loss: 0.1651 | Train Dice: 0.8153 | Val Dice: 0.8300 | Val IoU: 0.7425 | Val HD95: 30.49 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:43 | ETA: 00:00:00  *best*
+2026-10-12 19:47:48 | INFO    |   alpha=0.600 -> mean val Dice over last 5 epochs = 0.8151
+2026-10-12 19:47:48 | INFO    | ====================================================================================================
+2026-10-12 19:47:48 | INFO    | Loss-weight run 5/5 | alpha (BCE) = 0.800, beta (soft-mIoU) = 0.200 | architecture [0, 2, 2, 2, 2, 2, 2, 4]
+2026-10-12 19:47:53 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 1/20 | batch 22/88 (25%) | running loss 0.4230 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:47:57 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 1/20 | batch 44/88 (50%) | running loss 0.3992 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:48:01 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 1/20 | batch 66/88 (75%) | running loss 0.3863 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:48:09 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 1/20 | Progress:   5.0% | Train Loss: 0.3814 | Val Loss: 0.3591 | Train Dice: 0.2186 | Val Dice: 0.4221 | Val IoU: 0.3016 | Val HD95: 73.93 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:00:20 | ETA: 00:06:25  *best*
+2026-10-12 19:48:13 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 2/20 | batch 22/88 (25%) | running loss 0.3444 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:48:17 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 2/20 | batch 44/88 (50%) | running loss 0.3404 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:48:21 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 2/20 | batch 66/88 (75%) | running loss 0.3362 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:48:29 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 2/20 | Progress:  10.0% | Train Loss: 0.3274 | Val Loss: 0.3175 | Train Dice: 0.5095 | Val Dice: 0.5572 | Val IoU: 0.4185 | Val HD95: 67.28 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:00:41 | ETA: 00:06:06  *best*
+2026-10-12 19:48:33 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 3/20 | batch 22/88 (25%) | running loss 0.2779 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:48:37 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 3/20 | batch 44/88 (50%) | running loss 0.3035 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:48:42 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 3/20 | batch 66/88 (75%) | running loss 0.3097 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:48:49 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 3/20 | Progress:  15.0% | Train Loss: 0.3071 | Val Loss: 0.2894 | Train Dice: 0.5487 | Val Dice: 0.5757 | Val IoU: 0.4544 | Val HD95: 60.57 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:01:01 | ETA: 00:05:44  *best*
+2026-10-12 19:48:53 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 4/20 | batch 22/88 (25%) | running loss 0.2820 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:48:58 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 4/20 | batch 44/88 (50%) | running loss 0.2925 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:49:02 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 4/20 | batch 66/88 (75%) | running loss 0.2861 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:49:09 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 4/20 | Progress:  20.0% | Train Loss: 0.2862 | Val Loss: 0.2795 | Train Dice: 0.6081 | Val Dice: 0.6210 | Val IoU: 0.5005 | Val HD95: 54.16 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:01:21 | ETA: 00:05:23  *best*
+2026-10-12 19:49:13 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 5/20 | batch 22/88 (25%) | running loss 0.2469 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:49:18 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 5/20 | batch 44/88 (50%) | running loss 0.2619 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:49:22 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 5/20 | batch 66/88 (75%) | running loss 0.2700 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:49:29 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 5/20 | Progress:  25.0% | Train Loss: 0.2685 | Val Loss: 0.2407 | Train Dice: 0.6398 | Val Dice: 0.6926 | Val IoU: 0.5835 | Val HD95: 49.00 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:01:41 | ETA: 00:05:03  *best*
+2026-10-12 19:49:34 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 6/20 | batch 22/88 (25%) | running loss 0.2504 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:49:38 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 6/20 | batch 44/88 (50%) | running loss 0.2511 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:49:42 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 6/20 | batch 66/88 (75%) | running loss 0.2579 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:49:49 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 6/20 | Progress:  30.0% | Train Loss: 0.2507 | Val Loss: 0.2429 | Train Dice: 0.6710 | Val Dice: 0.6704 | Val IoU: 0.5615 | Val HD95: 54.47 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:01 | ETA: 00:04:42
+2026-10-12 19:49:54 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 7/20 | batch 22/88 (25%) | running loss 0.2396 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:49:58 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 7/20 | batch 44/88 (50%) | running loss 0.2333 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:50:02 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 7/20 | batch 66/88 (75%) | running loss 0.2330 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:50:09 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 7/20 | Progress:  35.0% | Train Loss: 0.2355 | Val Loss: 0.2157 | Train Dice: 0.7065 | Val Dice: 0.7363 | Val IoU: 0.6295 | Val HD95: 49.57 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:02:21 | ETA: 00:04:22  *best*
+2026-10-12 19:50:14 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 8/20 | batch 22/88 (25%) | running loss 0.2000 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:50:18 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 8/20 | batch 44/88 (50%) | running loss 0.2134 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:50:22 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 8/20 | batch 66/88 (75%) | running loss 0.2274 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:50:29 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 8/20 | Progress:  40.0% | Train Loss: 0.2275 | Val Loss: 0.2275 | Train Dice: 0.7204 | Val Dice: 0.7241 | Val IoU: 0.6150 | Val HD95: 52.06 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:02:41 | ETA: 00:04:02
+2026-10-12 19:50:34 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 9/20 | batch 22/88 (25%) | running loss 0.2157 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:50:38 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 9/20 | batch 44/88 (50%) | running loss 0.2166 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:50:42 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 9/20 | batch 66/88 (75%) | running loss 0.2164 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:50:49 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 9/20 | Progress:  45.0% | Train Loss: 0.2188 | Val Loss: 0.2167 | Train Dice: 0.7317 | Val Dice: 0.7297 | Val IoU: 0.6289 | Val HD95: 43.12 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:03:01 | ETA: 00:03:41
+2026-10-12 19:50:54 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 10/20 | batch 22/88 (25%) | running loss 0.2049 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:50:58 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 10/20 | batch 44/88 (50%) | running loss 0.2090 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:51:02 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 10/20 | batch 66/88 (75%) | running loss 0.2154 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:51:09 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 10/20 | Progress:  50.0% | Train Loss: 0.2139 | Val Loss: 0.2004 | Train Dice: 0.7326 | Val Dice: 0.7603 | Val IoU: 0.6570 | Val HD95: 43.07 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:21 | ETA: 00:03:21  *best*
+2026-10-12 19:51:14 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 11/20 | batch 22/88 (25%) | running loss 0.1795 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:51:18 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 11/20 | batch 44/88 (50%) | running loss 0.1919 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:51:22 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 11/20 | batch 66/88 (75%) | running loss 0.2009 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:51:29 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 11/20 | Progress:  55.0% | Train Loss: 0.2072 | Val Loss: 0.2008 | Train Dice: 0.7518 | Val Dice: 0.7672 | Val IoU: 0.6673 | Val HD95: 39.78 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:03:41 | ETA: 00:03:01  *best*
+2026-10-12 19:51:34 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 12/20 | batch 22/88 (25%) | running loss 0.2035 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:51:38 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 12/20 | batch 44/88 (50%) | running loss 0.1900 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:51:42 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 12/20 | batch 66/88 (75%) | running loss 0.1940 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:51:49 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 12/20 | Progress:  60.0% | Train Loss: 0.1962 | Val Loss: 0.2409 | Train Dice: 0.7716 | Val Dice: 0.6959 | Val IoU: 0.5948 | Val HD95: 56.18 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:01 | ETA: 00:02:41
+2026-10-12 19:51:54 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 13/20 | batch 22/88 (25%) | running loss 0.1987 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:51:58 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 13/20 | batch 44/88 (50%) | running loss 0.2008 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:52:02 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 13/20 | batch 66/88 (75%) | running loss 0.2039 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:52:10 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 13/20 | Progress:  65.0% | Train Loss: 0.2022 | Val Loss: 0.1983 | Train Dice: 0.7585 | Val Dice: 0.7848 | Val IoU: 0.6930 | Val HD95: 42.41 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:21 | ETA: 00:02:21  *best*
+2026-10-12 19:52:14 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 14/20 | batch 22/88 (25%) | running loss 0.1975 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:52:18 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 14/20 | batch 44/88 (50%) | running loss 0.1899 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:52:22 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 14/20 | batch 66/88 (75%) | running loss 0.1913 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:52:30 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 14/20 | Progress:  70.0% | Train Loss: 0.1917 | Val Loss: 0.1699 | Train Dice: 0.7784 | Val Dice: 0.8009 | Val IoU: 0.7084 | Val HD95: 37.52 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:04:41 | ETA: 00:02:01  *best*
+2026-10-12 19:52:34 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 15/20 | batch 22/88 (25%) | running loss 0.1750 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:52:38 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 15/20 | batch 44/88 (50%) | running loss 0.1821 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:52:43 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 15/20 | batch 66/88 (75%) | running loss 0.1829 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:52:50 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 15/20 | Progress:  75.0% | Train Loss: 0.1838 | Val Loss: 0.1925 | Train Dice: 0.7869 | Val Dice: 0.7834 | Val IoU: 0.6854 | Val HD95: 45.35 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:01 | ETA: 00:01:40
+2026-10-12 19:52:54 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 16/20 | batch 22/88 (25%) | running loss 0.1918 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:52:58 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 16/20 | batch 44/88 (50%) | running loss 0.1886 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:53:03 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 16/20 | batch 66/88 (75%) | running loss 0.1841 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:53:10 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 16/20 | Progress:  80.0% | Train Loss: 0.1847 | Val Loss: 0.1836 | Train Dice: 0.7825 | Val Dice: 0.7908 | Val IoU: 0.6935 | Val HD95: 43.52 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:05:21 | ETA: 00:01:20
+2026-10-12 19:53:14 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 17/20 | batch 22/88 (25%) | running loss 0.1765 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:53:18 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 17/20 | batch 44/88 (50%) | running loss 0.1812 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:53:23 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 17/20 | batch 66/88 (75%) | running loss 0.1741 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:53:30 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 17/20 | Progress:  85.0% | Train Loss: 0.1693 | Val Loss: 0.1841 | Train Dice: 0.7999 | Val Dice: 0.7999 | Val IoU: 0.7101 | Val HD95: 32.45 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:05:41 | ETA: 00:01:00
+2026-10-12 19:53:34 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 18/20 | batch 22/88 (25%) | running loss 0.1789 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:53:38 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 18/20 | batch 44/88 (50%) | running loss 0.1821 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:53:42 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 18/20 | batch 66/88 (75%) | running loss 0.1803 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:53:50 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 18/20 | Progress:  90.0% | Train Loss: 0.1766 | Val Loss: 0.1620 | Train Dice: 0.7940 | Val Dice: 0.8251 | Val IoU: 0.7377 | Val HD95: 31.99 px | LR: 1.00e-03 | epoch 00:00:19 | Elapsed: 00:06:01 | ETA: 00:00:40  *best*
+2026-10-12 19:53:54 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 19/20 | batch 22/88 (25%) | running loss 0.1537 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:53:58 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 19/20 | batch 44/88 (50%) | running loss 0.1569 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:54:02 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 19/20 | batch 66/88 (75%) | running loss 0.1605 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:54:10 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 19/20 | Progress:  95.0% | Train Loss: 0.1626 | Val Loss: 0.1872 | Train Dice: 0.8072 | Val Dice: 0.7879 | Val IoU: 0.6929 | Val HD95: 40.05 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:21 | ETA: 00:00:20
+2026-10-12 19:54:14 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 20/20 | batch 22/88 (25%) | running loss 0.1632 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:54:18 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 20/20 | batch 44/88 (50%) | running loss 0.1637 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:54:23 | INFO    | Loss-weight run 5/5 (alpha=0.80) |   epoch 20/20 | batch 66/88 (75%) | running loss 0.1635 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:54:30 | INFO    | Loss-weight run 5/5 (alpha=0.80) | Epoch 20/20 | Progress: 100.0% | Train Loss: 0.1646 | Val Loss: 0.1858 | Train Dice: 0.8010 | Val Dice: 0.7833 | Val IoU: 0.6798 | Val HD95: 45.84 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:06:41 | ETA: 00:00:00
+2026-10-12 19:54:30 | INFO    |   alpha=0.800 -> mean val Dice over last 5 epochs = 0.7974
+2026-10-12 19:54:30 | INFO    | Selected loss weights: alpha (BCE) = 0.600, beta (soft-mIoU) = 0.400 (validation criterion 0.8151)
+2026-10-12 19:54:30 | INFO    | Stage 'loss_weights' finished in 00:26:55
+2026-10-12 19:54:30 | INFO    | ####################################################################################################
+2026-10-12 19:54:30 | INFO    | STAGE: FINAL
+2026-10-12 19:54:30 | INFO    | Final training of [0, 2, 2, 2, 2, 2, 2, 4] for up to 100 epochs | alpha=0.600 beta=0.400 | AdamW lr=1.0e-03 wd=5.0e-05 | warm-up + poly schedule | early stopping on overfitting only
+2026-10-12 19:54:35 | INFO    | Final training |   epoch 1/100 | batch 22/88 (25%) | running loss 0.5439 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:54:39 | INFO    | Final training |   epoch 1/100 | batch 44/88 (50%) | running loss 0.5110 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:54:43 | INFO    | Final training |   epoch 1/100 | batch 66/88 (75%) | running loss 0.4876 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:54:51 | INFO    | Final training | Epoch 1/100 | Progress:   1.0% | Train Loss: 0.4702 | Val Loss: 0.4237 | Train Dice: 0.0825 | Val Dice: 0.2872 | Val IoU: 0.1854 | Val HD95: 71.11 px | LR: 1.00e-03 | epoch 00:00:20 | Elapsed: 00:00:20 | ETA: 00:33:12  *best*
+2026-10-12 19:54:55 | INFO    | Final training |   epoch 2/100 | batch 22/88 (25%) | running loss 0.3929 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:54:59 | INFO    | Final training |   epoch 2/100 | batch 44/88 (50%) | running loss 0.3843 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:55:03 | INFO    | Final training |   epoch 2/100 | batch 66/88 (75%) | running loss 0.3795 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:55:11 | INFO    | Final training | Epoch 2/100 | Progress:   2.0% | Train Loss: 0.3706 | Val Loss: 0.3511 | Train Dice: 0.4974 | Val Dice: 0.5422 | Val IoU: 0.4150 | Val HD95: 67.68 px | LR: 9.91e-04 | epoch 00:00:20 | Elapsed: 00:00:40 | ETA: 00:32:46  *best*
+2026-10-12 19:55:15 | INFO    | Final training |   epoch 3/100 | batch 22/88 (25%) | running loss 0.3046 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:55:19 | INFO    | Final training |   epoch 3/100 | batch 44/88 (50%) | running loss 0.3346 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:55:23 | INFO    | Final training |   epoch 3/100 | batch 66/88 (75%) | running loss 0.3364 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:55:31 | INFO    | Final training | Epoch 3/100 | Progress:   3.0% | Train Loss: 0.3344 | Val Loss: 0.3159 | Train Dice: 0.5681 | Val Dice: 0.6057 | Val IoU: 0.4813 | Val HD95: 62.23 px | LR: 9.82e-04 | epoch 00:00:20 | Elapsed: 00:01:00 | ETA: 00:32:27  *best*
+2026-10-12 19:55:35 | INFO    | Final training |   epoch 4/100 | batch 22/88 (25%) | running loss 0.3159 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:55:39 | INFO    | Final training |   epoch 4/100 | batch 44/88 (50%) | running loss 0.3206 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:55:43 | INFO    | Final training |   epoch 4/100 | batch 66/88 (75%) | running loss 0.3125 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:55:51 | INFO    | Final training | Epoch 4/100 | Progress:   4.0% | Train Loss: 0.3109 | Val Loss: 0.3148 | Train Dice: 0.6243 | Val Dice: 0.5527 | Val IoU: 0.4552 | Val HD95: 76.07 px | LR: 9.73e-04 | epoch 00:00:20 | Elapsed: 00:01:20 | ETA: 00:32:04
+2026-10-12 19:55:55 | INFO    | Final training |   epoch 5/100 | batch 22/88 (25%) | running loss 0.2680 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:55:59 | INFO    | Final training |   epoch 5/100 | batch 44/88 (50%) | running loss 0.2775 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:56:03 | INFO    | Final training |   epoch 5/100 | batch 66/88 (75%) | running loss 0.2834 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:56:11 | INFO    | Final training | Epoch 5/100 | Progress:   5.0% | Train Loss: 0.2830 | Val Loss: 0.2693 | Train Dice: 0.6698 | Val Dice: 0.6896 | Val IoU: 0.5729 | Val HD95: 51.80 px | LR: 9.64e-04 | epoch 00:00:20 | Elapsed: 00:01:40 | ETA: 00:31:49  *best*
+2026-10-12 19:56:15 | INFO    | Final training |   epoch 6/100 | batch 22/88 (25%) | running loss 0.2768 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:56:19 | INFO    | Final training |   epoch 6/100 | batch 44/88 (50%) | running loss 0.2678 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:56:24 | INFO    | Final training |   epoch 6/100 | batch 66/88 (75%) | running loss 0.2726 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:56:31 | INFO    | Final training | Epoch 6/100 | Progress:   6.0% | Train Loss: 0.2666 | Val Loss: 0.2577 | Train Dice: 0.6903 | Val Dice: 0.7081 | Val IoU: 0.5881 | Val HD95: 50.65 px | LR: 9.54e-04 | epoch 00:00:20 | Elapsed: 00:02:01 | ETA: 00:31:29  *best*
+2026-10-12 19:56:35 | INFO    | Final training |   epoch 7/100 | batch 22/88 (25%) | running loss 0.2468 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:56:40 | INFO    | Final training |   epoch 7/100 | batch 44/88 (50%) | running loss 0.2457 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:56:44 | INFO    | Final training |   epoch 7/100 | batch 66/88 (75%) | running loss 0.2477 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:56:51 | INFO    | Final training | Epoch 7/100 | Progress:   7.0% | Train Loss: 0.2532 | Val Loss: 0.2446 | Train Dice: 0.7218 | Val Dice: 0.7217 | Val IoU: 0.6105 | Val HD95: 49.70 px | LR: 9.45e-04 | epoch 00:00:20 | Elapsed: 00:02:21 | ETA: 00:31:11  *best*
+2026-10-12 19:56:55 | INFO    | Final training |   epoch 8/100 | batch 22/88 (25%) | running loss 0.2064 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:57:00 | INFO    | Final training |   epoch 8/100 | batch 44/88 (50%) | running loss 0.2211 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:57:04 | INFO    | Final training |   epoch 8/100 | batch 66/88 (75%) | running loss 0.2373 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:57:11 | INFO    | Final training | Epoch 8/100 | Progress:   8.0% | Train Loss: 0.2383 | Val Loss: 0.2315 | Train Dice: 0.7347 | Val Dice: 0.7448 | Val IoU: 0.6406 | Val HD95: 43.18 px | LR: 9.36e-04 | epoch 00:00:20 | Elapsed: 00:02:41 | ETA: 00:30:52  *best*
+2026-10-12 19:57:16 | INFO    | Final training |   epoch 9/100 | batch 22/88 (25%) | running loss 0.2277 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:57:20 | INFO    | Final training |   epoch 9/100 | batch 44/88 (50%) | running loss 0.2288 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:57:24 | INFO    | Final training |   epoch 9/100 | batch 66/88 (75%) | running loss 0.2340 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:57:32 | INFO    | Final training | Epoch 9/100 | Progress:   9.0% | Train Loss: 0.2352 | Val Loss: 0.2304 | Train Dice: 0.7478 | Val Dice: 0.7458 | Val IoU: 0.6474 | Val HD95: 42.49 px | LR: 9.27e-04 | epoch 00:00:20 | Elapsed: 00:03:01 | ETA: 00:30:32  *best*
+2026-10-12 19:57:36 | INFO    | Final training |   epoch 10/100 | batch 22/88 (25%) | running loss 0.2085 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:57:40 | INFO    | Final training |   epoch 10/100 | batch 44/88 (50%) | running loss 0.2096 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:57:44 | INFO    | Final training |   epoch 10/100 | batch 66/88 (75%) | running loss 0.2209 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:57:52 | INFO    | Final training | Epoch 10/100 | Progress:  10.0% | Train Loss: 0.2210 | Val Loss: 0.2153 | Train Dice: 0.7618 | Val Dice: 0.7754 | Val IoU: 0.6698 | Val HD95: 39.02 px | LR: 9.18e-04 | epoch 00:00:20 | Elapsed: 00:03:21 | ETA: 00:30:13  *best*
+2026-10-12 19:57:56 | INFO    | Final training |   epoch 11/100 | batch 22/88 (25%) | running loss 0.1966 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:58:00 | INFO    | Final training |   epoch 11/100 | batch 44/88 (50%) | running loss 0.2094 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:58:05 | INFO    | Final training |   epoch 11/100 | batch 66/88 (75%) | running loss 0.2155 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:58:12 | INFO    | Final training | Epoch 11/100 | Progress:  11.0% | Train Loss: 0.2184 | Val Loss: 0.1972 | Train Dice: 0.7662 | Val Dice: 0.7973 | Val IoU: 0.7021 | Val HD95: 34.03 px | LR: 9.09e-04 | epoch 00:00:20 | Elapsed: 00:03:42 | ETA: 00:29:52  *best*
+2026-10-12 19:58:16 | INFO    | Final training |   epoch 12/100 | batch 22/88 (25%) | running loss 0.2231 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:58:20 | INFO    | Final training |   epoch 12/100 | batch 44/88 (50%) | running loss 0.2107 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:58:25 | INFO    | Final training |   epoch 12/100 | batch 66/88 (75%) | running loss 0.2147 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:58:32 | INFO    | Final training | Epoch 12/100 | Progress:  12.0% | Train Loss: 0.2126 | Val Loss: 0.2202 | Train Dice: 0.7738 | Val Dice: 0.7694 | Val IoU: 0.6689 | Val HD95: 47.33 px | LR: 8.99e-04 | epoch 00:00:20 | Elapsed: 00:04:02 | ETA: 00:29:32
+2026-10-12 19:58:36 | INFO    | Final training |   epoch 13/100 | batch 22/88 (25%) | running loss 0.2039 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:58:41 | INFO    | Final training |   epoch 13/100 | batch 44/88 (50%) | running loss 0.2047 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:58:45 | INFO    | Final training |   epoch 13/100 | batch 66/88 (75%) | running loss 0.2102 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:58:53 | INFO    | Final training | Epoch 13/100 | Progress:  13.0% | Train Loss: 0.2085 | Val Loss: 0.1986 | Train Dice: 0.7794 | Val Dice: 0.8026 | Val IoU: 0.7118 | Val HD95: 33.37 px | LR: 8.90e-04 | epoch 00:00:21 | Elapsed: 00:04:23 | ETA: 00:29:19  *best*
+2026-10-12 19:58:58 | INFO    | Final training |   epoch 14/100 | batch 22/88 (25%) | running loss 0.2069 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:59:02 | INFO    | Final training |   epoch 14/100 | batch 44/88 (50%) | running loss 0.2043 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:59:06 | INFO    | Final training |   epoch 14/100 | batch 66/88 (75%) | running loss 0.2026 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:59:15 | INFO    | Final training | Epoch 14/100 | Progress:  14.0% | Train Loss: 0.2032 | Val Loss: 0.1859 | Train Dice: 0.7898 | Val Dice: 0.8136 | Val IoU: 0.7195 | Val HD95: 37.70 px | LR: 8.81e-04 | epoch 00:00:20 | Elapsed: 00:04:44 | ETA: 00:29:06  *best*
+2026-10-12 19:59:19 | INFO    | Final training |   epoch 15/100 | batch 22/88 (25%) | running loss 0.1954 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:59:23 | INFO    | Final training |   epoch 15/100 | batch 44/88 (50%) | running loss 0.2008 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:59:28 | INFO    | Final training |   epoch 15/100 | batch 66/88 (75%) | running loss 0.1987 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:59:35 | INFO    | Final training | Epoch 15/100 | Progress:  15.0% | Train Loss: 0.1965 | Val Loss: 0.1823 | Train Dice: 0.7956 | Val Dice: 0.8128 | Val IoU: 0.7232 | Val HD95: 37.77 px | LR: 8.72e-04 | epoch 00:00:20 | Elapsed: 00:05:04 | ETA: 00:28:45
+2026-10-12 19:59:39 | INFO    | Final training |   epoch 16/100 | batch 22/88 (25%) | running loss 0.2020 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 19:59:43 | INFO    | Final training |   epoch 16/100 | batch 44/88 (50%) | running loss 0.1994 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 19:59:48 | INFO    | Final training |   epoch 16/100 | batch 66/88 (75%) | running loss 0.1945 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 19:59:55 | INFO    | Final training | Epoch 16/100 | Progress:  16.0% | Train Loss: 0.1950 | Val Loss: 0.1999 | Train Dice: 0.7956 | Val Dice: 0.7962 | Val IoU: 0.7005 | Val HD95: 44.58 px | LR: 8.63e-04 | epoch 00:00:20 | Elapsed: 00:05:25 | ETA: 00:28:24
+2026-10-12 19:59:59 | INFO    | Final training |   epoch 17/100 | batch 22/88 (25%) | running loss 0.1962 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:00:03 | INFO    | Final training |   epoch 17/100 | batch 44/88 (50%) | running loss 0.1990 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:00:08 | INFO    | Final training |   epoch 17/100 | batch 66/88 (75%) | running loss 0.1883 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:00:15 | INFO    | Final training | Epoch 17/100 | Progress:  17.0% | Train Loss: 0.1798 | Val Loss: 0.1867 | Train Dice: 0.8111 | Val Dice: 0.8146 | Val IoU: 0.7306 | Val HD95: 31.35 px | LR: 8.53e-04 | epoch 00:00:20 | Elapsed: 00:05:45 | ETA: 00:28:03  *best*
+2026-10-12 20:00:19 | INFO    | Final training |   epoch 18/100 | batch 22/88 (25%) | running loss 0.1861 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:00:24 | INFO    | Final training |   epoch 18/100 | batch 44/88 (50%) | running loss 0.1954 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:00:28 | INFO    | Final training |   epoch 18/100 | batch 66/88 (75%) | running loss 0.1876 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:00:35 | INFO    | Final training | Epoch 18/100 | Progress:  18.0% | Train Loss: 0.1844 | Val Loss: 0.1775 | Train Dice: 0.8055 | Val Dice: 0.8197 | Val IoU: 0.7268 | Val HD95: 35.19 px | LR: 8.44e-04 | epoch 00:00:20 | Elapsed: 00:06:05 | ETA: 00:27:42  *best*
+2026-10-12 20:00:39 | INFO    | Final training |   epoch 19/100 | batch 22/88 (25%) | running loss 0.1643 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:00:44 | INFO    | Final training |   epoch 19/100 | batch 44/88 (50%) | running loss 0.1659 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:00:48 | INFO    | Final training |   epoch 19/100 | batch 66/88 (75%) | running loss 0.1723 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:00:55 | INFO    | Final training | Epoch 19/100 | Progress:  19.0% | Train Loss: 0.1731 | Val Loss: 0.1716 | Train Dice: 0.8169 | Val Dice: 0.8261 | Val IoU: 0.7393 | Val HD95: 34.14 px | LR: 8.35e-04 | epoch 00:00:20 | Elapsed: 00:06:25 | ETA: 00:27:21  *best*
+2026-10-12 20:01:00 | INFO    | Final training |   epoch 20/100 | batch 22/88 (25%) | running loss 0.1658 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:01:04 | INFO    | Final training |   epoch 20/100 | batch 44/88 (50%) | running loss 0.1706 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:01:08 | INFO    | Final training |   epoch 20/100 | batch 66/88 (75%) | running loss 0.1687 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:01:15 | INFO    | Final training | Epoch 20/100 | Progress:  20.0% | Train Loss: 0.1717 | Val Loss: 0.1806 | Train Dice: 0.8188 | Val Dice: 0.8148 | Val IoU: 0.7234 | Val HD95: 39.24 px | LR: 8.25e-04 | epoch 00:00:20 | Elapsed: 00:06:45 | ETA: 00:27:00
+2026-10-12 20:01:20 | INFO    | Final training |   epoch 21/100 | batch 22/88 (25%) | running loss 0.1679 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:01:24 | INFO    | Final training |   epoch 21/100 | batch 44/88 (50%) | running loss 0.1787 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:01:28 | INFO    | Final training |   epoch 21/100 | batch 66/88 (75%) | running loss 0.1813 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:01:36 | INFO    | Final training | Epoch 21/100 | Progress:  21.0% | Train Loss: 0.1737 | Val Loss: 0.1729 | Train Dice: 0.8212 | Val Dice: 0.8277 | Val IoU: 0.7403 | Val HD95: 30.20 px | LR: 8.16e-04 | epoch 00:00:20 | Elapsed: 00:07:05 | ETA: 00:26:40  *best*
+2026-10-12 20:01:40 | INFO    | Final training |   epoch 22/100 | batch 22/88 (25%) | running loss 0.1727 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:01:44 | INFO    | Final training |   epoch 22/100 | batch 44/88 (50%) | running loss 0.1629 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:01:49 | INFO    | Final training |   epoch 22/100 | batch 66/88 (75%) | running loss 0.1698 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:01:56 | INFO    | Final training | Epoch 22/100 | Progress:  22.0% | Train Loss: 0.1683 | Val Loss: 0.1749 | Train Dice: 0.8222 | Val Dice: 0.8210 | Val IoU: 0.7288 | Val HD95: 41.18 px | LR: 8.07e-04 | epoch 00:00:20 | Elapsed: 00:07:25 | ETA: 00:26:19
+2026-10-12 20:02:00 | INFO    | Final training |   epoch 23/100 | batch 22/88 (25%) | running loss 0.1471 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:02:04 | INFO    | Final training |   epoch 23/100 | batch 44/88 (50%) | running loss 0.1575 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:02:09 | INFO    | Final training |   epoch 23/100 | batch 66/88 (75%) | running loss 0.1562 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:02:16 | INFO    | Final training | Epoch 23/100 | Progress:  23.0% | Train Loss: 0.1594 | Val Loss: 0.1613 | Train Dice: 0.8343 | Val Dice: 0.8423 | Val IoU: 0.7582 | Val HD95: 28.12 px | LR: 7.98e-04 | epoch 00:00:20 | Elapsed: 00:07:45 | ETA: 00:25:58  *best*
+2026-10-12 20:02:20 | INFO    | Final training |   epoch 24/100 | batch 22/88 (25%) | running loss 0.1610 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:02:24 | INFO    | Final training |   epoch 24/100 | batch 44/88 (50%) | running loss 0.1586 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:02:29 | INFO    | Final training |   epoch 24/100 | batch 66/88 (75%) | running loss 0.1639 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:02:36 | INFO    | Final training | Epoch 24/100 | Progress:  24.0% | Train Loss: 0.1628 | Val Loss: 0.1736 | Train Dice: 0.8266 | Val Dice: 0.8167 | Val IoU: 0.7287 | Val HD95: 31.83 px | LR: 7.88e-04 | epoch 00:00:20 | Elapsed: 00:08:06 | ETA: 00:25:38
+2026-10-12 20:02:40 | INFO    | Final training |   epoch 25/100 | batch 22/88 (25%) | running loss 0.1833 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:02:45 | INFO    | Final training |   epoch 25/100 | batch 44/88 (50%) | running loss 0.1644 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:02:49 | INFO    | Final training |   epoch 25/100 | batch 66/88 (75%) | running loss 0.1610 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:02:56 | INFO    | Final training | Epoch 25/100 | Progress:  25.0% | Train Loss: 0.1615 | Val Loss: 0.1559 | Train Dice: 0.8301 | Val Dice: 0.8411 | Val IoU: 0.7572 | Val HD95: 30.36 px | LR: 7.79e-04 | epoch 00:00:20 | Elapsed: 00:08:26 | ETA: 00:25:17
+2026-10-12 20:03:00 | INFO    | Final training |   epoch 26/100 | batch 22/88 (25%) | running loss 0.1355 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:03:05 | INFO    | Final training |   epoch 26/100 | batch 44/88 (50%) | running loss 0.1434 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:03:09 | INFO    | Final training |   epoch 26/100 | batch 66/88 (75%) | running loss 0.1577 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:03:16 | INFO    | Final training | Epoch 26/100 | Progress:  26.0% | Train Loss: 0.1520 | Val Loss: 0.1523 | Train Dice: 0.8408 | Val Dice: 0.8419 | Val IoU: 0.7621 | Val HD95: 27.25 px | LR: 7.70e-04 | epoch 00:00:20 | Elapsed: 00:08:46 | ETA: 00:24:56
+2026-10-12 20:03:20 | INFO    | Final training |   epoch 27/100 | batch 22/88 (25%) | running loss 0.1641 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:03:25 | INFO    | Final training |   epoch 27/100 | batch 44/88 (50%) | running loss 0.1562 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:03:29 | INFO    | Final training |   epoch 27/100 | batch 66/88 (75%) | running loss 0.1610 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:03:36 | INFO    | Final training | Epoch 27/100 | Progress:  27.0% | Train Loss: 0.1575 | Val Loss: 0.1507 | Train Dice: 0.8309 | Val Dice: 0.8437 | Val IoU: 0.7602 | Val HD95: 32.30 px | LR: 7.60e-04 | epoch 00:00:20 | Elapsed: 00:09:06 | ETA: 00:24:36  *best*
+2026-10-12 20:03:41 | INFO    | Final training |   epoch 28/100 | batch 22/88 (25%) | running loss 0.1192 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:03:45 | INFO    | Final training |   epoch 28/100 | batch 44/88 (50%) | running loss 0.1317 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:03:49 | INFO    | Final training |   epoch 28/100 | batch 66/88 (75%) | running loss 0.1424 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:03:56 | INFO    | Final training | Epoch 28/100 | Progress:  28.0% | Train Loss: 0.1450 | Val Loss: 0.1554 | Train Dice: 0.8497 | Val Dice: 0.8409 | Val IoU: 0.7566 | Val HD95: 31.36 px | LR: 7.51e-04 | epoch 00:00:20 | Elapsed: 00:09:26 | ETA: 00:24:15
+2026-10-12 20:04:01 | INFO    | Final training |   epoch 29/100 | batch 22/88 (25%) | running loss 0.1331 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:04:05 | INFO    | Final training |   epoch 29/100 | batch 44/88 (50%) | running loss 0.1458 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:04:09 | INFO    | Final training |   epoch 29/100 | batch 66/88 (75%) | running loss 0.1447 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:04:17 | INFO    | Final training | Epoch 29/100 | Progress:  29.0% | Train Loss: 0.1440 | Val Loss: 0.1458 | Train Dice: 0.8484 | Val Dice: 0.8558 | Val IoU: 0.7772 | Val HD95: 30.61 px | LR: 7.41e-04 | epoch 00:00:20 | Elapsed: 00:09:46 | ETA: 00:23:55  *best*
+2026-10-12 20:04:21 | INFO    | Final training |   epoch 30/100 | batch 22/88 (25%) | running loss 0.1361 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:04:25 | INFO    | Final training |   epoch 30/100 | batch 44/88 (50%) | running loss 0.1407 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:04:29 | INFO    | Final training |   epoch 30/100 | batch 66/88 (75%) | running loss 0.1463 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:04:37 | INFO    | Final training | Epoch 30/100 | Progress:  30.0% | Train Loss: 0.1434 | Val Loss: 0.1421 | Train Dice: 0.8491 | Val Dice: 0.8596 | Val IoU: 0.7802 | Val HD95: 28.70 px | LR: 7.32e-04 | epoch 00:00:20 | Elapsed: 00:10:06 | ETA: 00:23:35  *best*
+2026-10-12 20:04:41 | INFO    | Final training |   epoch 31/100 | batch 22/88 (25%) | running loss 0.1175 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:04:45 | INFO    | Final training |   epoch 31/100 | batch 44/88 (50%) | running loss 0.1238 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:04:50 | INFO    | Final training |   epoch 31/100 | batch 66/88 (75%) | running loss 0.1326 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:04:57 | INFO    | Final training | Epoch 31/100 | Progress:  31.0% | Train Loss: 0.1333 | Val Loss: 0.1466 | Train Dice: 0.8564 | Val Dice: 0.8490 | Val IoU: 0.7690 | Val HD95: 29.11 px | LR: 7.23e-04 | epoch 00:00:20 | Elapsed: 00:10:26 | ETA: 00:23:14
+2026-10-12 20:05:01 | INFO    | Final training |   epoch 32/100 | batch 22/88 (25%) | running loss 0.1269 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:05:05 | INFO    | Final training |   epoch 32/100 | batch 44/88 (50%) | running loss 0.1319 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:05:10 | INFO    | Final training |   epoch 32/100 | batch 66/88 (75%) | running loss 0.1329 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:05:17 | INFO    | Final training | Epoch 32/100 | Progress:  32.0% | Train Loss: 0.1307 | Val Loss: 0.1474 | Train Dice: 0.8630 | Val Dice: 0.8545 | Val IoU: 0.7722 | Val HD95: 27.88 px | LR: 7.13e-04 | epoch 00:00:20 | Elapsed: 00:10:46 | ETA: 00:22:54
+2026-10-12 20:05:21 | INFO    | Final training |   epoch 33/100 | batch 22/88 (25%) | running loss 0.1231 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:05:25 | INFO    | Final training |   epoch 33/100 | batch 44/88 (50%) | running loss 0.1257 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:05:30 | INFO    | Final training |   epoch 33/100 | batch 66/88 (75%) | running loss 0.1263 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:05:37 | INFO    | Final training | Epoch 33/100 | Progress:  33.0% | Train Loss: 0.1258 | Val Loss: 0.1395 | Train Dice: 0.8638 | Val Dice: 0.8567 | Val IoU: 0.7772 | Val HD95: 28.60 px | LR: 7.04e-04 | epoch 00:00:20 | Elapsed: 00:11:06 | ETA: 00:22:33
+2026-10-12 20:05:41 | INFO    | Final training |   epoch 34/100 | batch 22/88 (25%) | running loss 0.1043 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:05:45 | INFO    | Final training |   epoch 34/100 | batch 44/88 (50%) | running loss 0.1167 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:05:50 | INFO    | Final training |   epoch 34/100 | batch 66/88 (75%) | running loss 0.1219 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:05:57 | INFO    | Final training | Epoch 34/100 | Progress:  34.0% | Train Loss: 0.1212 | Val Loss: 0.1485 | Train Dice: 0.8721 | Val Dice: 0.8511 | Val IoU: 0.7714 | Val HD95: 31.87 px | LR: 6.94e-04 | epoch 00:00:20 | Elapsed: 00:11:26 | ETA: 00:22:13
+2026-10-12 20:06:01 | INFO    | Final training |   epoch 35/100 | batch 22/88 (25%) | running loss 0.1137 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:06:05 | INFO    | Final training |   epoch 35/100 | batch 44/88 (50%) | running loss 0.1209 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:06:10 | INFO    | Final training |   epoch 35/100 | batch 66/88 (75%) | running loss 0.1201 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:06:17 | INFO    | Final training | Epoch 35/100 | Progress:  35.0% | Train Loss: 0.1256 | Val Loss: 0.1452 | Train Dice: 0.8706 | Val Dice: 0.8573 | Val IoU: 0.7788 | Val HD95: 30.13 px | LR: 6.85e-04 | epoch 00:00:20 | Elapsed: 00:11:46 | ETA: 00:21:52
+2026-10-12 20:06:21 | INFO    | Final training |   epoch 36/100 | batch 22/88 (25%) | running loss 0.1136 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:06:25 | INFO    | Final training |   epoch 36/100 | batch 44/88 (50%) | running loss 0.1209 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:06:30 | INFO    | Final training |   epoch 36/100 | batch 66/88 (75%) | running loss 0.1199 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:06:37 | INFO    | Final training | Epoch 36/100 | Progress:  36.0% | Train Loss: 0.1291 | Val Loss: 0.1459 | Train Dice: 0.8664 | Val Dice: 0.8469 | Val IoU: 0.7646 | Val HD95: 27.32 px | LR: 6.75e-04 | epoch 00:00:20 | Elapsed: 00:12:06 | ETA: 00:21:31
+2026-10-12 20:06:41 | INFO    | Final training |   epoch 37/100 | batch 22/88 (25%) | running loss 0.1223 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:06:45 | INFO    | Final training |   epoch 37/100 | batch 44/88 (50%) | running loss 0.1291 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:06:50 | INFO    | Final training |   epoch 37/100 | batch 66/88 (75%) | running loss 0.1334 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:06:57 | INFO    | Final training | Epoch 37/100 | Progress:  37.0% | Train Loss: 0.1290 | Val Loss: 0.1438 | Train Dice: 0.8663 | Val Dice: 0.8601 | Val IoU: 0.7812 | Val HD95: 27.93 px | LR: 6.66e-04 | epoch 00:00:19 | Elapsed: 00:12:27 | ETA: 00:21:11  *best*
+2026-10-12 20:07:01 | INFO    | Final training |   epoch 38/100 | batch 22/88 (25%) | running loss 0.1237 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:07:05 | INFO    | Final training |   epoch 38/100 | batch 44/88 (50%) | running loss 0.1215 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:07:10 | INFO    | Final training |   epoch 38/100 | batch 66/88 (75%) | running loss 0.1240 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:07:17 | INFO    | Final training | Epoch 38/100 | Progress:  38.0% | Train Loss: 0.1214 | Val Loss: 0.1329 | Train Dice: 0.8722 | Val Dice: 0.8643 | Val IoU: 0.7903 | Val HD95: 26.53 px | LR: 6.56e-04 | epoch 00:00:19 | Elapsed: 00:12:47 | ETA: 00:20:51  *best*
+2026-10-12 20:07:21 | INFO    | Final training |   epoch 39/100 | batch 22/88 (25%) | running loss 0.1233 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:07:26 | INFO    | Final training |   epoch 39/100 | batch 44/88 (50%) | running loss 0.1252 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:07:30 | INFO    | Final training |   epoch 39/100 | batch 66/88 (75%) | running loss 0.1206 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:07:37 | INFO    | Final training | Epoch 39/100 | Progress:  39.0% | Train Loss: 0.1273 | Val Loss: 0.1397 | Train Dice: 0.8698 | Val Dice: 0.8591 | Val IoU: 0.7775 | Val HD95: 28.13 px | LR: 6.47e-04 | epoch 00:00:20 | Elapsed: 00:13:07 | ETA: 00:20:30
+2026-10-12 20:07:41 | INFO    | Final training |   epoch 40/100 | batch 22/88 (25%) | running loss 0.1287 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:07:46 | INFO    | Final training |   epoch 40/100 | batch 44/88 (50%) | running loss 0.1215 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:07:50 | INFO    | Final training |   epoch 40/100 | batch 66/88 (75%) | running loss 0.1224 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:07:57 | INFO    | Final training | Epoch 40/100 | Progress:  40.0% | Train Loss: 0.1188 | Val Loss: 0.1373 | Train Dice: 0.8725 | Val Dice: 0.8638 | Val IoU: 0.7896 | Val HD95: 25.69 px | LR: 6.37e-04 | epoch 00:00:20 | Elapsed: 00:13:27 | ETA: 00:20:10
+2026-10-12 20:08:01 | INFO    | Final training |   epoch 41/100 | batch 22/88 (25%) | running loss 0.1057 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:08:06 | INFO    | Final training |   epoch 41/100 | batch 44/88 (50%) | running loss 0.1228 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:08:10 | INFO    | Final training |   epoch 41/100 | batch 66/88 (75%) | running loss 0.1158 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:08:17 | INFO    | Final training | Epoch 41/100 | Progress:  41.0% | Train Loss: 0.1141 | Val Loss: 0.1405 | Train Dice: 0.8791 | Val Dice: 0.8650 | Val IoU: 0.7884 | Val HD95: 31.01 px | LR: 6.28e-04 | epoch 00:00:20 | Elapsed: 00:13:47 | ETA: 00:19:50  *best*
+2026-10-12 20:08:21 | INFO    | Final training |   epoch 42/100 | batch 22/88 (25%) | running loss 0.0933 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:08:26 | INFO    | Final training |   epoch 42/100 | batch 44/88 (50%) | running loss 0.1022 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:08:30 | INFO    | Final training |   epoch 42/100 | batch 66/88 (75%) | running loss 0.1052 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:08:37 | INFO    | Final training | Epoch 42/100 | Progress:  42.0% | Train Loss: 0.1097 | Val Loss: 0.1366 | Train Dice: 0.8817 | Val Dice: 0.8666 | Val IoU: 0.7899 | Val HD95: 27.02 px | LR: 6.18e-04 | epoch 00:00:20 | Elapsed: 00:14:07 | ETA: 00:19:30  *best*
+2026-10-12 20:08:42 | INFO    | Final training |   epoch 43/100 | batch 22/88 (25%) | running loss 0.1003 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:08:46 | INFO    | Final training |   epoch 43/100 | batch 44/88 (50%) | running loss 0.1091 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:08:50 | INFO    | Final training |   epoch 43/100 | batch 66/88 (75%) | running loss 0.1144 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:08:57 | INFO    | Final training | Epoch 43/100 | Progress:  43.0% | Train Loss: 0.1142 | Val Loss: 0.1333 | Train Dice: 0.8787 | Val Dice: 0.8682 | Val IoU: 0.7943 | Val HD95: 26.15 px | LR: 6.08e-04 | epoch 00:00:19 | Elapsed: 00:14:27 | ETA: 00:19:09  *best*
+2026-10-12 20:09:02 | INFO    | Final training |   epoch 44/100 | batch 22/88 (25%) | running loss 0.1114 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:09:06 | INFO    | Final training |   epoch 44/100 | batch 44/88 (50%) | running loss 0.1130 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:09:10 | INFO    | Final training |   epoch 44/100 | batch 66/88 (75%) | running loss 0.1163 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:09:17 | INFO    | Final training | Epoch 44/100 | Progress:  44.0% | Train Loss: 0.1200 | Val Loss: 0.1491 | Train Dice: 0.8731 | Val Dice: 0.8450 | Val IoU: 0.7659 | Val HD95: 31.95 px | LR: 5.99e-04 | epoch 00:00:19 | Elapsed: 00:14:47 | ETA: 00:18:49
+2026-10-12 20:09:22 | INFO    | Final training |   epoch 45/100 | batch 22/88 (25%) | running loss 0.1166 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:09:26 | INFO    | Final training |   epoch 45/100 | batch 44/88 (50%) | running loss 0.1109 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:09:30 | INFO    | Final training |   epoch 45/100 | batch 66/88 (75%) | running loss 0.1120 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:09:37 | INFO    | Final training | Epoch 45/100 | Progress:  45.0% | Train Loss: 0.1105 | Val Loss: 0.1408 | Train Dice: 0.8799 | Val Dice: 0.8531 | Val IoU: 0.7747 | Val HD95: 30.09 px | LR: 5.89e-04 | epoch 00:00:20 | Elapsed: 00:15:07 | ETA: 00:18:29
+2026-10-12 20:09:42 | INFO    | Final training |   epoch 46/100 | batch 22/88 (25%) | running loss 0.1080 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:09:46 | INFO    | Final training |   epoch 46/100 | batch 44/88 (50%) | running loss 0.1040 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:09:50 | INFO    | Final training |   epoch 46/100 | batch 66/88 (75%) | running loss 0.1056 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:09:57 | INFO    | Final training | Epoch 46/100 | Progress:  46.0% | Train Loss: 0.1067 | Val Loss: 0.1297 | Train Dice: 0.8881 | Val Dice: 0.8724 | Val IoU: 0.7987 | Val HD95: 25.88 px | LR: 5.80e-04 | epoch 00:00:19 | Elapsed: 00:15:27 | ETA: 00:18:08  *best*
+2026-10-12 20:10:02 | INFO    | Final training |   epoch 47/100 | batch 22/88 (25%) | running loss 0.1060 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:10:06 | INFO    | Final training |   epoch 47/100 | batch 44/88 (50%) | running loss 0.1010 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:10:10 | INFO    | Final training |   epoch 47/100 | batch 66/88 (75%) | running loss 0.1057 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:10:17 | INFO    | Final training | Epoch 47/100 | Progress:  47.0% | Train Loss: 0.1091 | Val Loss: 0.1430 | Train Dice: 0.8836 | Val Dice: 0.8563 | Val IoU: 0.7800 | Val HD95: 31.35 px | LR: 5.70e-04 | epoch 00:00:20 | Elapsed: 00:15:47 | ETA: 00:17:48
+2026-10-12 20:10:22 | INFO    | Final training |   epoch 48/100 | batch 22/88 (25%) | running loss 0.1015 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:10:26 | INFO    | Final training |   epoch 48/100 | batch 44/88 (50%) | running loss 0.0978 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:10:30 | INFO    | Final training |   epoch 48/100 | batch 66/88 (75%) | running loss 0.1013 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:10:37 | INFO    | Final training | Epoch 48/100 | Progress:  48.0% | Train Loss: 0.1062 | Val Loss: 0.1402 | Train Dice: 0.8860 | Val Dice: 0.8707 | Val IoU: 0.7971 | Val HD95: 25.35 px | LR: 5.60e-04 | epoch 00:00:19 | Elapsed: 00:16:07 | ETA: 00:17:28
+2026-10-12 20:10:42 | INFO    | Final training |   epoch 49/100 | batch 22/88 (25%) | running loss 0.1052 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:10:46 | INFO    | Final training |   epoch 49/100 | batch 44/88 (50%) | running loss 0.1076 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:10:50 | INFO    | Final training |   epoch 49/100 | batch 66/88 (75%) | running loss 0.1105 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:10:57 | INFO    | Final training | Epoch 49/100 | Progress:  49.0% | Train Loss: 0.1097 | Val Loss: 0.1319 | Train Dice: 0.8855 | Val Dice: 0.8686 | Val IoU: 0.7963 | Val HD95: 24.17 px | LR: 5.50e-04 | epoch 00:00:20 | Elapsed: 00:16:27 | ETA: 00:17:07
+2026-10-12 20:11:02 | INFO    | Final training |   epoch 50/100 | batch 22/88 (25%) | running loss 0.0998 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:11:06 | INFO    | Final training |   epoch 50/100 | batch 44/88 (50%) | running loss 0.1029 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:11:10 | INFO    | Final training |   epoch 50/100 | batch 66/88 (75%) | running loss 0.1008 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:11:18 | INFO    | Final training | Epoch 50/100 | Progress:  50.0% | Train Loss: 0.1017 | Val Loss: 0.1309 | Train Dice: 0.8963 | Val Dice: 0.8699 | Val IoU: 0.7943 | Val HD95: 24.20 px | LR: 5.41e-04 | epoch 00:00:20 | Elapsed: 00:16:47 | ETA: 00:16:47
+2026-10-12 20:11:22 | INFO    | Final training |   epoch 51/100 | batch 22/88 (25%) | running loss 0.1087 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:11:26 | INFO    | Final training |   epoch 51/100 | batch 44/88 (50%) | running loss 0.1076 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:11:30 | INFO    | Final training |   epoch 51/100 | batch 66/88 (75%) | running loss 0.1025 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:11:38 | INFO    | Final training | Epoch 51/100 | Progress:  51.0% | Train Loss: 0.1006 | Val Loss: 0.1282 | Train Dice: 0.8968 | Val Dice: 0.8763 | Val IoU: 0.8063 | Val HD95: 24.14 px | LR: 5.31e-04 | epoch 00:00:20 | Elapsed: 00:17:07 | ETA: 00:16:27  *best*
+2026-10-12 20:11:42 | INFO    | Final training |   epoch 52/100 | batch 22/88 (25%) | running loss 0.1081 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:11:46 | INFO    | Final training |   epoch 52/100 | batch 44/88 (50%) | running loss 0.1001 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:11:50 | INFO    | Final training |   epoch 52/100 | batch 66/88 (75%) | running loss 0.0995 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:11:58 | INFO    | Final training | Epoch 52/100 | Progress:  52.0% | Train Loss: 0.0963 | Val Loss: 0.1294 | Train Dice: 0.8991 | Val Dice: 0.8724 | Val IoU: 0.8009 | Val HD95: 23.44 px | LR: 5.21e-04 | epoch 00:00:20 | Elapsed: 00:17:27 | ETA: 00:16:07
+2026-10-12 20:12:02 | INFO    | Final training |   epoch 53/100 | batch 22/88 (25%) | running loss 0.0928 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:12:06 | INFO    | Final training |   epoch 53/100 | batch 44/88 (50%) | running loss 0.0936 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:12:11 | INFO    | Final training |   epoch 53/100 | batch 66/88 (75%) | running loss 0.0944 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:12:18 | INFO    | Final training | Epoch 53/100 | Progress:  53.0% | Train Loss: 0.0991 | Val Loss: 0.1332 | Train Dice: 0.8951 | Val Dice: 0.8743 | Val IoU: 0.8032 | Val HD95: 24.78 px | LR: 5.11e-04 | epoch 00:00:20 | Elapsed: 00:17:47 | ETA: 00:15:46
+2026-10-12 20:12:22 | INFO    | Final training |   epoch 54/100 | batch 22/88 (25%) | running loss 0.0936 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:12:26 | INFO    | Final training |   epoch 54/100 | batch 44/88 (50%) | running loss 0.0924 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:12:30 | INFO    | Final training |   epoch 54/100 | batch 66/88 (75%) | running loss 0.0900 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:12:38 | INFO    | Final training | Epoch 54/100 | Progress:  54.0% | Train Loss: 0.0940 | Val Loss: 0.1252 | Train Dice: 0.9018 | Val Dice: 0.8764 | Val IoU: 0.8060 | Val HD95: 24.33 px | LR: 5.02e-04 | epoch 00:00:19 | Elapsed: 00:18:07 | ETA: 00:15:26  *best*
+2026-10-12 20:12:42 | INFO    | Final training |   epoch 55/100 | batch 22/88 (25%) | running loss 0.0996 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:12:46 | INFO    | Final training |   epoch 55/100 | batch 44/88 (50%) | running loss 0.1001 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:12:50 | INFO    | Final training |   epoch 55/100 | batch 66/88 (75%) | running loss 0.1019 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:12:57 | INFO    | Final training | Epoch 55/100 | Progress:  55.0% | Train Loss: 0.1017 | Val Loss: 0.1306 | Train Dice: 0.8941 | Val Dice: 0.8757 | Val IoU: 0.8035 | Val HD95: 25.35 px | LR: 4.92e-04 | epoch 00:00:19 | Elapsed: 00:18:27 | ETA: 00:15:06
+2026-10-12 20:13:02 | INFO    | Final training |   epoch 56/100 | batch 22/88 (25%) | running loss 0.0840 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:13:06 | INFO    | Final training |   epoch 56/100 | batch 44/88 (50%) | running loss 0.0934 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:13:10 | INFO    | Final training |   epoch 56/100 | batch 66/88 (75%) | running loss 0.0910 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:13:17 | INFO    | Final training | Epoch 56/100 | Progress:  56.0% | Train Loss: 0.0900 | Val Loss: 0.1274 | Train Dice: 0.9044 | Val Dice: 0.8779 | Val IoU: 0.8082 | Val HD95: 21.54 px | LR: 4.82e-04 | epoch 00:00:19 | Elapsed: 00:18:47 | ETA: 00:14:46  *best*
+2026-10-12 20:13:22 | INFO    | Final training |   epoch 57/100 | batch 22/88 (25%) | running loss 0.1062 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:13:26 | INFO    | Final training |   epoch 57/100 | batch 44/88 (50%) | running loss 0.1023 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:13:30 | INFO    | Final training |   epoch 57/100 | batch 66/88 (75%) | running loss 0.0973 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:13:37 | INFO    | Final training | Epoch 57/100 | Progress:  57.0% | Train Loss: 0.0959 | Val Loss: 0.1229 | Train Dice: 0.8993 | Val Dice: 0.8775 | Val IoU: 0.8054 | Val HD95: 24.82 px | LR: 4.72e-04 | epoch 00:00:19 | Elapsed: 00:19:07 | ETA: 00:14:25
+2026-10-12 20:13:42 | INFO    | Final training |   epoch 58/100 | batch 22/88 (25%) | running loss 0.0769 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:13:46 | INFO    | Final training |   epoch 58/100 | batch 44/88 (50%) | running loss 0.0892 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:13:50 | INFO    | Final training |   epoch 58/100 | batch 66/88 (75%) | running loss 0.0893 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:13:57 | INFO    | Final training | Epoch 58/100 | Progress:  58.0% | Train Loss: 0.0932 | Val Loss: 0.1294 | Train Dice: 0.9013 | Val Dice: 0.8658 | Val IoU: 0.7913 | Val HD95: 26.38 px | LR: 4.62e-04 | epoch 00:00:19 | Elapsed: 00:19:27 | ETA: 00:14:05
+2026-10-12 20:14:02 | INFO    | Final training |   epoch 59/100 | batch 22/88 (25%) | running loss 0.0869 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:14:06 | INFO    | Final training |   epoch 59/100 | batch 44/88 (50%) | running loss 0.0875 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:14:10 | INFO    | Final training |   epoch 59/100 | batch 66/88 (75%) | running loss 0.0860 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:14:17 | INFO    | Final training | Epoch 59/100 | Progress:  59.0% | Train Loss: 0.0862 | Val Loss: 0.1251 | Train Dice: 0.9115 | Val Dice: 0.8779 | Val IoU: 0.8054 | Val HD95: 24.24 px | LR: 4.52e-04 | epoch 00:00:20 | Elapsed: 00:19:47 | ETA: 00:13:45  *best*
+2026-10-12 20:14:22 | INFO    | Final training |   epoch 60/100 | batch 22/88 (25%) | running loss 0.0877 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:14:26 | INFO    | Final training |   epoch 60/100 | batch 44/88 (50%) | running loss 0.0880 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:14:30 | INFO    | Final training |   epoch 60/100 | batch 66/88 (75%) | running loss 0.0857 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:14:37 | INFO    | Final training | Epoch 60/100 | Progress:  60.0% | Train Loss: 0.0882 | Val Loss: 0.1271 | Train Dice: 0.9080 | Val Dice: 0.8765 | Val IoU: 0.8058 | Val HD95: 24.67 px | LR: 4.42e-04 | epoch 00:00:19 | Elapsed: 00:20:07 | ETA: 00:13:25
+2026-10-12 20:14:42 | INFO    | Final training |   epoch 61/100 | batch 22/88 (25%) | running loss 0.0947 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:14:46 | INFO    | Final training |   epoch 61/100 | batch 44/88 (50%) | running loss 0.0919 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:14:50 | INFO    | Final training |   epoch 61/100 | batch 66/88 (75%) | running loss 0.0926 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:14:58 | INFO    | Final training | Epoch 61/100 | Progress:  61.0% | Train Loss: 0.0902 | Val Loss: 0.1241 | Train Dice: 0.9057 | Val Dice: 0.8805 | Val IoU: 0.8136 | Val HD95: 23.63 px | LR: 4.32e-04 | epoch 00:00:20 | Elapsed: 00:20:27 | ETA: 00:13:05  *best*
+2026-10-12 20:15:02 | INFO    | Final training |   epoch 62/100 | batch 22/88 (25%) | running loss 0.0966 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:15:06 | INFO    | Final training |   epoch 62/100 | batch 44/88 (50%) | running loss 0.0920 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:15:10 | INFO    | Final training |   epoch 62/100 | batch 66/88 (75%) | running loss 0.0909 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:15:17 | INFO    | Final training | Epoch 62/100 | Progress:  62.0% | Train Loss: 0.0882 | Val Loss: 0.1197 | Train Dice: 0.9070 | Val Dice: 0.8822 | Val IoU: 0.8126 | Val HD95: 21.40 px | LR: 4.22e-04 | epoch 00:00:19 | Elapsed: 00:20:47 | ETA: 00:12:44  *best*
+2026-10-12 20:15:22 | INFO    | Final training |   epoch 63/100 | batch 22/88 (25%) | running loss 0.0873 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:15:26 | INFO    | Final training |   epoch 63/100 | batch 44/88 (50%) | running loss 0.0821 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:15:30 | INFO    | Final training |   epoch 63/100 | batch 66/88 (75%) | running loss 0.0805 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:15:37 | INFO    | Final training | Epoch 63/100 | Progress:  63.0% | Train Loss: 0.0842 | Val Loss: 0.1213 | Train Dice: 0.9129 | Val Dice: 0.8785 | Val IoU: 0.8123 | Val HD95: 24.94 px | LR: 4.12e-04 | epoch 00:00:19 | Elapsed: 00:21:07 | ETA: 00:12:24
+2026-10-12 20:15:42 | INFO    | Final training |   epoch 64/100 | batch 22/88 (25%) | running loss 0.0914 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:15:46 | INFO    | Final training |   epoch 64/100 | batch 44/88 (50%) | running loss 0.0948 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:15:50 | INFO    | Final training |   epoch 64/100 | batch 66/88 (75%) | running loss 0.0885 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:15:57 | INFO    | Final training | Epoch 64/100 | Progress:  64.0% | Train Loss: 0.0869 | Val Loss: 0.1258 | Train Dice: 0.9067 | Val Dice: 0.8785 | Val IoU: 0.8096 | Val HD95: 22.33 px | LR: 4.02e-04 | epoch 00:00:19 | Elapsed: 00:21:27 | ETA: 00:12:04
+2026-10-12 20:16:02 | INFO    | Final training |   epoch 65/100 | batch 22/88 (25%) | running loss 0.0861 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:16:06 | INFO    | Final training |   epoch 65/100 | batch 44/88 (50%) | running loss 0.0847 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:16:10 | INFO    | Final training |   epoch 65/100 | batch 66/88 (75%) | running loss 0.0813 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:16:17 | INFO    | Final training | Epoch 65/100 | Progress:  65.0% | Train Loss: 0.0835 | Val Loss: 0.1295 | Train Dice: 0.9138 | Val Dice: 0.8727 | Val IoU: 0.8055 | Val HD95: 24.80 px | LR: 3.92e-04 | epoch 00:00:20 | Elapsed: 00:21:47 | ETA: 00:11:44
+2026-10-12 20:16:22 | INFO    | Final training |   epoch 66/100 | batch 22/88 (25%) | running loss 0.0825 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:16:26 | INFO    | Final training |   epoch 66/100 | batch 44/88 (50%) | running loss 0.0859 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:16:30 | INFO    | Final training |   epoch 66/100 | batch 66/88 (75%) | running loss 0.0840 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:16:37 | INFO    | Final training | Epoch 66/100 | Progress:  66.0% | Train Loss: 0.0831 | Val Loss: 0.1295 | Train Dice: 0.9103 | Val Dice: 0.8733 | Val IoU: 0.8043 | Val HD95: 23.90 px | LR: 3.82e-04 | epoch 00:00:19 | Elapsed: 00:22:07 | ETA: 00:11:24
+2026-10-12 20:16:42 | INFO    | Final training |   epoch 67/100 | batch 22/88 (25%) | running loss 0.0824 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:16:46 | INFO    | Final training |   epoch 67/100 | batch 44/88 (50%) | running loss 0.0872 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:16:50 | INFO    | Final training |   epoch 67/100 | batch 66/88 (75%) | running loss 0.0825 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:16:57 | INFO    | Final training | Epoch 67/100 | Progress:  67.0% | Train Loss: 0.0825 | Val Loss: 0.1269 | Train Dice: 0.9130 | Val Dice: 0.8826 | Val IoU: 0.8129 | Val HD95: 21.98 px | LR: 3.72e-04 | epoch 00:00:19 | Elapsed: 00:22:27 | ETA: 00:11:03  *best*
+2026-10-12 20:17:02 | INFO    | Final training |   epoch 68/100 | batch 22/88 (25%) | running loss 0.0961 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:17:06 | INFO    | Final training |   epoch 68/100 | batch 44/88 (50%) | running loss 0.0891 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:17:10 | INFO    | Final training |   epoch 68/100 | batch 66/88 (75%) | running loss 0.0834 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:17:17 | INFO    | Final training | Epoch 68/100 | Progress:  68.0% | Train Loss: 0.0807 | Val Loss: 0.1340 | Train Dice: 0.9147 | Val Dice: 0.8700 | Val IoU: 0.7996 | Val HD95: 25.40 px | LR: 3.62e-04 | epoch 00:00:19 | Elapsed: 00:22:47 | ETA: 00:10:43
+2026-10-12 20:17:21 | INFO    | Final training |   epoch 69/100 | batch 22/88 (25%) | running loss 0.0729 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:17:26 | INFO    | Final training |   epoch 69/100 | batch 44/88 (50%) | running loss 0.0758 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:17:30 | INFO    | Final training |   epoch 69/100 | batch 66/88 (75%) | running loss 0.0843 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:17:37 | INFO    | Final training | Epoch 69/100 | Progress:  69.0% | Train Loss: 0.0821 | Val Loss: 0.1255 | Train Dice: 0.9149 | Val Dice: 0.8819 | Val IoU: 0.8154 | Val HD95: 24.51 px | LR: 3.52e-04 | epoch 00:00:19 | Elapsed: 00:23:07 | ETA: 00:10:23
+2026-10-12 20:17:41 | INFO    | Final training |   epoch 70/100 | batch 22/88 (25%) | running loss 0.0853 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:17:46 | INFO    | Final training |   epoch 70/100 | batch 44/88 (50%) | running loss 0.0797 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:17:50 | INFO    | Final training |   epoch 70/100 | batch 66/88 (75%) | running loss 0.0768 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:17:57 | INFO    | Final training | Epoch 70/100 | Progress:  70.0% | Train Loss: 0.0754 | Val Loss: 0.1288 | Train Dice: 0.9188 | Val Dice: 0.8770 | Val IoU: 0.8077 | Val HD95: 22.40 px | LR: 3.41e-04 | epoch 00:00:19 | Elapsed: 00:23:27 | ETA: 00:10:03
+2026-10-12 20:18:01 | INFO    | Final training |   epoch 71/100 | batch 22/88 (25%) | running loss 0.0783 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:18:06 | INFO    | Final training |   epoch 71/100 | batch 44/88 (50%) | running loss 0.0814 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:18:10 | INFO    | Final training |   epoch 71/100 | batch 66/88 (75%) | running loss 0.0798 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:18:17 | INFO    | Final training | Epoch 71/100 | Progress:  71.0% | Train Loss: 0.0793 | Val Loss: 0.1262 | Train Dice: 0.9149 | Val Dice: 0.8759 | Val IoU: 0.8091 | Val HD95: 23.07 px | LR: 3.31e-04 | epoch 00:00:19 | Elapsed: 00:23:47 | ETA: 00:09:43
+2026-10-12 20:18:21 | INFO    | Final training |   epoch 72/100 | batch 22/88 (25%) | running loss 0.0724 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:18:25 | INFO    | Final training |   epoch 72/100 | batch 44/88 (50%) | running loss 0.0765 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:18:30 | INFO    | Final training |   epoch 72/100 | batch 66/88 (75%) | running loss 0.0764 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:18:37 | INFO    | Final training | Epoch 72/100 | Progress:  72.0% | Train Loss: 0.0781 | Val Loss: 0.1242 | Train Dice: 0.9181 | Val Dice: 0.8807 | Val IoU: 0.8150 | Val HD95: 21.85 px | LR: 3.21e-04 | epoch 00:00:19 | Elapsed: 00:24:06 | ETA: 00:09:22
+2026-10-12 20:18:41 | INFO    | Final training |   epoch 73/100 | batch 22/88 (25%) | running loss 0.0731 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:18:45 | INFO    | Final training |   epoch 73/100 | batch 44/88 (50%) | running loss 0.0744 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:18:50 | INFO    | Final training |   epoch 73/100 | batch 66/88 (75%) | running loss 0.0713 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:18:57 | INFO    | Final training | Epoch 73/100 | Progress:  73.0% | Train Loss: 0.0726 | Val Loss: 0.1216 | Train Dice: 0.9242 | Val Dice: 0.8839 | Val IoU: 0.8162 | Val HD95: 23.26 px | LR: 3.11e-04 | epoch 00:00:19 | Elapsed: 00:24:26 | ETA: 00:09:02  *best*
+2026-10-12 20:19:01 | INFO    | Final training |   epoch 74/100 | batch 22/88 (25%) | running loss 0.0724 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:19:05 | INFO    | Final training |   epoch 74/100 | batch 44/88 (50%) | running loss 0.0690 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:19:10 | INFO    | Final training |   epoch 74/100 | batch 66/88 (75%) | running loss 0.0723 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:19:17 | INFO    | Final training | Epoch 74/100 | Progress:  74.0% | Train Loss: 0.0750 | Val Loss: 0.1192 | Train Dice: 0.9230 | Val Dice: 0.8903 | Val IoU: 0.8255 | Val HD95: 21.21 px | LR: 3.00e-04 | epoch 00:00:20 | Elapsed: 00:24:47 | ETA: 00:08:42  *best*
+2026-10-12 20:19:21 | INFO    | Final training |   epoch 75/100 | batch 22/88 (25%) | running loss 0.0673 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:19:26 | INFO    | Final training |   epoch 75/100 | batch 44/88 (50%) | running loss 0.0701 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:19:30 | INFO    | Final training |   epoch 75/100 | batch 66/88 (75%) | running loss 0.0695 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:19:37 | INFO    | Final training | Epoch 75/100 | Progress:  75.0% | Train Loss: 0.0714 | Val Loss: 0.1227 | Train Dice: 0.9256 | Val Dice: 0.8799 | Val IoU: 0.8127 | Val HD95: 23.19 px | LR: 2.90e-04 | epoch 00:00:19 | Elapsed: 00:25:07 | ETA: 00:08:22
+2026-10-12 20:19:41 | INFO    | Final training |   epoch 76/100 | batch 22/88 (25%) | running loss 0.0755 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:19:45 | INFO    | Final training |   epoch 76/100 | batch 44/88 (50%) | running loss 0.0780 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:19:50 | INFO    | Final training |   epoch 76/100 | batch 66/88 (75%) | running loss 0.0770 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:19:57 | INFO    | Final training | Epoch 76/100 | Progress:  76.0% | Train Loss: 0.0762 | Val Loss: 0.1288 | Train Dice: 0.9212 | Val Dice: 0.8810 | Val IoU: 0.8134 | Val HD95: 22.13 px | LR: 2.79e-04 | epoch 00:00:20 | Elapsed: 00:25:27 | ETA: 00:08:02
+2026-10-12 20:20:01 | INFO    | Final training |   epoch 77/100 | batch 22/88 (25%) | running loss 0.0740 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:20:05 | INFO    | Final training |   epoch 77/100 | batch 44/88 (50%) | running loss 0.0708 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:20:10 | INFO    | Final training |   epoch 77/100 | batch 66/88 (75%) | running loss 0.0703 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:20:17 | INFO    | Final training | Epoch 77/100 | Progress:  77.0% | Train Loss: 0.0701 | Val Loss: 0.1223 | Train Dice: 0.9261 | Val Dice: 0.8847 | Val IoU: 0.8183 | Val HD95: 21.29 px | LR: 2.69e-04 | epoch 00:00:19 | Elapsed: 00:25:46 | ETA: 00:07:42
+2026-10-12 20:20:21 | INFO    | Final training |   epoch 78/100 | batch 22/88 (25%) | running loss 0.0626 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:20:25 | INFO    | Final training |   epoch 78/100 | batch 44/88 (50%) | running loss 0.0644 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:20:30 | INFO    | Final training |   epoch 78/100 | batch 66/88 (75%) | running loss 0.0689 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:20:37 | INFO    | Final training | Epoch 78/100 | Progress:  78.0% | Train Loss: 0.0736 | Val Loss: 0.1268 | Train Dice: 0.9226 | Val Dice: 0.8824 | Val IoU: 0.8138 | Val HD95: 23.89 px | LR: 2.58e-04 | epoch 00:00:20 | Elapsed: 00:26:07 | ETA: 00:07:22
+2026-10-12 20:20:41 | INFO    | Final training |   epoch 79/100 | batch 22/88 (25%) | running loss 0.0708 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:20:45 | INFO    | Final training |   epoch 79/100 | batch 44/88 (50%) | running loss 0.0699 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:20:50 | INFO    | Final training |   epoch 79/100 | batch 66/88 (75%) | running loss 0.0713 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:20:57 | INFO    | Final training | Epoch 79/100 | Progress:  79.0% | Train Loss: 0.0717 | Val Loss: 0.1207 | Train Dice: 0.9266 | Val Dice: 0.8848 | Val IoU: 0.8178 | Val HD95: 22.53 px | LR: 2.48e-04 | epoch 00:00:20 | Elapsed: 00:26:27 | ETA: 00:07:02
+2026-10-12 20:21:01 | INFO    | Final training |   epoch 80/100 | batch 22/88 (25%) | running loss 0.0763 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:21:06 | INFO    | Final training |   epoch 80/100 | batch 44/88 (50%) | running loss 0.0792 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:21:10 | INFO    | Final training |   epoch 80/100 | batch 66/88 (75%) | running loss 0.0769 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:21:17 | INFO    | Final training | Epoch 80/100 | Progress:  80.0% | Train Loss: 0.0743 | Val Loss: 0.1197 | Train Dice: 0.9199 | Val Dice: 0.8867 | Val IoU: 0.8202 | Val HD95: 23.59 px | LR: 2.37e-04 | epoch 00:00:20 | Elapsed: 00:26:47 | ETA: 00:06:42
+2026-10-12 20:21:21 | INFO    | Final training |   epoch 81/100 | batch 22/88 (25%) | running loss 0.0653 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:21:25 | INFO    | Final training |   epoch 81/100 | batch 44/88 (50%) | running loss 0.0711 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:21:30 | INFO    | Final training |   epoch 81/100 | batch 66/88 (75%) | running loss 0.0721 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:21:37 | INFO    | Final training | Epoch 81/100 | Progress:  81.0% | Train Loss: 0.0702 | Val Loss: 0.1152 | Train Dice: 0.9274 | Val Dice: 0.8909 | Val IoU: 0.8241 | Val HD95: 22.51 px | LR: 2.26e-04 | epoch 00:00:20 | Elapsed: 00:27:07 | ETA: 00:06:22  *best*
+2026-10-12 20:21:41 | INFO    | Final training |   epoch 82/100 | batch 22/88 (25%) | running loss 0.0708 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:21:46 | INFO    | Final training |   epoch 82/100 | batch 44/88 (50%) | running loss 0.0702 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:21:50 | INFO    | Final training |   epoch 82/100 | batch 66/88 (75%) | running loss 0.0709 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:21:57 | INFO    | Final training | Epoch 82/100 | Progress:  82.0% | Train Loss: 0.0706 | Val Loss: 0.1154 | Train Dice: 0.9258 | Val Dice: 0.8921 | Val IoU: 0.8266 | Val HD95: 22.47 px | LR: 2.16e-04 | epoch 00:00:20 | Elapsed: 00:27:27 | ETA: 00:06:01  *best*
+2026-10-12 20:22:02 | INFO    | Final training |   epoch 83/100 | batch 22/88 (25%) | running loss 0.0645 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:22:06 | INFO    | Final training |   epoch 83/100 | batch 44/88 (50%) | running loss 0.0704 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:22:10 | INFO    | Final training |   epoch 83/100 | batch 66/88 (75%) | running loss 0.0678 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:22:17 | INFO    | Final training | Epoch 83/100 | Progress:  83.0% | Train Loss: 0.0674 | Val Loss: 0.1192 | Train Dice: 0.9310 | Val Dice: 0.8867 | Val IoU: 0.8191 | Val HD95: 22.91 px | LR: 2.05e-04 | epoch 00:00:20 | Elapsed: 00:27:47 | ETA: 00:05:41
+2026-10-12 20:22:21 | INFO    | Final training |   epoch 84/100 | batch 22/88 (25%) | running loss 0.0657 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:22:26 | INFO    | Final training |   epoch 84/100 | batch 44/88 (50%) | running loss 0.0666 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:22:30 | INFO    | Final training |   epoch 84/100 | batch 66/88 (75%) | running loss 0.0660 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:22:37 | INFO    | Final training | Epoch 84/100 | Progress:  84.0% | Train Loss: 0.0671 | Val Loss: 0.1179 | Train Dice: 0.9311 | Val Dice: 0.8870 | Val IoU: 0.8205 | Val HD95: 21.80 px | LR: 1.94e-04 | epoch 00:00:20 | Elapsed: 00:28:07 | ETA: 00:05:21
+2026-10-12 20:22:41 | INFO    | Final training |   epoch 85/100 | batch 22/88 (25%) | running loss 0.0676 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:22:46 | INFO    | Final training |   epoch 85/100 | batch 44/88 (50%) | running loss 0.0643 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:22:50 | INFO    | Final training |   epoch 85/100 | batch 66/88 (75%) | running loss 0.0668 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:22:57 | INFO    | Final training | Epoch 85/100 | Progress:  85.0% | Train Loss: 0.0686 | Val Loss: 0.1172 | Train Dice: 0.9287 | Val Dice: 0.8813 | Val IoU: 0.8157 | Val HD95: 21.69 px | LR: 1.83e-04 | epoch 00:00:20 | Elapsed: 00:28:27 | ETA: 00:05:01
+2026-10-12 20:23:01 | INFO    | Final training |   epoch 86/100 | batch 22/88 (25%) | running loss 0.0664 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:23:06 | INFO    | Final training |   epoch 86/100 | batch 44/88 (50%) | running loss 0.0621 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:23:10 | INFO    | Final training |   epoch 86/100 | batch 66/88 (75%) | running loss 0.0628 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:23:17 | INFO    | Final training | Epoch 86/100 | Progress:  86.0% | Train Loss: 0.0629 | Val Loss: 0.1203 | Train Dice: 0.9340 | Val Dice: 0.8843 | Val IoU: 0.8163 | Val HD95: 21.96 px | LR: 1.72e-04 | epoch 00:00:20 | Elapsed: 00:28:47 | ETA: 00:04:41
+2026-10-12 20:23:21 | INFO    | Final training |   epoch 87/100 | batch 22/88 (25%) | running loss 0.0665 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:23:26 | INFO    | Final training |   epoch 87/100 | batch 44/88 (50%) | running loss 0.0630 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:23:30 | INFO    | Final training |   epoch 87/100 | batch 66/88 (75%) | running loss 0.0645 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:23:37 | INFO    | Final training | Epoch 87/100 | Progress:  87.0% | Train Loss: 0.0652 | Val Loss: 0.1185 | Train Dice: 0.9325 | Val Dice: 0.8871 | Val IoU: 0.8194 | Val HD95: 22.58 px | LR: 1.61e-04 | epoch 00:00:19 | Elapsed: 00:29:07 | ETA: 00:04:21
+2026-10-12 20:23:41 | INFO    | Final training |   epoch 88/100 | batch 22/88 (25%) | running loss 0.0587 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:23:46 | INFO    | Final training |   epoch 88/100 | batch 44/88 (50%) | running loss 0.0618 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:23:50 | INFO    | Final training |   epoch 88/100 | batch 66/88 (75%) | running loss 0.0640 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:23:57 | INFO    | Final training | Epoch 88/100 | Progress:  88.0% | Train Loss: 0.0638 | Val Loss: 0.1188 | Train Dice: 0.9328 | Val Dice: 0.8867 | Val IoU: 0.8210 | Val HD95: 21.71 px | LR: 1.50e-04 | epoch 00:00:20 | Elapsed: 00:29:27 | ETA: 00:04:01
+2026-10-12 20:24:01 | INFO    | Final training |   epoch 89/100 | batch 22/88 (25%) | running loss 0.0663 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:24:06 | INFO    | Final training |   epoch 89/100 | batch 44/88 (50%) | running loss 0.0632 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:24:10 | INFO    | Final training |   epoch 89/100 | batch 66/88 (75%) | running loss 0.0622 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:24:17 | INFO    | Final training | Epoch 89/100 | Progress:  89.0% | Train Loss: 0.0624 | Val Loss: 0.1170 | Train Dice: 0.9361 | Val Dice: 0.8900 | Val IoU: 0.8265 | Val HD95: 20.17 px | LR: 1.38e-04 | epoch 00:00:20 | Elapsed: 00:29:47 | ETA: 00:03:41
+2026-10-12 20:24:21 | INFO    | Final training |   epoch 90/100 | batch 22/88 (25%) | running loss 0.0625 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:24:26 | INFO    | Final training |   epoch 90/100 | batch 44/88 (50%) | running loss 0.0654 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:24:30 | INFO    | Final training |   epoch 90/100 | batch 66/88 (75%) | running loss 0.0624 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:24:37 | INFO    | Final training | Epoch 90/100 | Progress:  90.0% | Train Loss: 0.0637 | Val Loss: 0.1221 | Train Dice: 0.9336 | Val Dice: 0.8891 | Val IoU: 0.8238 | Val HD95: 22.03 px | LR: 1.27e-04 | epoch 00:00:19 | Elapsed: 00:30:07 | ETA: 00:03:21
+2026-10-12 20:24:41 | INFO    | Final training |   epoch 91/100 | batch 22/88 (25%) | running loss 0.0637 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:24:45 | INFO    | Final training |   epoch 91/100 | batch 44/88 (50%) | running loss 0.0647 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:24:50 | INFO    | Final training |   epoch 91/100 | batch 66/88 (75%) | running loss 0.0628 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:24:57 | INFO    | Final training | Epoch 91/100 | Progress:  91.0% | Train Loss: 0.0625 | Val Loss: 0.1207 | Train Dice: 0.9334 | Val Dice: 0.8868 | Val IoU: 0.8207 | Val HD95: 21.14 px | LR: 1.16e-04 | epoch 00:00:20 | Elapsed: 00:30:27 | ETA: 00:03:01
+2026-10-12 20:25:01 | INFO    | Final training |   epoch 92/100 | batch 22/88 (25%) | running loss 0.0648 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:25:05 | INFO    | Final training |   epoch 92/100 | batch 44/88 (50%) | running loss 0.0637 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:25:10 | INFO    | Final training |   epoch 92/100 | batch 66/88 (75%) | running loss 0.0632 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:25:17 | INFO    | Final training | Epoch 92/100 | Progress:  92.0% | Train Loss: 0.0628 | Val Loss: 0.1208 | Train Dice: 0.9349 | Val Dice: 0.8860 | Val IoU: 0.8195 | Val HD95: 22.06 px | LR: 1.04e-04 | epoch 00:00:20 | Elapsed: 00:30:46 | ETA: 00:02:41
+2026-10-12 20:25:21 | INFO    | Final training |   epoch 93/100 | batch 22/88 (25%) | running loss 0.0583 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:25:25 | INFO    | Final training |   epoch 93/100 | batch 44/88 (50%) | running loss 0.0607 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:25:30 | INFO    | Final training |   epoch 93/100 | batch 66/88 (75%) | running loss 0.0597 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:25:37 | INFO    | Final training | Epoch 93/100 | Progress:  93.0% | Train Loss: 0.0603 | Val Loss: 0.1183 | Train Dice: 0.9376 | Val Dice: 0.8873 | Val IoU: 0.8212 | Val HD95: 21.65 px | LR: 9.22e-05 | epoch 00:00:20 | Elapsed: 00:31:07 | ETA: 00:02:20
+2026-10-12 20:25:41 | INFO    | Final training |   epoch 94/100 | batch 22/88 (25%) | running loss 0.0548 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:25:46 | INFO    | Final training |   epoch 94/100 | batch 44/88 (50%) | running loss 0.0562 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:25:50 | INFO    | Final training |   epoch 94/100 | batch 66/88 (75%) | running loss 0.0568 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:25:57 | INFO    | Final training | Epoch 94/100 | Progress:  94.0% | Train Loss: 0.0600 | Val Loss: 0.1171 | Train Dice: 0.9399 | Val Dice: 0.8904 | Val IoU: 0.8260 | Val HD95: 22.03 px | LR: 8.02e-05 | epoch 00:00:20 | Elapsed: 00:31:27 | ETA: 00:02:00
+2026-10-12 20:26:01 | INFO    | Final training |   epoch 95/100 | batch 22/88 (25%) | running loss 0.0608 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:26:06 | INFO    | Final training |   epoch 95/100 | batch 44/88 (50%) | running loss 0.0587 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:26:10 | INFO    | Final training |   epoch 95/100 | batch 66/88 (75%) | running loss 0.0588 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:26:17 | INFO    | Final training | Epoch 95/100 | Progress:  95.0% | Train Loss: 0.0590 | Val Loss: 0.1171 | Train Dice: 0.9392 | Val Dice: 0.8927 | Val IoU: 0.8286 | Val HD95: 21.42 px | LR: 6.81e-05 | epoch 00:00:20 | Elapsed: 00:31:47 | ETA: 00:01:40  *best*
+2026-10-12 20:26:21 | INFO    | Final training |   epoch 96/100 | batch 22/88 (25%) | running loss 0.0581 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:26:26 | INFO    | Final training |   epoch 96/100 | batch 44/88 (50%) | running loss 0.0567 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:26:30 | INFO    | Final training |   epoch 96/100 | batch 66/88 (75%) | running loss 0.0561 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:26:37 | INFO    | Final training | Epoch 96/100 | Progress:  96.0% | Train Loss: 0.0570 | Val Loss: 0.1162 | Train Dice: 0.9418 | Val Dice: 0.8920 | Val IoU: 0.8281 | Val HD95: 21.39 px | LR: 5.57e-05 | epoch 00:00:20 | Elapsed: 00:32:07 | ETA: 00:01:20
+2026-10-12 20:26:41 | INFO    | Final training |   epoch 97/100 | batch 22/88 (25%) | running loss 0.0565 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:26:46 | INFO    | Final training |   epoch 97/100 | batch 44/88 (50%) | running loss 0.0556 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:26:50 | INFO    | Final training |   epoch 97/100 | batch 66/88 (75%) | running loss 0.0587 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:26:57 | INFO    | Final training | Epoch 97/100 | Progress:  97.0% | Train Loss: 0.0588 | Val Loss: 0.1190 | Train Dice: 0.9399 | Val Dice: 0.8899 | Val IoU: 0.8259 | Val HD95: 22.33 px | LR: 4.30e-05 | epoch 00:00:20 | Elapsed: 00:32:27 | ETA: 00:01:00
+2026-10-12 20:27:01 | INFO    | Final training |   epoch 98/100 | batch 22/88 (25%) | running loss 0.0527 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:27:06 | INFO    | Final training |   epoch 98/100 | batch 44/88 (50%) | running loss 0.0567 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:27:10 | INFO    | Final training |   epoch 98/100 | batch 66/88 (75%) | running loss 0.0578 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:27:17 | INFO    | Final training | Epoch 98/100 | Progress:  98.0% | Train Loss: 0.0582 | Val Loss: 0.1171 | Train Dice: 0.9385 | Val Dice: 0.8905 | Val IoU: 0.8265 | Val HD95: 20.79 px | LR: 2.98e-05 | epoch 00:00:20 | Elapsed: 00:32:47 | ETA: 00:00:40
+2026-10-12 20:27:21 | INFO    | Final training |   epoch 99/100 | batch 22/88 (25%) | running loss 0.0533 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:27:26 | INFO    | Final training |   epoch 99/100 | batch 44/88 (50%) | running loss 0.0563 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:27:30 | INFO    | Final training |   epoch 99/100 | batch 66/88 (75%) | running loss 0.0579 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:27:37 | INFO    | Final training | Epoch 99/100 | Progress:  99.0% | Train Loss: 0.0571 | Val Loss: 0.1181 | Train Dice: 0.9414 | Val Dice: 0.8911 | Val IoU: 0.8272 | Val HD95: 21.01 px | LR: 1.60e-05 | epoch 00:00:20 | Elapsed: 00:33:07 | ETA: 00:00:20
+2026-10-12 20:27:42 | INFO    | Final training |   epoch 100/100 | batch 22/88 (25%) | running loss 0.0561 | epoch elapsed 00:00:04, epoch ETA 00:00:13
+2026-10-12 20:27:46 | INFO    | Final training |   epoch 100/100 | batch 44/88 (50%) | running loss 0.0550 | epoch elapsed 00:00:09, epoch ETA 00:00:09
+2026-10-12 20:27:50 | INFO    | Final training |   epoch 100/100 | batch 66/88 (75%) | running loss 0.0589 | epoch elapsed 00:00:13, epoch ETA 00:00:04
+2026-10-12 20:27:57 | INFO    | Final training | Epoch 100/100 | Progress: 100.0% | Train Loss: 0.0588 | Val Loss: 0.1179 | Train Dice: 0.9394 | Val Dice: 0.8908 | Val IoU: 0.8266 | Val HD95: 21.29 px | LR: 0.00e+00 | epoch 00:00:20 | Elapsed: 00:33:27 | ETA: 00:00:00
+2026-10-12 20:28:14 | INFO    | Best checkpoint (epoch 95) restored | Train Loss 0.0518 Dice 0.9476 | Val Loss 0.1171 Dice 0.8927 IoU 0.8286 mIoU 0.8927 Sensitivity 0.9112 HD95 21.42 px
+2026-10-12 20:28:14 | INFO    | Flip TTA on validation: Dice 0.8944 (without 0.8927) -> TTA ON for the test
+2026-10-12 20:28:16 | INFO    | Stage 'final' finished in 00:33:45
+2026-10-12 20:28:16 | INFO    | ####################################################################################################
+2026-10-12 20:28:16 | INFO    | STAGE: TEST
+2026-10-12 20:28:16 | INFO    | Evaluating the held-out TEST split exactly once | best validation checkpoint (epoch 95) | flip TTA: on
+2026-10-12 20:28:17 | INFO    | Loaded cached preprocessed KVASIR/test (120 samples) from KVASIR_test_256x256_8bac4677780d7ecc6033d879.npz
+2026-10-12 20:28:22 | INFO    | TEST | Dice (DSC) 0.8461 | mIoU 0.8568 | IoU 0.7714 | Sensitivity 0.8541 | HD95 34.14 px | Params 3.377 M | FLOPs 37.50 G (batch of 8; 4.69 G per image) | 29.25 ms/image
+2026-10-12 20:28:22 | INFO    | Stage 'test' finished in 00:00:06
+2026-10-12 20:28:22 | INFO    | ####################################################################################################
+2026-10-12 20:28:22 | INFO    | STAGE: REPORT
+2026-10-12 20:28:26 | INFO    | Stage 'report' finished in 00:00:04
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: QENAS, zero-shot pick (max ZiCo) — ablation / zero-shot NAS rule: the Pareto candidate with the highest ZiCo, chosen without training
+Seed: 42
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_synflow, f3_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 217
+Hypervolume: 0.7516 (generation 0) -> 1.0214 (final)
+Final Pareto front size: 20   Pareto candidates trained: 8
+
+Selected architecture:
+Chromosome: [0, 2, 2, 2, 2, 2, 2, 4]
+Block sequence: ['Residual', 'Inception', 'Inception', 'Inception', 'Inception', 'Inception', 'Inception', 'DARTS']
+ln(1+SynFlow): 76.646   ZiCo: 881.329
+
+20-epoch capability: Epoch-1 Dice 0.4614 | Epoch-20 Dice 0.8266 | ΔDice +0.3652
+Selection: Candidate 7 selected: highest ZiCo among the Pareto candidates (zero-shot rule, no training used). Learning-capability selection would have chosen candidate 6.
+
+Loss coefficients:
+alpha (BCE): 0.600   beta (soft-mIoU): 0.400
+
+Final training:
+Epochs run: 100 (best epoch 95)
+Best validation Dice: 0.8927   mIoU: 0.8927   HD95: 21.42 px
+Validation Dice with flip TTA: 0.8944 -> TTA on
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        84.61 %
+mIoU (class mean): 85.68 %
+Params:            3.377 M
+FLOPs:             37.50 G per batch of 8 (Mixed-GGNAS convention; 4.69 G per image)
+HD95:              34.14 px
+Sensitivity:       85.41 %
+IoU (foreground):  77.14 %
+Inference:         29.25 ms per image on cuda
+Test loss:         0.1767
+
+================================================
+
+2026-10-12 20:28:26 | INFO    | QENAS time on KVASIR (qenas_zico_pick, seed 42): 01:01:12 from start to end (all stages) | this session: 01:01:13

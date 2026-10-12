@@ -1,0 +1,50 @@
+{
+  "fingerprint": "238db655d388cfa4",
+  "created": "2026-10-13T13:07:37",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-13T13:08:13",
+      "train": 43,
+      "val": 11,
+      "test": 27,
+      "seconds": 34.7
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-13T13:14:04",
+      "alpha": 0.2,
+      "beta": 0.8,
+      "seconds": 351.0
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-13T13:19:50",
+      "best_epoch": 100,
+      "best_val_dice": 0.932852207494582,
+      "tta": true,
+      "seconds": 345.7
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-13T13:19:54",
+      "test_dice": 0.9288144098554535,
+      "test_miou": 0.9363892797613063,
+      "test_hd95": 25.42939590744193,
+      "seconds": 4.3
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-13T13:20:00",
+      "seconds": 5.7
+    }
+  },
+  "test_evaluated": true,
+  "method": "attention_unet",
+  "dataset": "IDRID",
+  "seed": 44,
+  "updated": "2026-10-13T13:20:00",
+  "test_evaluated_at": "2026-10-13T13:19:52",
+  "total_seconds": 741.4
+}

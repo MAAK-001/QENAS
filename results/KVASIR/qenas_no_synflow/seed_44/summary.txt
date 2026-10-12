@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: QENAS w/o SynFlow — ablation: two objectives (params, ZiCo), i.e. without SynFlow
+Seed: 44
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f3_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 220
+Hypervolume: 0.7184 (generation 0) -> 1.1076 (final)
+Final Pareto front size: 13   Pareto candidates trained: 8
+
+Selected architecture:
+Chromosome: [2, 2, 1, 4, 4, 4, 4, 4]
+Block sequence: ['Inception', 'Inception', 'Dense', 'DARTS', 'DARTS', 'DARTS', 'DARTS', 'DARTS']
+ln(1+SynFlow): 56.413   ZiCo: 768.912
+
+20-epoch capability: Epoch-1 Dice 0.3729 | Epoch-20 Dice 0.8421 | ΔDice +0.4692
+Selection: Candidate 4 selected: largest ΔDice tier (within measured Dice noise of the leader, 3 tied); tie broken by final validation Dice. ΔDice=0.4692, final val Dice=0.8421, ΔLoss=0.2433, Dice trend tau=0.94 (p=6.8e-14).
+
+Loss coefficients:
+alpha (BCE): 0.500   beta (soft-mIoU): 0.500
+
+Final training:
+Epochs run: 100 (best epoch 99)
+Best validation Dice: 0.8924   mIoU: 0.8921   HD95: 23.68 px
+Validation Dice with flip TTA: 0.8942 -> TTA on
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        85.48 %
+mIoU (class mean): 86.24 %
+Params:            0.710 M
+FLOPs:             14.24 G per batch of 8 (Mixed-GGNAS convention; 1.78 G per image)
+HD95:              29.78 px
+Sensitivity:       87.63 %
+IoU (foreground):  77.92 %
+Inference:         32.71 ms per image on cuda
+Test loss:         0.1629
+
+================================================
+QENAS time on KVASIR (qenas_no_synflow, seed 44): 02:05:50 from start to end (all stages) | this session: 02:05:52

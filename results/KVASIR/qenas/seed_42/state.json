@@ -1,0 +1,88 @@
+{
+  "fingerprint": "ea47ed12c5abda14",
+  "created": "2026-10-12T12:55:16",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-12T12:56:06",
+      "train": 704,
+      "val": 176,
+      "test": 120,
+      "seconds": 48.6
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-12T13:01:05",
+      "unique_evaluations": 217,
+      "final_front_size": 20,
+      "cache_hits": 0,
+      "cache_misses": 217,
+      "objectives": [
+        "f1_params",
+        "f2_synflow",
+        "f3_zico"
+      ],
+      "hypervolume_generation_0": 0.7515966853863867,
+      "hypervolume_final": 1.021400416058534,
+      "seconds": 299.3
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-12T13:01:07",
+      "front_size": 20,
+      "n_candidates": 8,
+      "seconds": 1.2
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-12T13:47:30",
+      "n_candidates": 8,
+      "n_diverged": 0,
+      "seconds": 2783.3
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-12T13:47:32",
+      "selected_candidate": 6,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.4
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-12T14:11:39",
+      "alpha": 0.6,
+      "beta": 0.4,
+      "seconds": 1446.9
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-12T14:37:00",
+      "best_epoch": 55,
+      "best_val_dice": 0.8820963922071443,
+      "tta": true,
+      "seconds": 1520.5
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-12T14:37:09",
+      "test_dice": 0.8414011083930095,
+      "test_miou": 0.8499125304106385,
+      "test_hd95": 32.6641148133505,
+      "seconds": 9.5
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-12T14:37:13",
+      "seconds": 4.2
+    }
+  },
+  "test_evaluated": true,
+  "method": "qenas",
+  "dataset": "KVASIR",
+  "seed": 42,
+  "updated": "2026-10-12T14:37:13",
+  "test_evaluated_at": "2026-10-12T14:37:05",
+  "total_seconds": 6115.9
+}
