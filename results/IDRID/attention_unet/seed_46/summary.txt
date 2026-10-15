@@ -1,0 +1,28 @@
+================ QENAS RESULT ================
+
+Dataset: IDRID
+Method: Attention U-Net — baseline: Attention U-Net (Oktay et al. 2018), 8.73 M parameters as in the Mixed-GGNAS tables
+Seed: 46
+
+Architecture: Attention U-Net (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.200   beta (soft-mIoU): 0.800
+
+Final training:
+Epochs run: 120 (best epoch 116)
+Best validation Dice: 0.9538   mIoU: 0.9554   HD95: 8.65 px
+
+Final test (n = 27, evaluated once):
+Dice (DSC):        91.60 %
+mIoU (class mean): 93.43 %
+Params:            8.726 M
+FLOPs:             167.40 G per batch of 4 (Mixed-GGNAS convention; 41.85 G per image)
+HD95:              17.23 px
+Sensitivity:       91.02 %
+IoU (foreground):  87.08 %
+Inference:         14.03 ms per image on cuda
+Test loss:         0.0590
+
+================================================
+QENAS time on IDRID (attention_unet, seed 46): 00:13:17 from start to end (all stages) | this session: 00:13:19

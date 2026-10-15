@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: QENAS, zero-shot pick (max ZiCo) — ablation / zero-shot NAS rule: the candidate with the highest ZiCo, chosen without training
+Seed: 47
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 219
+Hypervolume: 0.8695 (generation 0) -> 1.1426 (final)
+Final Pareto front size: 11
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [2, 2, 2, 2, 2, 3, 2, 2]
+Block sequence: ['Inception', 'Inception', 'Inception', 'Inception', 'Inception', 'ConvNeXt', 'Inception', 'Inception']
+ZiCo: 895.864
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.5274
+Selection: Candidate 11 selected: highest ZiCo among the candidates (zero-shot rule, no training used). Learning-capability selection would have chosen candidate 6.
+
+Loss coefficients:
+alpha (BCE): 0.600   beta (soft-mIoU): 0.400
+
+Final training:
+Epochs run: 120 (best epoch 111)
+Best validation Dice: 0.8915   mIoU: 0.8923   HD95: 24.41 px
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        83.18 %
+mIoU (class mean): 84.78 %
+Params:            3.470 M
+FLOPs:             49.09 G per batch of 8 (Mixed-GGNAS convention; 6.14 G per image)
+HD95:              38.74 px  (1 empty predictions scored as the image diagonal)
+Sensitivity:       85.26 %
+IoU (foreground):  75.50 %
+Inference:         19.48 ms per image on cuda
+Test loss:         0.2090
+
+================================================
+QENAS time on KVASIR (qenas_zico_pick, seed 47): 02:21:17 from start to end (all stages) | this session: 02:21:19

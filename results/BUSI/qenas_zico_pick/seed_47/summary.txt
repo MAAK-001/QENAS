@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: BUSI
+Method: QENAS, zero-shot pick (max ZiCo) — ablation / zero-shot NAS rule: the candidate with the highest ZiCo, chosen without training
+Seed: 47
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 219
+Hypervolume: 0.7588 (generation 0) -> 1.1421 (final)
+Final Pareto front size: 14
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [4, 4, 4, 4, 2, 4, 4, 2]
+Block sequence: ['DARTS', 'DARTS', 'DARTS', 'DARTS', 'Inception', 'DARTS', 'DARTS', 'Inception']
+ZiCo: 1207.928
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.4293
+Selection: Candidate 14 selected: highest ZiCo among the candidates (zero-shot rule, no training used). Learning-capability selection would have chosen candidate 2.
+
+Loss coefficients:
+alpha (BCE): 0.600   beta (soft-mIoU): 0.400
+
+Final training:
+Epochs run: 114 (best epoch 91) — overfitting: val Dice not improved for 23 epochs (best epoch 91); val loss increasing (Kendall tau=0.39, p=0.0082) while train loss decreasing (tau=-0.68, p=2.55e-06) over the last 20 epochs
+Best validation Dice: 0.8105   mIoU: 0.8390   HD95: 29.12 px
+
+Final test (n = 129, evaluated once):
+Dice (DSC):        79.44 %
+mIoU (class mean): 82.57 %
+Params:            2.711 M
+FLOPs:             33.22 G per batch of 8 (Mixed-GGNAS convention; 4.15 G per image)
+HD95:              29.88 px
+Sensitivity:       81.71 %
+IoU (foreground):  70.76 %
+Inference:         44.57 ms per image on cuda
+Test loss:         0.1904
+
+================================================
+QENAS time on BUSI (qenas_zico_pick, seed 47): 01:17:52 from start to end (all stages) | this session: 01:17:58

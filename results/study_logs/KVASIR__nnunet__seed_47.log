@@ -1,0 +1,1926 @@
+2026-10-18 17:43:32 | INFO    | QENAS | dataset KVASIR | method nnunet | seed 47 | experiment /kaggle/working/QENAS_results/results/KVASIR/nnunet/seed_47 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint 68ed2202b6bea788
+2026-10-18 17:43:32 | INFO    | Method nnunet (baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split) | stages: split -> nnunet_data -> nnunet_train -> nnunet_test -> report
+2026-10-18 17:43:32 | INFO    | ####################################################################################################
+2026-10-18 17:43:32 | INFO    | STAGE: SPLIT
+2026-10-18 17:43:55 | INFO    | Dataset structure: images/<id>.jpg paired with masks/<id>.jpg (JPEG masks, binarised); official train.txt / val.txt
+2026-10-18 17:43:55 | INFO    | 
+KVASIR
+Train: 704
+Validation: 176
+Test: 120
+2026-10-18 17:43:55 | INFO    | Stage 'split' finished in 00:00:23
+2026-10-18 17:43:55 | INFO    | ####################################################################################################
+2026-10-18 17:43:55 | INFO    | STAGE: NNUNET_DATA
+2026-10-18 17:43:57 | INFO    |   preprocessing KVASIR/train: 140/704 | Progress:  19.9% | Elapsed: 00:00:01 | ETA: 00:00:05
+2026-10-18 17:43:58 | INFO    |   preprocessing KVASIR/train: 280/704 | Progress:  39.8% | Elapsed: 00:00:02 | ETA: 00:00:04
+2026-10-18 17:43:59 | INFO    |   preprocessing KVASIR/train: 420/704 | Progress:  59.7% | Elapsed: 00:00:04 | ETA: 00:00:02
+2026-10-18 17:44:00 | INFO    |   preprocessing KVASIR/train: 560/704 | Progress:  79.5% | Elapsed: 00:00:05 | ETA: 00:00:01
+2026-10-18 17:44:01 | INFO    |   preprocessing KVASIR/train: 700/704 | Progress:  99.4% | Elapsed: 00:00:06 | ETA: 00:00:00
+2026-10-18 17:44:01 | INFO    |   preprocessing KVASIR/train: 704/704 | Progress: 100.0% | Elapsed: 00:00:06 | ETA: 00:00:00
+2026-10-18 17:44:07 | INFO    |   preprocessing KVASIR/val: 35/176 | Progress:  19.9% | Elapsed: 00:00:00 | ETA: 00:00:01
+2026-10-18 17:44:07 | INFO    |   preprocessing KVASIR/val: 70/176 | Progress:  39.8% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-18 17:44:07 | INFO    |   preprocessing KVASIR/val: 105/176 | Progress:  59.7% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-18 17:44:08 | INFO    |   preprocessing KVASIR/val: 140/176 | Progress:  79.5% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-18 17:44:08 | INFO    |   preprocessing KVASIR/val: 175/176 | Progress:  99.4% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-18 17:44:08 | INFO    |   preprocessing KVASIR/val: 176/176 | Progress: 100.0% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-18 17:44:11 | INFO    | Data ready: train 704, validation 176 (test held out) | normalisation mean [0.5591, 0.3216, 0.2354] std [0.3159, 0.2188, 0.1845]
+2026-10-18 17:44:36 | INFO    | nnU-Net raw dataset Dataset904_KVASIR: 704 training + 176 validation cases (256x256 PNG)
+2026-10-18 17:44:36 | INFO    | Stage 'nnunet_data' finished in 00:00:41
+2026-10-18 17:44:36 | INFO    | ####################################################################################################
+2026-10-18 17:44:36 | INFO    | STAGE: NNUNET_TRAIN
+Dataset904_KVASIR
+Using <class 'nnunetv2.imageio.natural_image_reader_writer.NaturalImage2DIO'> as reader/writer
+
+####################
+verify_dataset_integrity Done. 
+If you didn't see any error messages then your dataset is most likely OK!
+####################
+
+Using <class 'nnunetv2.imageio.natural_image_reader_writer.NaturalImage2DIO'> as reader/writer
+Extracting dataset fingerprint:   0%|          | 0/880 [00:00<?, ?it/s]Extracting dataset fingerprint:   0%|          | 1/880 [00:02<41:15,  2.82s/it]Extracting dataset fingerprint:   0%|          | 3/880 [00:02<11:13,  1.30it/s]Extracting dataset fingerprint:   1%|          | 8/880 [00:03<03:16,  4.44it/s]Extracting dataset fingerprint:   1%|▏         | 12/880 [00:03<01:56,  7.44it/s]Extracting dataset fingerprint:   2%|▏         | 17/880 [00:03<01:12, 11.98it/s]Extracting dataset fingerprint:   3%|▎         | 23/880 [00:03<00:46, 18.32it/s]Extracting dataset fingerprint:   4%|▎         | 32/880 [00:03<00:28, 29.66it/s]Extracting dataset fingerprint:   4%|▍         | 39/880 [00:03<00:22, 36.93it/s]Extracting dataset fingerprint:   6%|▌         | 49/880 [00:03<00:16, 49.98it/s]Extracting dataset fingerprint:   6%|▋         | 57/880 [00:03<00:14, 56.76it/s]Extracting dataset fingerprint:   7%|▋         | 65/880 [00:03<00:13, 62.29it/s]Extracting dataset fingerprint:   8%|▊         | 73/880 [00:03<00:12, 66.76it/s]Extracting dataset fingerprint:   9%|▉         | 81/880 [00:04<00:11, 69.92it/s]Extracting dataset fingerprint:  10%|█         | 90/880 [00:04<00:10, 75.05it/s]Extracting dataset fingerprint:  11%|█▏        | 99/880 [00:04<00:09, 79.05it/s]Extracting dataset fingerprint:  12%|█▏        | 108/880 [00:04<00:09, 81.73it/s]Extracting dataset fingerprint:  13%|█▎        | 117/880 [00:04<00:09, 83.93it/s]Extracting dataset fingerprint:  14%|█▍        | 126/880 [00:04<00:08, 85.39it/s]Extracting dataset fingerprint:  15%|█▌        | 135/880 [00:04<00:08, 86.21it/s]Extracting dataset fingerprint:  16%|█▋        | 144/880 [00:04<00:08, 86.85it/s]Extracting dataset fingerprint:  17%|█▋        | 153/880 [00:04<00:08, 87.62it/s]Extracting dataset fingerprint:  18%|█▊        | 162/880 [00:04<00:08, 88.16it/s]Extracting dataset fingerprint:  19%|█▉        | 171/880 [00:05<00:08, 88.53it/s]Extracting dataset fingerprint:  20%|██        | 180/880 [00:05<00:07, 88.81it/s]Extracting dataset fingerprint:  21%|██▏       | 189/880 [00:05<00:07, 88.96it/s]Extracting dataset fingerprint:  22%|██▎       | 198/880 [00:05<00:10, 68.12it/s]Extracting dataset fingerprint:  23%|██▎       | 206/880 [00:05<00:09, 70.89it/s]Extracting dataset fingerprint:  24%|██▍       | 215/880 [00:05<00:08, 75.54it/s]Extracting dataset fingerprint:  25%|██▌       | 224/880 [00:05<00:08, 78.55it/s]Extracting dataset fingerprint:  26%|██▋       | 233/880 [00:05<00:07, 81.52it/s]Extracting dataset fingerprint:  28%|██▊       | 242/880 [00:05<00:07, 83.72it/s]Extracting dataset fingerprint:  29%|██▊       | 251/880 [00:06<00:07, 85.33it/s]Extracting dataset fingerprint:  30%|██▉       | 260/880 [00:06<00:07, 86.31it/s]Extracting dataset fingerprint:  31%|███       | 269/880 [00:06<00:07, 87.23it/s]Extracting dataset fingerprint:  32%|███▏      | 278/880 [00:06<00:06, 87.68it/s]Extracting dataset fingerprint:  33%|███▎      | 287/880 [00:06<00:06, 88.20it/s]Extracting dataset fingerprint:  34%|███▎      | 296/880 [00:06<00:06, 88.53it/s]Extracting dataset fingerprint:  35%|███▍      | 305/880 [00:06<00:06, 88.75it/s]Extracting dataset fingerprint:  36%|███▌      | 314/880 [00:06<00:06, 88.90it/s]Extracting dataset fingerprint:  37%|███▋      | 323/880 [00:06<00:06, 88.69it/s]Extracting dataset fingerprint:  38%|███▊      | 332/880 [00:06<00:06, 88.84it/s]Extracting dataset fingerprint:  39%|███▉      | 341/880 [00:07<00:06, 88.98it/s]Extracting dataset fingerprint:  40%|███▉      | 350/880 [00:07<00:05, 88.99it/s]Extracting dataset fingerprint:  41%|████      | 359/880 [00:07<00:05, 88.89it/s]Extracting dataset fingerprint:  42%|████▏     | 368/880 [00:07<00:07, 68.54it/s]Extracting dataset fingerprint:  43%|████▎     | 376/880 [00:07<00:07, 71.28it/s]Extracting dataset fingerprint:  44%|████▎     | 384/880 [00:07<00:06, 73.44it/s]Extracting dataset fingerprint:  45%|████▍     | 392/880 [00:07<00:06, 75.11it/s]Extracting dataset fingerprint:  45%|████▌     | 400/880 [00:07<00:06, 76.15it/s]Extracting dataset fingerprint:  46%|████▋     | 408/880 [00:07<00:06, 77.11it/s]Extracting dataset fingerprint:  47%|████▋     | 416/880 [00:08<00:06, 77.19it/s]Extracting dataset fingerprint:  48%|████▊     | 425/880 [00:08<00:05, 80.77it/s]Extracting dataset fingerprint:  49%|████▉     | 434/880 [00:08<00:05, 83.10it/s]Extracting dataset fingerprint:  50%|█████     | 443/880 [00:08<00:05, 84.99it/s]Extracting dataset fingerprint:  51%|█████▏    | 452/880 [00:08<00:04, 86.06it/s]Extracting dataset fingerprint:  52%|█████▏    | 461/880 [00:08<00:04, 87.09it/s]Extracting dataset fingerprint:  53%|█████▎    | 470/880 [00:08<00:04, 87.80it/s]Extracting dataset fingerprint:  54%|█████▍    | 479/880 [00:08<00:04, 88.32it/s]Extracting dataset fingerprint:  55%|█████▌    | 488/880 [00:08<00:04, 88.25it/s]Extracting dataset fingerprint:  56%|█████▋    | 497/880 [00:09<00:05, 68.29it/s]Extracting dataset fingerprint:  57%|█████▋    | 505/880 [00:09<00:05, 71.08it/s]Extracting dataset fingerprint:  58%|█████▊    | 513/880 [00:09<00:05, 73.12it/s]Extracting dataset fingerprint:  59%|█████▉    | 521/880 [00:09<00:04, 74.78it/s]Extracting dataset fingerprint:  60%|██████    | 529/880 [00:09<00:04, 75.59it/s]Extracting dataset fingerprint:  61%|██████    | 537/880 [00:09<00:04, 76.73it/s]Extracting dataset fingerprint:  62%|██████▏   | 545/880 [00:09<00:04, 77.57it/s]Extracting dataset fingerprint:  63%|██████▎   | 553/880 [00:09<00:04, 78.04it/s]Extracting dataset fingerprint:  64%|██████▍   | 561/880 [00:09<00:04, 78.40it/s]Extracting dataset fingerprint:  65%|██████▍   | 569/880 [00:09<00:03, 78.71it/s]Extracting dataset fingerprint:  66%|██████▌   | 577/880 [00:10<00:03, 78.77it/s]Extracting dataset fingerprint:  66%|██████▋   | 585/880 [00:10<00:03, 79.03it/s]Extracting dataset fingerprint:  67%|██████▋   | 593/880 [00:10<00:03, 79.20it/s]Extracting dataset fingerprint:  68%|██████▊   | 601/880 [00:10<00:03, 79.19it/s]Extracting dataset fingerprint:  69%|██████▉   | 609/880 [00:10<00:03, 79.33it/s]Extracting dataset fingerprint:  70%|███████   | 617/880 [00:10<00:03, 79.45it/s]Extracting dataset fingerprint:  71%|███████   | 625/880 [00:10<00:03, 79.35it/s]Extracting dataset fingerprint:  72%|███████▏  | 633/880 [00:10<00:03, 79.06it/s]Extracting dataset fingerprint:  73%|███████▎  | 641/880 [00:10<00:03, 79.26it/s]Extracting dataset fingerprint:  74%|███████▍  | 649/880 [00:11<00:02, 79.38it/s]Extracting dataset fingerprint:  75%|███████▍  | 657/880 [00:11<00:02, 79.34it/s]Extracting dataset fingerprint:  76%|███████▌  | 665/880 [00:11<00:02, 79.45it/s]Extracting dataset fingerprint:  76%|███████▋  | 673/880 [00:11<00:02, 79.53it/s]Extracting dataset fingerprint:  77%|███████▋  | 681/880 [00:11<00:02, 79.30it/s]Extracting dataset fingerprint:  78%|███████▊  | 689/880 [00:11<00:02, 79.41it/s]Extracting dataset fingerprint:  79%|███████▉  | 697/880 [00:11<00:02, 79.45it/s]Extracting dataset fingerprint:  80%|████████  | 705/880 [00:11<00:02, 79.10it/s]Extracting dataset fingerprint:  81%|████████  | 713/880 [00:11<00:02, 79.30it/s]Extracting dataset fingerprint:  82%|████████▏ | 721/880 [00:11<00:02, 79.07it/s]Extracting dataset fingerprint:  83%|████████▎ | 730/880 [00:12<00:01, 81.89it/s]Extracting dataset fingerprint:  84%|████████▍ | 739/880 [00:12<00:01, 84.13it/s]Extracting dataset fingerprint:  85%|████████▌ | 748/880 [00:12<00:01, 85.31it/s]Extracting dataset fingerprint:  86%|████████▌ | 757/880 [00:12<00:01, 86.59it/s]Extracting dataset fingerprint:  87%|████████▋ | 766/880 [00:12<00:01, 87.42it/s]Extracting dataset fingerprint:  88%|████████▊ | 775/880 [00:12<00:01, 87.98it/s]Extracting dataset fingerprint:  89%|████████▉ | 784/880 [00:12<00:01, 88.46it/s]Extracting dataset fingerprint:  90%|█████████ | 793/880 [00:12<00:00, 88.79it/s]Extracting dataset fingerprint:  91%|█████████ | 802/880 [00:12<00:00, 88.89it/s]Extracting dataset fingerprint:  92%|█████████▏| 811/880 [00:12<00:00, 89.14it/s]Extracting dataset fingerprint:  93%|█████████▎| 820/880 [00:13<00:00, 88.91it/s]Extracting dataset fingerprint:  94%|█████████▍| 829/880 [00:13<00:00, 89.12it/s]Extracting dataset fingerprint:  95%|█████████▌| 838/880 [00:13<00:00, 89.29it/s]Extracting dataset fingerprint:  96%|█████████▋| 847/880 [00:13<00:00, 89.41it/s]Extracting dataset fingerprint:  97%|█████████▋| 856/880 [00:13<00:00, 89.50it/s]Extracting dataset fingerprint:  98%|█████████▊| 865/880 [00:13<00:00, 89.55it/s]Extracting dataset fingerprint:  99%|█████████▉| 874/880 [00:13<00:00, 88.61it/s]Extracting dataset fingerprint: 100%|██████████| 880/880 [00:13<00:00, 63.61it/s]
+
+############################
+INFO: You are using the old nnU-Net default planner. We have updated our recommendations. Please consider using those instead! Read more here: https://github.com/MIC-DKFZ/nnUNet/blob/master/documentation/resenc_presets.md
+############################
+
+2D U-Net configuration:
+{'data_identifier': 'nnUNetPlans_2d', 'preprocessor_name': 'DefaultPreprocessor', 'batch_size': 44, 'patch_size': (np.int64(256), np.int64(256)), 'median_image_size_in_voxels': array([256., 256.]), 'spacing': array([1., 1.]), 'normalization_schemes': ['ZScoreNormalization', 'ZScoreNormalization', 'ZScoreNormalization'], 'use_mask_for_norm': [False, False, False], 'resampling_fn_data': 'resample_data_or_seg_to_shape', 'resampling_fn_seg': 'resample_data_or_seg_to_shape', 'resampling_fn_data_kwargs': {'is_seg': False, 'order': 3, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_seg_kwargs': {'is_seg': True, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_probabilities': 'resample_data_or_seg_to_shape', 'resampling_fn_probabilities_kwargs': {'is_seg': False, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'architecture': {'network_class_name': 'dynamic_network_architectures.architectures.unet.PlainConvUNet', 'arch_kwargs': {'n_stages': 7, 'features_per_stage': (32, 64, 128, 256, 512, 512, 512), 'conv_op': 'torch.nn.modules.conv.Conv2d', 'kernel_sizes': ((3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3)), 'strides': ((1, 1), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2)), 'n_conv_per_stage': (2, 2, 2, 2, 2, 2, 2), 'n_conv_per_stage_decoder': (2, 2, 2, 2, 2, 2), 'conv_bias': True, 'norm_op': 'torch.nn.modules.instancenorm.InstanceNorm2d', 'norm_op_kwargs': {'eps': 1e-05, 'affine': True}, 'dropout_op': None, 'dropout_op_kwargs': None, 'nonlin': 'torch.nn.LeakyReLU', 'nonlin_kwargs': {'inplace': True}}, '_kw_requires_import': ('conv_op', 'norm_op', 'dropout_op', 'nonlin')}, 'batch_dice': True}
+
+Using <class 'nnunetv2.imageio.natural_image_reader_writer.NaturalImage2DIO'> as reader/writer
+Plans were saved to /kaggle/working/QENAS_results/results/KVASIR/nnunet/seed_47/nnunet_work/preprocessed/Dataset904_KVASIR/nnUNetPlans.json
+Preprocessing dataset Dataset904_KVASIR
+Configuration: 2d...
+{'data_identifier': 'nnUNetPlans_2d', 'preprocessor_name': 'DefaultPreprocessor', 'batch_size': 44, 'patch_size': [256, 256], 'median_image_size_in_voxels': [256.0, 256.0], 'spacing': [1.0, 1.0], 'normalization_schemes': ['ZScoreNormalization', 'ZScoreNormalization', 'ZScoreNormalization'], 'use_mask_for_norm': [False, False, False], 'resampling_fn_data': 'resample_data_or_seg_to_shape', 'resampling_fn_seg': 'resample_data_or_seg_to_shape', 'resampling_fn_data_kwargs': {'is_seg': False, 'order': 3, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_seg_kwargs': {'is_seg': True, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_probabilities': 'resample_data_or_seg_to_shape', 'resampling_fn_probabilities_kwargs': {'is_seg': False, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'architecture': {'network_class_name': 'dynamic_network_architectures.architectures.unet.PlainConvUNet', 'arch_kwargs': {'n_stages': 7, 'features_per_stage': [32, 64, 128, 256, 512, 512, 512], 'conv_op': 'torch.nn.modules.conv.Conv2d', 'kernel_sizes': [[3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3]], 'strides': [[1, 1], [2, 2], [2, 2], [2, 2], [2, 2], [2, 2], [2, 2]], 'n_conv_per_stage': [2, 2, 2, 2, 2, 2, 2], 'n_conv_per_stage_decoder': [2, 2, 2, 2, 2, 2], 'conv_bias': True, 'norm_op': 'torch.nn.modules.instancenorm.InstanceNorm2d', 'norm_op_kwargs': {'eps': 1e-05, 'affine': True}, 'dropout_op': None, 'dropout_op_kwargs': None, 'nonlin': 'torch.nn.LeakyReLU', 'nonlin_kwargs': {'inplace': True}}, '_kw_requires_import': ['conv_op', 'norm_op', 'dropout_op', 'nonlin']}, 'batch_dice': True}
+Preprocessing cases:   0%|          | 0/880 [00:00<?, ?it/s]Preprocessing cases:   0%|          | 1/880 [00:03<50:10,  3.42s/it]Preprocessing cases:   1%|          | 5/880 [00:03<07:45,  1.88it/s]Preprocessing cases:   1%|          | 9/880 [00:03<03:40,  3.94it/s]Preprocessing cases:   1%|▏         | 13/880 [00:03<02:12,  6.53it/s]Preprocessing cases:   2%|▏         | 17/880 [00:03<01:29,  9.62it/s]Preprocessing cases:   2%|▏         | 21/880 [00:03<01:05, 13.17it/s]Preprocessing cases:   3%|▎         | 25/880 [00:04<00:50, 16.95it/s]Preprocessing cases:   3%|▎         | 29/880 [00:04<00:40, 20.83it/s]Preprocessing cases:   4%|▍         | 33/880 [00:04<00:34, 24.53it/s]Preprocessing cases:   4%|▍         | 37/880 [00:04<00:30, 27.83it/s]Preprocessing cases:   5%|▍         | 41/880 [00:04<00:27, 30.51it/s]Preprocessing cases:   5%|▌         | 45/880 [00:04<00:25, 32.84it/s]Preprocessing cases:   6%|▌         | 49/880 [00:04<00:23, 34.68it/s]Preprocessing cases:   6%|▌         | 53/880 [00:04<00:22, 36.07it/s]Preprocessing cases:   6%|▋         | 57/880 [00:04<00:28, 28.82it/s]Preprocessing cases:   7%|▋         | 61/880 [00:05<00:26, 31.26it/s]Preprocessing cases:   7%|▋         | 65/880 [00:05<00:24, 33.41it/s]Preprocessing cases:   8%|▊         | 69/880 [00:05<00:23, 35.10it/s]Preprocessing cases:   8%|▊         | 73/880 [00:05<00:22, 36.39it/s]Preprocessing cases:   9%|▉         | 77/880 [00:05<00:21, 37.27it/s]Preprocessing cases:   9%|▉         | 81/880 [00:05<00:21, 37.99it/s]Preprocessing cases:  10%|▉         | 85/880 [00:05<00:20, 38.30it/s]Preprocessing cases:  10%|█         | 89/880 [00:05<00:20, 38.72it/s]Preprocessing cases:  11%|█         | 93/880 [00:05<00:26, 29.97it/s]Preprocessing cases:  11%|█         | 97/880 [00:06<00:24, 31.82it/s]Preprocessing cases:  11%|█▏        | 101/880 [00:06<00:23, 33.85it/s]Preprocessing cases:  12%|█▏        | 105/880 [00:06<00:21, 35.24it/s]Preprocessing cases:  12%|█▏        | 109/880 [00:06<00:21, 36.48it/s]Preprocessing cases:  13%|█▎        | 113/880 [00:06<00:20, 37.15it/s]Preprocessing cases:  13%|█▎        | 117/880 [00:06<00:20, 37.89it/s]Preprocessing cases:  14%|█▍        | 121/880 [00:06<00:19, 38.41it/s]Preprocessing cases:  14%|█▍        | 125/880 [00:06<00:19, 38.78it/s]Preprocessing cases:  15%|█▍        | 129/880 [00:06<00:19, 39.05it/s]Preprocessing cases:  15%|█▌        | 133/880 [00:06<00:19, 39.27it/s]Preprocessing cases:  16%|█▌        | 137/880 [00:07<00:24, 30.29it/s]Preprocessing cases:  16%|█▌        | 141/880 [00:07<00:22, 32.62it/s]Preprocessing cases:  16%|█▋        | 145/880 [00:07<00:21, 34.47it/s]Preprocessing cases:  17%|█▋        | 149/880 [00:07<00:20, 35.91it/s]Preprocessing cases:  17%|█▋        | 153/880 [00:07<00:19, 36.93it/s]Preprocessing cases:  18%|█▊        | 157/880 [00:07<00:19, 37.75it/s]Preprocessing cases:  18%|█▊        | 161/880 [00:07<00:18, 38.34it/s]Preprocessing cases:  19%|█▉        | 165/880 [00:07<00:18, 38.76it/s]Preprocessing cases:  19%|█▉        | 169/880 [00:07<00:18, 38.88it/s]Preprocessing cases:  20%|█▉        | 173/880 [00:08<00:18, 39.13it/s]Preprocessing cases:  20%|██        | 177/880 [00:08<00:18, 38.98it/s]Preprocessing cases:  21%|██        | 181/880 [00:08<00:17, 39.22it/s]Preprocessing cases:  21%|██        | 185/880 [00:08<00:17, 38.93it/s]Preprocessing cases:  21%|██▏       | 189/880 [00:08<00:17, 39.18it/s]Preprocessing cases:  22%|██▏       | 193/880 [00:08<00:17, 39.34it/s]Preprocessing cases:  22%|██▏       | 197/880 [00:08<00:17, 39.47it/s]Preprocessing cases:  23%|██▎       | 201/880 [00:08<00:17, 39.14it/s]Preprocessing cases:  23%|██▎       | 205/880 [00:08<00:17, 39.32it/s]Preprocessing cases:  24%|██▍       | 209/880 [00:08<00:17, 39.45it/s]Preprocessing cases:  24%|██▍       | 213/880 [00:09<00:16, 39.52it/s]Preprocessing cases:  25%|██▍       | 217/880 [00:09<00:16, 39.55it/s]Preprocessing cases:  25%|██▌       | 221/880 [00:09<00:16, 39.62it/s]Preprocessing cases:  26%|██▌       | 225/880 [00:09<00:16, 39.67it/s]Preprocessing cases:  26%|██▌       | 229/880 [00:09<00:21, 30.48it/s]Preprocessing cases:  26%|██▋       | 233/880 [00:09<00:19, 32.78it/s]Preprocessing cases:  27%|██▋       | 237/880 [00:09<00:18, 34.45it/s]Preprocessing cases:  27%|██▋       | 241/880 [00:09<00:17, 35.90it/s]Preprocessing cases:  28%|██▊       | 245/880 [00:10<00:17, 36.97it/s]Preprocessing cases:  28%|██▊       | 249/880 [00:10<00:16, 37.78it/s]Preprocessing cases:  29%|██▉       | 253/880 [00:10<00:16, 38.27it/s]Preprocessing cases:  29%|██▉       | 257/880 [00:10<00:16, 38.71it/s]Preprocessing cases:  30%|██▉       | 261/880 [00:10<00:15, 38.93it/s]Preprocessing cases:  30%|███       | 265/880 [00:10<00:15, 39.18it/s]Preprocessing cases:  31%|███       | 269/880 [00:10<00:15, 39.37it/s]Preprocessing cases:  31%|███       | 273/880 [00:10<00:15, 39.49it/s]Preprocessing cases:  31%|███▏      | 277/880 [00:10<00:15, 39.57it/s]Preprocessing cases:  32%|███▏      | 281/880 [00:10<00:15, 39.45it/s]Preprocessing cases:  32%|███▏      | 285/880 [00:11<00:15, 39.54it/s]Preprocessing cases:  33%|███▎      | 289/880 [00:11<00:14, 39.61it/s]Preprocessing cases:  33%|███▎      | 293/880 [00:11<00:14, 39.67it/s]Preprocessing cases:  34%|███▍      | 297/880 [00:11<00:19, 30.40it/s]Preprocessing cases:  34%|███▍      | 301/880 [00:11<00:17, 32.72it/s]Preprocessing cases:  35%|███▍      | 305/880 [00:11<00:16, 34.41it/s]Preprocessing cases:  35%|███▌      | 309/880 [00:11<00:15, 35.85it/s]Preprocessing cases:  36%|███▌      | 313/880 [00:11<00:15, 36.94it/s]Preprocessing cases:  36%|███▌      | 317/880 [00:11<00:14, 37.76it/s]Preprocessing cases:  36%|███▋      | 321/880 [00:12<00:14, 38.35it/s]Preprocessing cases:  37%|███▋      | 325/880 [00:12<00:14, 38.76it/s]Preprocessing cases:  37%|███▋      | 329/880 [00:12<00:14, 38.77it/s]Preprocessing cases:  38%|███▊      | 333/880 [00:12<00:13, 39.08it/s]Preprocessing cases:  38%|███▊      | 337/880 [00:12<00:13, 39.29it/s]Preprocessing cases:  39%|███▉      | 341/880 [00:12<00:13, 39.44it/s]Preprocessing cases:  39%|███▉      | 345/880 [00:12<00:13, 39.55it/s]Preprocessing cases:  40%|███▉      | 349/880 [00:12<00:13, 39.45it/s]Preprocessing cases:  40%|████      | 353/880 [00:12<00:13, 39.54it/s]Preprocessing cases:  41%|████      | 357/880 [00:12<00:13, 39.61it/s]Preprocessing cases:  41%|████      | 361/880 [00:13<00:13, 39.66it/s]Preprocessing cases:  41%|████▏     | 365/880 [00:13<00:12, 39.67it/s]Preprocessing cases:  42%|████▏     | 369/880 [00:13<00:12, 39.60it/s]Preprocessing cases:  42%|████▏     | 373/880 [00:13<00:12, 39.64it/s]Preprocessing cases:  43%|████▎     | 377/880 [00:13<00:16, 30.52it/s]Preprocessing cases:  43%|████▎     | 381/880 [00:13<00:15, 32.82it/s]Preprocessing cases:  44%|████▍     | 385/880 [00:13<00:14, 34.64it/s]Preprocessing cases:  44%|████▍     | 389/880 [00:13<00:13, 36.00it/s]Preprocessing cases:  45%|████▍     | 393/880 [00:13<00:13, 36.79it/s]Preprocessing cases:  45%|████▌     | 397/880 [00:14<00:12, 37.63it/s]Preprocessing cases:  46%|████▌     | 401/880 [00:14<00:12, 38.24it/s]Preprocessing cases:  46%|████▌     | 405/880 [00:14<00:12, 38.57it/s]Preprocessing cases:  46%|████▋     | 409/880 [00:14<00:12, 38.77it/s]Preprocessing cases:  47%|████▋     | 413/880 [00:14<00:11, 39.08it/s]Preprocessing cases:  47%|████▋     | 417/880 [00:14<00:11, 39.29it/s]Preprocessing cases:  48%|████▊     | 421/880 [00:14<00:11, 39.44it/s]Preprocessing cases:  48%|████▊     | 425/880 [00:14<00:14, 30.42it/s]Preprocessing cases:  49%|████▉     | 429/880 [00:14<00:13, 32.70it/s]Preprocessing cases:  49%|████▉     | 433/880 [00:15<00:12, 34.54it/s]Preprocessing cases:  50%|████▉     | 437/880 [00:15<00:12, 35.96it/s]Preprocessing cases:  50%|█████     | 441/880 [00:15<00:11, 37.04it/s]Preprocessing cases:  51%|█████     | 445/880 [00:15<00:11, 37.82it/s]Preprocessing cases:  51%|█████     | 449/880 [00:15<00:11, 38.14it/s]Preprocessing cases:  51%|█████▏    | 453/880 [00:15<00:11, 38.44it/s]Preprocessing cases:  52%|█████▏    | 457/880 [00:15<00:10, 38.83it/s]Preprocessing cases:  52%|█████▏    | 461/880 [00:15<00:10, 38.91it/s]Preprocessing cases:  53%|█████▎    | 465/880 [00:15<00:10, 39.07it/s]Preprocessing cases:  53%|█████▎    | 469/880 [00:16<00:13, 30.24it/s]Preprocessing cases:  54%|█████▍    | 473/880 [00:16<00:15, 26.07it/s]Preprocessing cases:  54%|█████▍    | 476/880 [00:16<00:18, 22.04it/s]Preprocessing cases:  54%|█████▍    | 479/880 [00:16<00:16, 23.64it/s]Preprocessing cases:  55%|█████▍    | 482/880 [00:16<00:15, 25.04it/s]Preprocessing cases:  55%|█████▌    | 486/880 [00:16<00:13, 28.52it/s]Preprocessing cases:  56%|█████▌    | 490/880 [00:16<00:12, 31.43it/s]Preprocessing cases:  56%|█████▌    | 494/880 [00:16<00:11, 33.69it/s]Preprocessing cases:  57%|█████▋    | 498/880 [00:17<00:10, 35.33it/s]Preprocessing cases:  57%|█████▋    | 502/880 [00:17<00:10, 36.61it/s]Preprocessing cases:  57%|█████▊    | 506/880 [00:17<00:10, 37.20it/s]Preprocessing cases:  58%|█████▊    | 510/880 [00:17<00:09, 37.90it/s]Preprocessing cases:  58%|█████▊    | 514/880 [00:17<00:09, 38.17it/s]Preprocessing cases:  59%|█████▉    | 518/880 [00:17<00:09, 38.65it/s]Preprocessing cases:  59%|█████▉    | 522/880 [00:17<00:09, 38.98it/s]Preprocessing cases:  60%|█████▉    | 526/880 [00:17<00:09, 39.23it/s]Preprocessing cases:  60%|██████    | 530/880 [00:17<00:08, 39.40it/s]Preprocessing cases:  61%|██████    | 534/880 [00:17<00:08, 39.50it/s]Preprocessing cases:  61%|██████    | 538/880 [00:18<00:11, 30.49it/s]Preprocessing cases:  62%|██████▏   | 542/880 [00:18<00:10, 32.72it/s]Preprocessing cases:  62%|██████▏   | 546/880 [00:18<00:09, 34.57it/s]Preprocessing cases:  62%|██████▎   | 550/880 [00:18<00:09, 35.99it/s]Preprocessing cases:  63%|██████▎   | 554/880 [00:18<00:08, 36.90it/s]Preprocessing cases:  63%|██████▎   | 558/880 [00:18<00:08, 37.72it/s]Preprocessing cases:  64%|██████▍   | 562/880 [00:18<00:08, 38.33it/s]Preprocessing cases:  64%|██████▍   | 566/880 [00:18<00:08, 38.76it/s]Preprocessing cases:  65%|██████▍   | 570/880 [00:18<00:07, 38.95it/s]Preprocessing cases:  65%|██████▌   | 574/880 [00:19<00:10, 30.18it/s]Preprocessing cases:  66%|██████▌   | 578/880 [00:19<00:09, 32.51it/s]Preprocessing cases:  66%|██████▌   | 582/880 [00:19<00:08, 34.41it/s]Preprocessing cases:  67%|██████▋   | 586/880 [00:19<00:08, 35.87it/s]Preprocessing cases:  67%|██████▋   | 590/880 [00:19<00:07, 36.97it/s]Preprocessing cases:  68%|██████▊   | 594/880 [00:19<00:07, 37.77it/s]Preprocessing cases:  68%|██████▊   | 598/880 [00:19<00:07, 38.28it/s]Preprocessing cases:  68%|██████▊   | 602/880 [00:19<00:07, 38.73it/s]Preprocessing cases:  69%|██████▉   | 606/880 [00:20<00:07, 38.79it/s]Preprocessing cases:  69%|██████▉   | 610/880 [00:20<00:06, 39.11it/s]Preprocessing cases:  70%|██████▉   | 614/880 [00:20<00:06, 39.32it/s]Preprocessing cases:  70%|███████   | 618/880 [00:20<00:06, 39.47it/s]Preprocessing cases:  71%|███████   | 622/880 [00:20<00:08, 30.48it/s]Preprocessing cases:  71%|███████   | 626/880 [00:20<00:07, 32.79it/s]Preprocessing cases:  72%|███████▏  | 630/880 [00:20<00:07, 34.63it/s]Preprocessing cases:  72%|███████▏  | 634/880 [00:20<00:06, 36.04it/s]Preprocessing cases:  72%|███████▎  | 638/880 [00:20<00:06, 36.92it/s]Preprocessing cases:  73%|███████▎  | 642/880 [00:21<00:06, 37.74it/s]Preprocessing cases:  73%|███████▎  | 646/880 [00:21<00:06, 38.01it/s]Preprocessing cases:  74%|███████▍  | 650/880 [00:21<00:05, 38.54it/s]Preprocessing cases:  74%|███████▍  | 654/880 [00:21<00:05, 38.92it/s]Preprocessing cases:  75%|███████▍  | 658/880 [00:21<00:05, 39.19it/s]Preprocessing cases:  75%|███████▌  | 662/880 [00:21<00:05, 39.38it/s]Preprocessing cases:  76%|███████▌  | 666/880 [00:21<00:07, 30.40it/s]Preprocessing cases:  76%|███████▌  | 670/880 [00:21<00:06, 32.66it/s]Preprocessing cases:  77%|███████▋  | 674/880 [00:21<00:05, 34.52it/s]Preprocessing cases:  77%|███████▋  | 678/880 [00:22<00:05, 35.96it/s]Preprocessing cases:  78%|███████▊  | 682/880 [00:22<00:05, 37.05it/s]Preprocessing cases:  78%|███████▊  | 686/880 [00:22<00:05, 37.69it/s]Preprocessing cases:  78%|███████▊  | 690/880 [00:22<00:04, 38.19it/s]Preprocessing cases:  79%|███████▉  | 694/880 [00:22<00:04, 38.67it/s]Preprocessing cases:  79%|███████▉  | 698/880 [00:22<00:04, 39.02it/s]Preprocessing cases:  80%|███████▉  | 702/880 [00:22<00:04, 38.71it/s]Preprocessing cases:  80%|████████  | 706/880 [00:22<00:04, 39.05it/s]Preprocessing cases:  81%|████████  | 710/880 [00:22<00:04, 39.28it/s]Preprocessing cases:  81%|████████  | 714/880 [00:22<00:04, 39.45it/s]Preprocessing cases:  82%|████████▏ | 718/880 [00:23<00:05, 30.50it/s]Preprocessing cases:  82%|████████▏ | 722/880 [00:23<00:04, 32.81it/s]Preprocessing cases:  82%|████████▎ | 726/880 [00:23<00:04, 34.65it/s]Preprocessing cases:  83%|████████▎ | 730/880 [00:23<00:04, 36.06it/s]Preprocessing cases:  83%|████████▎ | 734/880 [00:23<00:03, 37.08it/s]Preprocessing cases:  84%|████████▍ | 738/880 [00:23<00:03, 37.87it/s]Preprocessing cases:  84%|████████▍ | 742/880 [00:23<00:03, 38.43it/s]Preprocessing cases:  85%|████████▍ | 746/880 [00:23<00:03, 38.72it/s]Preprocessing cases:  85%|████████▌ | 750/880 [00:23<00:03, 38.98it/s]Preprocessing cases:  86%|████████▌ | 754/880 [00:24<00:03, 39.22it/s]Preprocessing cases:  86%|████████▌ | 758/880 [00:24<00:03, 39.40it/s]Preprocessing cases:  87%|████████▋ | 762/880 [00:24<00:02, 39.54it/s]Preprocessing cases:  87%|████████▋ | 766/880 [00:24<00:02, 39.63it/s]Preprocessing cases:  88%|████████▊ | 770/880 [00:24<00:02, 39.70it/s]Preprocessing cases:  88%|████████▊ | 774/880 [00:24<00:02, 39.64it/s]Preprocessing cases:  88%|████████▊ | 778/880 [00:24<00:03, 30.56it/s]Preprocessing cases:  89%|████████▉ | 782/880 [00:24<00:02, 32.86it/s]Preprocessing cases:  89%|████████▉ | 786/880 [00:24<00:02, 34.68it/s]Preprocessing cases:  90%|████████▉ | 790/880 [00:25<00:02, 36.09it/s]Preprocessing cases:  90%|█████████ | 794/880 [00:25<00:02, 37.14it/s]Preprocessing cases:  91%|█████████ | 798/880 [00:25<00:02, 37.92it/s]Preprocessing cases:  91%|█████████ | 802/880 [00:25<00:02, 38.48it/s]Preprocessing cases:  92%|█████████▏| 806/880 [00:25<00:01, 38.51it/s]Preprocessing cases:  92%|█████████▏| 810/880 [00:25<00:01, 38.91it/s]Preprocessing cases:  92%|█████████▎| 814/880 [00:25<00:01, 39.18it/s]Preprocessing cases:  93%|█████████▎| 818/880 [00:25<00:02, 30.33it/s]Preprocessing cases:  93%|█████████▎| 822/880 [00:25<00:01, 32.67it/s]Preprocessing cases:  94%|█████████▍| 826/880 [00:26<00:01, 34.54it/s]Preprocessing cases:  94%|█████████▍| 830/880 [00:26<00:01, 35.96it/s]Preprocessing cases:  95%|█████████▍| 834/880 [00:26<00:01, 37.05it/s]Preprocessing cases:  95%|█████████▌| 838/880 [00:26<00:01, 37.84it/s]Preprocessing cases:  96%|█████████▌| 842/880 [00:26<00:01, 29.82it/s]Preprocessing cases:  96%|█████████▌| 846/880 [00:26<00:01, 32.11it/s]Preprocessing cases:  97%|█████████▋| 850/880 [00:26<00:00, 34.10it/s]Preprocessing cases:  97%|█████████▋| 854/880 [00:26<00:00, 35.52it/s]Preprocessing cases:  98%|█████████▊| 858/880 [00:26<00:00, 36.72it/s]Preprocessing cases:  98%|█████████▊| 862/880 [00:27<00:00, 37.61it/s]Preprocessing cases:  98%|█████████▊| 866/880 [00:27<00:00, 38.27it/s]Preprocessing cases:  99%|█████████▉| 870/880 [00:27<00:00, 38.73it/s]Preprocessing cases:  99%|█████████▉| 874/880 [00:27<00:00, 39.07it/s]Preprocessing cases: 100%|█████████▉| 878/880 [00:27<00:00, 39.30it/s]Preprocessing cases: 100%|██████████| 880/880 [00:27<00:00, 31.82it/s]
+Using device: cuda:0
+
+#######################################################################
+Please cite the following paper when using nnU-Net:
+Isensee, F., Jaeger, P. F., Kohl, S. A., Petersen, J., & Maier-Hein, K. H. (2021). nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation. Nature methods, 18(2), 203-211.
+#######################################################################
+
+WARNING: Cannot continue training because there seems to be no checkpoint available to continue from. Starting a new training...
+2026-10-18 17:45:45.436568: do_dummy_2d_data_aug: False
+2026-10-18 17:45:45.438840: Using splits from existing split file: /kaggle/working/QENAS_results/results/KVASIR/nnunet/seed_47/nnunet_work/preprocessed/Dataset904_KVASIR/splits_final.json
+2026-10-18 17:45:45.439168: The split file contains 1 splits.
+2026-10-18 17:45:45.439275: Desired fold for training: 0
+2026-10-18 17:45:45.439368: This split has 704 training and 176 validation cases.
+using pin_memory on device 0
+/usr/local/lib/python3.13/dist-packages/torch/nn/functional.py:3504: UserWarning: nll_loss2d_forward_out_cuda_template does not have a deterministic implementation, but you set 'torch.use_deterministic_algorithms(True, warn_only=True)'. You can file an issue at https://github.com/pytorch/pytorch/issues to help us prioritize adding deterministic support for this operation. (Triggered internally at /pytorch/aten/src/ATen/Context.cpp:160.)
+  return torch._C._nn.cross_entropy_loss(
+using pin_memory on device 0
+
+This is the configuration used by this training:
+Configuration name: 2d
+ {'data_identifier': 'nnUNetPlans_2d', 'preprocessor_name': 'DefaultPreprocessor', 'batch_size': 44, 'patch_size': [256, 256], 'median_image_size_in_voxels': [256.0, 256.0], 'spacing': [1.0, 1.0], 'normalization_schemes': ['ZScoreNormalization', 'ZScoreNormalization', 'ZScoreNormalization'], 'use_mask_for_norm': [False, False, False], 'resampling_fn_data': 'resample_data_or_seg_to_shape', 'resampling_fn_seg': 'resample_data_or_seg_to_shape', 'resampling_fn_data_kwargs': {'is_seg': False, 'order': 3, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_seg_kwargs': {'is_seg': True, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_probabilities': 'resample_data_or_seg_to_shape', 'resampling_fn_probabilities_kwargs': {'is_seg': False, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'architecture': {'network_class_name': 'dynamic_network_architectures.architectures.unet.PlainConvUNet', 'arch_kwargs': {'n_stages': 7, 'features_per_stage': [32, 64, 128, 256, 512, 512, 512], 'conv_op': 'torch.nn.modules.conv.Conv2d', 'kernel_sizes': [[3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3]], 'strides': [[1, 1], [2, 2], [2, 2], [2, 2], [2, 2], [2, 2], [2, 2]], 'n_conv_per_stage': [2, 2, 2, 2, 2, 2, 2], 'n_conv_per_stage_decoder': [2, 2, 2, 2, 2, 2], 'conv_bias': True, 'norm_op': 'torch.nn.modules.instancenorm.InstanceNorm2d', 'norm_op_kwargs': {'eps': 1e-05, 'affine': True}, 'dropout_op': None, 'dropout_op_kwargs': None, 'nonlin': 'torch.nn.LeakyReLU', 'nonlin_kwargs': {'inplace': True}}, '_kw_requires_import': ['conv_op', 'norm_op', 'dropout_op', 'nonlin']}, 'batch_dice': True} 
+
+These are the global plan.json settings:
+ {'dataset_name': 'Dataset904_KVASIR', 'plans_name': 'nnUNetPlans', 'original_median_spacing_after_transp': [999.0, 1.0, 1.0], 'original_median_shape_after_transp': [1, 256, 256], 'image_reader_writer': 'NaturalImage2DIO', 'transpose_forward': [0, 1, 2], 'transpose_backward': [0, 1, 2], 'experiment_planner_used': 'ExperimentPlanner', 'label_manager': 'LabelManager', 'foreground_intensity_properties_per_channel': {'0': {'max': 255.0, 'mean': 206.9571075439453, 'median': 217.0, 'min': 0.0, 'percentile_00_5': 75.0, 'percentile_99_5': 255.0, 'std': 39.086402893066406}, '1': {'max': 255.0, 'mean': 122.36005401611328, 'median': 117.0, 'min': 0.0, 'percentile_00_5': 25.0, 'percentile_99_5': 251.0, 'std': 45.21532440185547}, '2': {'max': 255.0, 'mean': 89.79852294921875, 'median': 83.0, 'min': 0.0, 'percentile_00_5': 9.0, 'percentile_99_5': 242.0, 'std': 43.22010040283203}}} 
+
+2026-10-18 17:45:47.365293: Unable to plot network architecture:
+2026-10-18 17:45:47.365555: No module named 'hiddenlayer'
+2026-10-18 17:45:47.387719: 
+2026-10-18 17:45:47.389086: Epoch 0
+2026-10-18 17:45:47.389410: Current learning rate: 0.01
+2026-10-18 17:49:11.693458: train_loss -0.1289
+2026-10-18 17:49:11.694160: val_loss -0.3042
+2026-10-18 17:49:11.694603: Pseudo dice [np.float32(0.645)]
+2026-10-18 17:49:11.694983: Epoch time: 204.31 s
+2026-10-18 17:49:11.695333: Yayy! New best EMA pseudo Dice: 0.6449999809265137
+2026-10-18 17:49:13.721621: 
+2026-10-18 17:49:13.721927: Epoch 1
+2026-10-18 17:49:13.722173: Current learning rate: 0.00991
+2026-10-18 17:51:54.016793: train_loss -0.4228
+2026-10-18 17:51:54.017286: val_loss -0.5099
+2026-10-18 17:51:54.017647: Pseudo dice [np.float32(0.7646)]
+2026-10-18 17:51:54.018134: Epoch time: 160.3 s
+2026-10-18 17:51:54.018399: Yayy! New best EMA pseudo Dice: 0.6570000052452087
+2026-10-18 17:51:55.849994: 
+2026-10-18 17:51:55.850397: Epoch 2
+2026-10-18 17:51:55.850618: Current learning rate: 0.00982
+2026-10-18 17:54:40.147091: train_loss -0.6211
+2026-10-18 17:54:40.147636: val_loss -0.5981
+2026-10-18 17:54:40.147974: Pseudo dice [np.float32(0.8065)]
+2026-10-18 17:54:40.148367: Epoch time: 164.3 s
+2026-10-18 17:54:40.148692: Yayy! New best EMA pseudo Dice: 0.6718999743461609
+2026-10-18 17:54:41.941873: 
+2026-10-18 17:54:41.942222: Epoch 3
+2026-10-18 17:54:41.942383: Current learning rate: 0.00973
+2026-10-18 17:57:28.931639: train_loss -0.694
+2026-10-18 17:57:28.932189: val_loss -0.6383
+2026-10-18 17:57:28.932587: Pseudo dice [np.float32(0.8345)]
+2026-10-18 17:57:28.932849: Epoch time: 166.99 s
+2026-10-18 17:57:28.933029: Yayy! New best EMA pseudo Dice: 0.6881999969482422
+2026-10-18 17:57:30.794561: 
+2026-10-18 17:57:30.794815: Epoch 4
+2026-10-18 17:57:30.795027: Current learning rate: 0.00964
+2026-10-18 18:00:17.959306: train_loss -0.7365
+2026-10-18 18:00:17.963387: val_loss -0.6687
+2026-10-18 18:00:17.963679: Pseudo dice [np.float32(0.8504)]
+2026-10-18 18:00:17.964072: Epoch time: 167.17 s
+2026-10-18 18:00:18.238820: Yayy! New best EMA pseudo Dice: 0.7044000029563904
+2026-10-18 18:00:20.098515: 
+2026-10-18 18:00:20.098919: Epoch 5
+2026-10-18 18:00:20.099086: Current learning rate: 0.00955
+2026-10-18 18:03:07.317423: train_loss -0.7669
+2026-10-18 18:03:07.318070: val_loss -0.683
+2026-10-18 18:03:07.318226: Pseudo dice [np.float32(0.853)]
+2026-10-18 18:03:07.318383: Epoch time: 167.22 s
+2026-10-18 18:03:07.318504: Yayy! New best EMA pseudo Dice: 0.7192999720573425
+2026-10-18 18:03:09.149904: 
+2026-10-18 18:03:09.150188: Epoch 6
+2026-10-18 18:03:09.150361: Current learning rate: 0.00946
+2026-10-18 18:05:56.183624: train_loss -0.8021
+2026-10-18 18:05:56.184177: val_loss -0.7112
+2026-10-18 18:05:56.184531: Pseudo dice [np.float32(0.8657)]
+2026-10-18 18:05:56.184913: Epoch time: 167.04 s
+2026-10-18 18:05:56.185159: Yayy! New best EMA pseudo Dice: 0.7339000105857849
+2026-10-18 18:05:58.035873: 
+2026-10-18 18:05:58.036197: Epoch 7
+2026-10-18 18:05:58.036388: Current learning rate: 0.00937
+2026-10-18 18:08:44.955840: train_loss -0.8133
+2026-10-18 18:08:44.956366: val_loss -0.7077
+2026-10-18 18:08:44.956659: Pseudo dice [np.float32(0.8618)]
+2026-10-18 18:08:44.957012: Epoch time: 166.92 s
+2026-10-18 18:08:44.957227: Yayy! New best EMA pseudo Dice: 0.7466999888420105
+2026-10-18 18:08:46.696977: 
+2026-10-18 18:08:46.697464: Epoch 8
+2026-10-18 18:08:46.697743: Current learning rate: 0.00928
+2026-10-18 18:11:33.867585: train_loss -0.8324
+2026-10-18 18:11:33.868106: val_loss -0.7262
+2026-10-18 18:11:33.868390: Pseudo dice [np.float32(0.8782)]
+2026-10-18 18:11:33.868726: Epoch time: 167.17 s
+2026-10-18 18:11:33.869005: Yayy! New best EMA pseudo Dice: 0.7598999738693237
+2026-10-18 18:11:35.668876: 
+2026-10-18 18:11:35.669308: Epoch 9
+2026-10-18 18:11:35.669471: Current learning rate: 0.00919
+2026-10-18 18:14:23.023233: train_loss -0.8411
+2026-10-18 18:14:23.023702: val_loss -0.7123
+2026-10-18 18:14:23.023923: Pseudo dice [np.float32(0.8701)]
+2026-10-18 18:14:23.024066: Epoch time: 167.36 s
+2026-10-18 18:14:23.380596: Yayy! New best EMA pseudo Dice: 0.7709000110626221
+2026-10-18 18:14:25.323451: 
+2026-10-18 18:14:25.323865: Epoch 10
+2026-10-18 18:14:25.324034: Current learning rate: 0.0091
+2026-10-18 18:17:12.548731: train_loss -0.8618
+2026-10-18 18:17:12.549345: val_loss -0.6978
+2026-10-18 18:17:12.549493: Pseudo dice [np.float32(0.8687)]
+2026-10-18 18:17:12.549627: Epoch time: 167.23 s
+2026-10-18 18:17:12.549735: Yayy! New best EMA pseudo Dice: 0.7807000279426575
+2026-10-18 18:17:14.383862: 
+2026-10-18 18:17:14.384303: Epoch 11
+2026-10-18 18:17:14.384490: Current learning rate: 0.009
+2026-10-18 18:20:01.280598: train_loss -0.865
+2026-10-18 18:20:01.284083: val_loss -0.7092
+2026-10-18 18:20:01.284446: Pseudo dice [np.float32(0.873)]
+2026-10-18 18:20:01.284784: Epoch time: 166.9 s
+2026-10-18 18:20:01.285052: Yayy! New best EMA pseudo Dice: 0.789900004863739
+2026-10-18 18:20:03.103477: 
+2026-10-18 18:20:03.103855: Epoch 12
+2026-10-18 18:20:03.104028: Current learning rate: 0.00891
+2026-10-18 18:22:50.167780: train_loss -0.8701
+2026-10-18 18:22:50.168523: val_loss -0.7042
+2026-10-18 18:22:50.168955: Pseudo dice [np.float32(0.8725)]
+2026-10-18 18:22:50.169289: Epoch time: 167.07 s
+2026-10-18 18:22:50.169538: Yayy! New best EMA pseudo Dice: 0.7982000112533569
+2026-10-18 18:22:51.948292: 
+2026-10-18 18:22:51.948728: Epoch 13
+2026-10-18 18:22:51.948997: Current learning rate: 0.00882
+2026-10-18 18:25:39.268068: train_loss -0.8771
+2026-10-18 18:25:39.268820: val_loss -0.7079
+2026-10-18 18:25:39.269187: Pseudo dice [np.float32(0.8737)]
+2026-10-18 18:25:39.269366: Epoch time: 167.32 s
+2026-10-18 18:25:39.269491: Yayy! New best EMA pseudo Dice: 0.8057000041007996
+2026-10-18 18:25:41.221255: 
+2026-10-18 18:25:41.221627: Epoch 14
+2026-10-18 18:25:41.221953: Current learning rate: 0.00873
+2026-10-18 18:28:28.211721: train_loss -0.8828
+2026-10-18 18:28:28.212344: val_loss -0.7492
+2026-10-18 18:28:28.212690: Pseudo dice [np.float32(0.8897)]
+2026-10-18 18:28:28.213060: Epoch time: 166.99 s
+2026-10-18 18:28:28.599319: Yayy! New best EMA pseudo Dice: 0.8141000270843506
+2026-10-18 18:28:30.457951: 
+2026-10-18 18:28:30.458346: Epoch 15
+2026-10-18 18:28:30.458553: Current learning rate: 0.00864
+2026-10-18 18:31:17.536239: train_loss -0.8898
+2026-10-18 18:31:17.536869: val_loss -0.6881
+2026-10-18 18:31:17.537356: Pseudo dice [np.float32(0.8656)]
+2026-10-18 18:31:17.537735: Epoch time: 167.08 s
+2026-10-18 18:31:17.538017: Yayy! New best EMA pseudo Dice: 0.8192999958992004
+2026-10-18 18:31:19.317778: 
+2026-10-18 18:31:19.318127: Epoch 16
+2026-10-18 18:31:19.318293: Current learning rate: 0.00855
+2026-10-18 18:34:06.524582: train_loss -0.893
+2026-10-18 18:34:06.525489: val_loss -0.7141
+2026-10-18 18:34:06.525778: Pseudo dice [np.float32(0.8803)]
+2026-10-18 18:34:06.526026: Epoch time: 167.21 s
+2026-10-18 18:34:06.526268: Yayy! New best EMA pseudo Dice: 0.8253999948501587
+2026-10-18 18:34:08.954066: 
+2026-10-18 18:34:08.954533: Epoch 17
+2026-10-18 18:34:08.954823: Current learning rate: 0.00846
+2026-10-18 18:36:56.343448: train_loss -0.8969
+2026-10-18 18:36:56.343841: val_loss -0.7175
+2026-10-18 18:36:56.344092: Pseudo dice [np.float32(0.8788)]
+2026-10-18 18:36:56.344234: Epoch time: 167.39 s
+2026-10-18 18:36:56.344350: Yayy! New best EMA pseudo Dice: 0.8306999802589417
+2026-10-18 18:36:58.210513: 
+2026-10-18 18:36:58.210984: Epoch 18
+2026-10-18 18:36:58.211175: Current learning rate: 0.00836
+2026-10-18 18:39:45.627241: train_loss -0.8942
+2026-10-18 18:39:45.627806: val_loss -0.7231
+2026-10-18 18:39:45.628121: Pseudo dice [np.float32(0.8757)]
+2026-10-18 18:39:45.628538: Epoch time: 167.42 s
+2026-10-18 18:39:45.628816: Yayy! New best EMA pseudo Dice: 0.8352000117301941
+2026-10-18 18:39:47.453536: 
+2026-10-18 18:39:47.453995: Epoch 19
+2026-10-18 18:39:47.454169: Current learning rate: 0.00827
+2026-10-18 18:42:34.747051: train_loss -0.9019
+2026-10-18 18:42:34.747516: val_loss -0.7328
+2026-10-18 18:42:34.747867: Pseudo dice [np.float32(0.8794)]
+2026-10-18 18:42:34.748206: Epoch time: 167.29 s
+2026-10-18 18:42:35.129168: Yayy! New best EMA pseudo Dice: 0.8396000266075134
+2026-10-18 18:42:36.966908: 
+2026-10-18 18:42:36.967224: Epoch 20
+2026-10-18 18:42:36.967388: Current learning rate: 0.00818
+2026-10-18 18:45:24.361946: train_loss -0.9083
+2026-10-18 18:45:24.362415: val_loss -0.7073
+2026-10-18 18:45:24.362565: Pseudo dice [np.float32(0.8753)]
+2026-10-18 18:45:24.362712: Epoch time: 167.4 s
+2026-10-18 18:45:24.362990: Yayy! New best EMA pseudo Dice: 0.8432000279426575
+2026-10-18 18:45:26.184835: 
+2026-10-18 18:45:26.185245: Epoch 21
+2026-10-18 18:45:26.185420: Current learning rate: 0.00809
+2026-10-18 18:48:13.579251: train_loss -0.9103
+2026-10-18 18:48:13.579710: val_loss -0.7192
+2026-10-18 18:48:13.580021: Pseudo dice [np.float32(0.8809)]
+2026-10-18 18:48:13.580298: Epoch time: 167.4 s
+2026-10-18 18:48:13.580698: Yayy! New best EMA pseudo Dice: 0.847000002861023
+2026-10-18 18:48:15.416722: 
+2026-10-18 18:48:15.417117: Epoch 22
+2026-10-18 18:48:15.417296: Current learning rate: 0.008
+2026-10-18 18:51:02.692291: train_loss -0.9103
+2026-10-18 18:51:02.692829: val_loss -0.7406
+2026-10-18 18:51:02.693113: Pseudo dice [np.float32(0.8933)]
+2026-10-18 18:51:02.693385: Epoch time: 167.28 s
+2026-10-18 18:51:02.693776: Yayy! New best EMA pseudo Dice: 0.8515999913215637
+2026-10-18 18:51:04.490828: 
+2026-10-18 18:51:04.491253: Epoch 23
+2026-10-18 18:51:04.491515: Current learning rate: 0.0079
+2026-10-18 18:53:51.908180: train_loss -0.9138
+2026-10-18 18:53:51.908704: val_loss -0.7233
+2026-10-18 18:53:51.908968: Pseudo dice [np.float32(0.8852)]
+2026-10-18 18:53:51.909148: Epoch time: 167.42 s
+2026-10-18 18:53:51.909274: Yayy! New best EMA pseudo Dice: 0.8550000190734863
+2026-10-18 18:53:53.702099: 
+2026-10-18 18:53:53.702522: Epoch 24
+2026-10-18 18:53:53.702684: Current learning rate: 0.00781
+2026-10-18 18:56:41.154650: train_loss -0.9109
+2026-10-18 18:56:41.155069: val_loss -0.7227
+2026-10-18 18:56:41.155223: Pseudo dice [np.float32(0.8806)]
+2026-10-18 18:56:41.155395: Epoch time: 167.45 s
+2026-10-18 18:56:41.519301: Yayy! New best EMA pseudo Dice: 0.8575000166893005
+2026-10-18 18:56:43.268768: 
+2026-10-18 18:56:43.269153: Epoch 25
+2026-10-18 18:56:43.269315: Current learning rate: 0.00772
+2026-10-18 18:59:30.733407: train_loss -0.9184
+2026-10-18 18:59:30.733858: val_loss -0.7072
+2026-10-18 18:59:30.734064: Pseudo dice [np.float32(0.8782)]
+2026-10-18 18:59:30.734269: Epoch time: 167.47 s
+2026-10-18 18:59:30.734435: Yayy! New best EMA pseudo Dice: 0.8596000075340271
+2026-10-18 18:59:32.520462: 
+2026-10-18 18:59:32.520921: Epoch 26
+2026-10-18 18:59:32.521161: Current learning rate: 0.00763
+2026-10-18 19:02:19.926968: train_loss -0.925
+2026-10-18 19:02:19.927615: val_loss -0.7319
+2026-10-18 19:02:19.927986: Pseudo dice [np.float32(0.8884)]
+2026-10-18 19:02:19.928261: Epoch time: 167.41 s
+2026-10-18 19:02:19.928486: Yayy! New best EMA pseudo Dice: 0.862500011920929
+2026-10-18 19:02:22.020979: 
+2026-10-18 19:02:22.021258: Epoch 27
+2026-10-18 19:02:22.021551: Current learning rate: 0.00753
+2026-10-18 19:05:09.403573: train_loss -0.9223
+2026-10-18 19:05:09.404129: val_loss -0.7337
+2026-10-18 19:05:09.404286: Pseudo dice [np.float32(0.8852)]
+2026-10-18 19:05:09.404439: Epoch time: 167.38 s
+2026-10-18 19:05:09.404556: Yayy! New best EMA pseudo Dice: 0.8647000193595886
+2026-10-18 19:05:11.470856: 
+2026-10-18 19:05:11.471305: Epoch 28
+2026-10-18 19:05:11.471488: Current learning rate: 0.00744
+2026-10-18 19:07:59.062185: train_loss -0.9275
+2026-10-18 19:07:59.062656: val_loss -0.7133
+2026-10-18 19:07:59.062997: Pseudo dice [np.float32(0.8833)]
+2026-10-18 19:07:59.063238: Epoch time: 167.59 s
+2026-10-18 19:07:59.063420: Yayy! New best EMA pseudo Dice: 0.866599977016449
+2026-10-18 19:08:00.931366: 
+2026-10-18 19:08:00.931665: Epoch 29
+2026-10-18 19:08:00.931922: Current learning rate: 0.00735
+2026-10-18 19:10:48.445172: train_loss -0.932
+2026-10-18 19:10:48.445673: val_loss -0.6902
+2026-10-18 19:10:48.445959: Pseudo dice [np.float32(0.876)]
+2026-10-18 19:10:48.446162: Epoch time: 167.52 s
+2026-10-18 19:10:48.826821: Yayy! New best EMA pseudo Dice: 0.8675000071525574
+2026-10-18 19:10:50.846461: 
+2026-10-18 19:10:50.846936: Epoch 30
+2026-10-18 19:10:50.847131: Current learning rate: 0.00725
+2026-10-18 19:13:38.273090: train_loss -0.9304
+2026-10-18 19:13:38.273706: val_loss -0.7513
+2026-10-18 19:13:38.274091: Pseudo dice [np.float32(0.9004)]
+2026-10-18 19:13:38.274362: Epoch time: 167.43 s
+2026-10-18 19:13:38.274587: Yayy! New best EMA pseudo Dice: 0.8708000183105469
+2026-10-18 19:13:40.285360: 
+2026-10-18 19:13:40.285799: Epoch 31
+2026-10-18 19:13:40.285969: Current learning rate: 0.00716
+2026-10-18 19:16:27.753085: train_loss -0.9285
+2026-10-18 19:16:27.753705: val_loss -0.7362
+2026-10-18 19:16:27.753996: Pseudo dice [np.float32(0.8901)]
+2026-10-18 19:16:27.754237: Epoch time: 167.47 s
+2026-10-18 19:16:27.754485: Yayy! New best EMA pseudo Dice: 0.8727999925613403
+2026-10-18 19:16:29.797992: 
+2026-10-18 19:16:29.798265: Epoch 32
+2026-10-18 19:16:29.798556: Current learning rate: 0.00707
+2026-10-18 19:19:17.441727: train_loss -0.9317
+2026-10-18 19:19:17.442283: val_loss -0.748
+2026-10-18 19:19:17.442719: Pseudo dice [np.float32(0.8986)]
+2026-10-18 19:19:17.443063: Epoch time: 167.65 s
+2026-10-18 19:19:17.443312: Yayy! New best EMA pseudo Dice: 0.8752999901771545
+2026-10-18 19:19:19.492456: 
+2026-10-18 19:19:19.492865: Epoch 33
+2026-10-18 19:19:19.493027: Current learning rate: 0.00697
+2026-10-18 19:22:06.876310: train_loss -0.9316
+2026-10-18 19:22:06.877153: val_loss -0.7553
+2026-10-18 19:22:06.877513: Pseudo dice [np.float32(0.9043)]
+2026-10-18 19:22:06.878109: Epoch time: 167.39 s
+2026-10-18 19:22:06.878396: Yayy! New best EMA pseudo Dice: 0.8781999945640564
+2026-10-18 19:22:08.862750: 
+2026-10-18 19:22:08.863110: Epoch 34
+2026-10-18 19:22:08.863335: Current learning rate: 0.00688
+2026-10-18 19:24:56.219969: train_loss -0.9351
+2026-10-18 19:24:56.220605: val_loss -0.749
+2026-10-18 19:24:56.220917: Pseudo dice [np.float32(0.9011)]
+2026-10-18 19:24:56.221236: Epoch time: 167.36 s
+2026-10-18 19:24:56.673881: Yayy! New best EMA pseudo Dice: 0.8805000185966492
+2026-10-18 19:24:58.664035: 
+2026-10-18 19:24:58.664457: Epoch 35
+2026-10-18 19:24:58.664697: Current learning rate: 0.00679
+2026-10-18 19:27:46.267461: train_loss -0.9352
+2026-10-18 19:27:46.268329: val_loss -0.723
+2026-10-18 19:27:46.268687: Pseudo dice [np.float32(0.8846)]
+2026-10-18 19:27:46.269048: Epoch time: 167.61 s
+2026-10-18 19:27:46.269320: Yayy! New best EMA pseudo Dice: 0.8809000253677368
+2026-10-18 19:27:48.871198: 
+2026-10-18 19:27:48.871537: Epoch 36
+2026-10-18 19:27:48.871847: Current learning rate: 0.00669
+2026-10-18 19:30:36.322117: train_loss -0.9318
+2026-10-18 19:30:36.322616: val_loss -0.7123
+2026-10-18 19:30:36.322914: Pseudo dice [np.float32(0.8847)]
+2026-10-18 19:30:36.323082: Epoch time: 167.45 s
+2026-10-18 19:30:36.323263: Yayy! New best EMA pseudo Dice: 0.8812999725341797
+2026-10-18 19:30:38.308038: 
+2026-10-18 19:30:38.308460: Epoch 37
+2026-10-18 19:30:38.308631: Current learning rate: 0.0066
+2026-10-18 19:33:25.713231: train_loss -0.9371
+2026-10-18 19:33:25.713715: val_loss -0.7236
+2026-10-18 19:33:25.713900: Pseudo dice [np.float32(0.8885)]
+2026-10-18 19:33:25.714051: Epoch time: 167.41 s
+2026-10-18 19:33:25.714167: Yayy! New best EMA pseudo Dice: 0.8820000290870667
+2026-10-18 19:33:27.824352: 
+2026-10-18 19:33:27.824850: Epoch 38
+2026-10-18 19:33:27.825058: Current learning rate: 0.0065
+2026-10-18 19:36:15.150701: train_loss -0.9421
+2026-10-18 19:36:15.151243: val_loss -0.6587
+2026-10-18 19:36:15.151472: Pseudo dice [np.float32(0.8756)]
+2026-10-18 19:36:15.151685: Epoch time: 167.33 s
+2026-10-18 19:36:16.823947: 
+2026-10-18 19:36:16.824368: Epoch 39
+2026-10-18 19:36:16.824582: Current learning rate: 0.00641
+2026-10-18 19:39:04.192311: train_loss -0.9408
+2026-10-18 19:39:04.192873: val_loss -0.7428
+2026-10-18 19:39:04.193313: Pseudo dice [np.float32(0.8987)]
+2026-10-18 19:39:04.193628: Epoch time: 167.37 s
+2026-10-18 19:39:04.568459: Yayy! New best EMA pseudo Dice: 0.8830999732017517
+2026-10-18 19:39:06.548717: 
+2026-10-18 19:39:06.549157: Epoch 40
+2026-10-18 19:39:06.549338: Current learning rate: 0.00631
+2026-10-18 19:41:53.959802: train_loss -0.9412
+2026-10-18 19:41:53.960662: val_loss -0.7448
+2026-10-18 19:41:53.961072: Pseudo dice [np.float32(0.8962)]
+2026-10-18 19:41:53.961578: Epoch time: 167.41 s
+2026-10-18 19:41:53.961882: Yayy! New best EMA pseudo Dice: 0.8844000101089478
+2026-10-18 19:41:55.930146: 
+2026-10-18 19:41:55.930514: Epoch 41
+2026-10-18 19:41:55.930691: Current learning rate: 0.00622
+2026-10-18 19:44:43.365007: train_loss -0.9449
+2026-10-18 19:44:43.365569: val_loss -0.7408
+2026-10-18 19:44:43.365785: Pseudo dice [np.float32(0.9008)]
+2026-10-18 19:44:43.366029: Epoch time: 167.44 s
+2026-10-18 19:44:43.366198: Yayy! New best EMA pseudo Dice: 0.8860999941825867
+2026-10-18 19:44:45.479435: 
+2026-10-18 19:44:45.480336: Epoch 42
+2026-10-18 19:44:45.480633: Current learning rate: 0.00612
+2026-10-18 19:47:32.882931: train_loss -0.9431
+2026-10-18 19:47:32.883462: val_loss -0.6886
+2026-10-18 19:47:32.883736: Pseudo dice [np.float32(0.8777)]
+2026-10-18 19:47:32.884079: Epoch time: 167.4 s
+2026-10-18 19:47:34.489168: 
+2026-10-18 19:47:34.489589: Epoch 43
+2026-10-18 19:47:34.489845: Current learning rate: 0.00603
+2026-10-18 19:50:21.875679: train_loss -0.9426
+2026-10-18 19:50:21.876339: val_loss -0.7272
+2026-10-18 19:50:21.876502: Pseudo dice [np.float32(0.892)]
+2026-10-18 19:50:21.876649: Epoch time: 167.39 s
+2026-10-18 19:50:23.506979: 
+2026-10-18 19:50:23.507482: Epoch 44
+2026-10-18 19:50:23.507792: Current learning rate: 0.00593
+2026-10-18 19:53:10.857135: train_loss -0.9467
+2026-10-18 19:53:10.857637: val_loss -0.6964
+2026-10-18 19:53:10.858017: Pseudo dice [np.float32(0.8849)]
+2026-10-18 19:53:10.858387: Epoch time: 167.35 s
+2026-10-18 19:53:12.922975: 
+2026-10-18 19:53:12.923426: Epoch 45
+2026-10-18 19:53:12.923593: Current learning rate: 0.00584
+2026-10-18 19:56:00.323565: train_loss -0.947
+2026-10-18 19:56:00.324142: val_loss -0.7182
+2026-10-18 19:56:00.324412: Pseudo dice [np.float32(0.8909)]
+2026-10-18 19:56:00.324697: Epoch time: 167.4 s
+2026-10-18 19:56:00.324941: Yayy! New best EMA pseudo Dice: 0.8863000273704529
+2026-10-18 19:56:02.241328: 
+2026-10-18 19:56:02.241672: Epoch 46
+2026-10-18 19:56:02.241897: Current learning rate: 0.00574
+2026-10-18 19:58:49.653828: train_loss -0.9499
+2026-10-18 19:58:49.654388: val_loss -0.7203
+2026-10-18 19:58:49.654708: Pseudo dice [np.float32(0.8913)]
+2026-10-18 19:58:49.655005: Epoch time: 167.41 s
+2026-10-18 19:58:49.655212: Yayy! New best EMA pseudo Dice: 0.8867999911308289
+2026-10-18 19:58:51.557456: 
+2026-10-18 19:58:51.557926: Epoch 47
+2026-10-18 19:58:51.558144: Current learning rate: 0.00565
+2026-10-18 20:01:38.983137: train_loss -0.9496
+2026-10-18 20:01:38.983924: val_loss -0.6888
+2026-10-18 20:01:38.984417: Pseudo dice [np.float32(0.8862)]
+2026-10-18 20:01:38.984791: Epoch time: 167.43 s
+2026-10-18 20:01:40.412045: 
+2026-10-18 20:01:40.412585: Epoch 48
+2026-10-18 20:01:40.412945: Current learning rate: 0.00555
+2026-10-18 20:04:27.701390: train_loss -0.9504
+2026-10-18 20:04:27.701874: val_loss -0.7393
+2026-10-18 20:04:27.702123: Pseudo dice [np.float32(0.8999)]
+2026-10-18 20:04:27.702279: Epoch time: 167.29 s
+2026-10-18 20:04:27.702480: Yayy! New best EMA pseudo Dice: 0.8881000280380249
+2026-10-18 20:04:29.538059: 
+2026-10-18 20:04:29.538450: Epoch 49
+2026-10-18 20:04:29.538622: Current learning rate: 0.00546
+2026-10-18 20:07:16.909617: train_loss -0.9493
+2026-10-18 20:07:16.910181: val_loss -0.6954
+2026-10-18 20:07:16.910332: Pseudo dice [np.float32(0.8859)]
+2026-10-18 20:07:16.910486: Epoch time: 167.37 s
+2026-10-18 20:07:18.698992: 
+2026-10-18 20:07:18.699390: Epoch 50
+2026-10-18 20:07:18.699559: Current learning rate: 0.00536
+2026-10-18 20:10:06.095333: train_loss -0.9489
+2026-10-18 20:10:06.095917: val_loss -0.7397
+2026-10-18 20:10:06.096185: Pseudo dice [np.float32(0.8978)]
+2026-10-18 20:10:06.096352: Epoch time: 167.4 s
+2026-10-18 20:10:06.096473: Yayy! New best EMA pseudo Dice: 0.8888000249862671
+2026-10-18 20:10:07.900675: 
+2026-10-18 20:10:07.901045: Epoch 51
+2026-10-18 20:10:07.901218: Current learning rate: 0.00526
+2026-10-18 20:12:55.379181: train_loss -0.9534
+2026-10-18 20:12:55.379760: val_loss -0.7244
+2026-10-18 20:12:55.380075: Pseudo dice [np.float32(0.8928)]
+2026-10-18 20:12:55.380479: Epoch time: 167.48 s
+2026-10-18 20:12:55.380712: Yayy! New best EMA pseudo Dice: 0.88919997215271
+2026-10-18 20:12:57.225656: 
+2026-10-18 20:12:57.225888: Epoch 52
+2026-10-18 20:12:57.226144: Current learning rate: 0.00517
+2026-10-18 20:15:44.710139: train_loss -0.9514
+2026-10-18 20:15:44.710871: val_loss -0.7403
+2026-10-18 20:15:44.711342: Pseudo dice [np.float32(0.901)]
+2026-10-18 20:15:44.711716: Epoch time: 167.49 s
+2026-10-18 20:15:44.712037: Yayy! New best EMA pseudo Dice: 0.8903999924659729
+2026-10-18 20:15:46.539343: 
+2026-10-18 20:15:46.539777: Epoch 53
+2026-10-18 20:15:46.539964: Current learning rate: 0.00507
+2026-10-18 20:18:34.156594: train_loss -0.9535
+2026-10-18 20:18:34.157248: val_loss -0.7052
+2026-10-18 20:18:34.157481: Pseudo dice [np.float32(0.8898)]
+2026-10-18 20:18:34.157708: Epoch time: 167.62 s
+2026-10-18 20:18:35.609560: 
+2026-10-18 20:18:35.609893: Epoch 54
+2026-10-18 20:18:35.610124: Current learning rate: 0.00497
+2026-10-18 20:21:22.900232: train_loss -0.9502
+2026-10-18 20:21:22.900653: val_loss -0.707
+2026-10-18 20:21:22.900827: Pseudo dice [np.float32(0.8904)]
+2026-10-18 20:21:22.900980: Epoch time: 167.29 s
+2026-10-18 20:21:24.744529: 
+2026-10-18 20:21:24.744946: Epoch 55
+2026-10-18 20:21:24.745171: Current learning rate: 0.00487
+2026-10-18 20:24:12.131335: train_loss -0.9462
+2026-10-18 20:24:12.132017: val_loss -0.7213
+2026-10-18 20:24:12.132263: Pseudo dice [np.float32(0.8934)]
+2026-10-18 20:24:12.132420: Epoch time: 167.39 s
+2026-10-18 20:24:12.132540: Yayy! New best EMA pseudo Dice: 0.8906999826431274
+2026-10-18 20:24:13.873127: 
+2026-10-18 20:24:13.873407: Epoch 56
+2026-10-18 20:24:13.873650: Current learning rate: 0.00478
+2026-10-18 20:27:01.145180: train_loss -0.9503
+2026-10-18 20:27:01.146055: val_loss -0.7036
+2026-10-18 20:27:01.146469: Pseudo dice [np.float32(0.8905)]
+2026-10-18 20:27:01.146858: Epoch time: 167.27 s
+2026-10-18 20:27:02.604465: 
+2026-10-18 20:27:02.604843: Epoch 57
+2026-10-18 20:27:02.605086: Current learning rate: 0.00468
+2026-10-18 20:29:49.844053: train_loss -0.9543
+2026-10-18 20:29:49.844698: val_loss -0.7212
+2026-10-18 20:29:49.845031: Pseudo dice [np.float32(0.8961)]
+2026-10-18 20:29:49.845347: Epoch time: 167.24 s
+2026-10-18 20:29:49.845584: Yayy! New best EMA pseudo Dice: 0.8912000060081482
+2026-10-18 20:29:52.181046: 
+2026-10-18 20:29:52.181386: Epoch 58
+2026-10-18 20:29:52.181561: Current learning rate: 0.00458
+2026-10-18 20:32:39.427014: train_loss -0.9559
+2026-10-18 20:32:39.427694: val_loss -0.726
+2026-10-18 20:32:39.427992: Pseudo dice [np.float32(0.8944)]
+2026-10-18 20:32:39.428266: Epoch time: 167.25 s
+2026-10-18 20:32:39.428569: Yayy! New best EMA pseudo Dice: 0.8914999961853027
+2026-10-18 20:32:41.277494: 
+2026-10-18 20:32:41.277982: Epoch 59
+2026-10-18 20:32:41.278161: Current learning rate: 0.00448
+2026-10-18 20:35:28.451586: train_loss -0.956
+2026-10-18 20:35:28.452065: val_loss -0.7215
+2026-10-18 20:35:28.452217: Pseudo dice [np.float32(0.8951)]
+2026-10-18 20:35:28.452366: Epoch time: 167.18 s
+2026-10-18 20:35:28.868343: Yayy! New best EMA pseudo Dice: 0.8919000029563904
+2026-10-18 20:35:30.681299: 
+2026-10-18 20:35:30.681885: Epoch 60
+2026-10-18 20:35:30.682083: Current learning rate: 0.00438
+2026-10-18 20:38:17.959067: train_loss -0.9563
+2026-10-18 20:38:17.959584: val_loss -0.7053
+2026-10-18 20:38:17.959875: Pseudo dice [np.float32(0.8899)]
+2026-10-18 20:38:17.960190: Epoch time: 167.28 s
+2026-10-18 20:38:19.497191: 
+2026-10-18 20:38:19.497714: Epoch 61
+2026-10-18 20:38:19.498044: Current learning rate: 0.00429
+2026-10-18 20:41:06.747453: train_loss -0.9582
+2026-10-18 20:41:06.747905: val_loss -0.7013
+2026-10-18 20:41:06.748148: Pseudo dice [np.float32(0.8891)]
+2026-10-18 20:41:06.748574: Epoch time: 167.25 s
+2026-10-18 20:41:08.336099: 
+2026-10-18 20:41:08.336542: Epoch 62
+2026-10-18 20:41:08.336709: Current learning rate: 0.00419
+2026-10-18 20:43:55.408812: train_loss -0.9581
+2026-10-18 20:43:55.409258: val_loss -0.7054
+2026-10-18 20:43:55.409444: Pseudo dice [np.float32(0.8893)]
+2026-10-18 20:43:55.409600: Epoch time: 167.07 s
+2026-10-18 20:43:56.890698: 
+2026-10-18 20:43:56.891032: Epoch 63
+2026-10-18 20:43:56.891205: Current learning rate: 0.00409
+2026-10-18 20:46:44.053983: train_loss -0.9576
+2026-10-18 20:46:44.054782: val_loss -0.7389
+2026-10-18 20:46:44.055139: Pseudo dice [np.float32(0.8959)]
+2026-10-18 20:46:44.055524: Epoch time: 167.16 s
+2026-10-18 20:46:45.520070: 
+2026-10-18 20:46:45.520517: Epoch 64
+2026-10-18 20:46:45.520690: Current learning rate: 0.00399
+2026-10-18 20:49:32.692420: train_loss -0.9586
+2026-10-18 20:49:32.692993: val_loss -0.7147
+2026-10-18 20:49:32.693156: Pseudo dice [np.float32(0.8898)]
+2026-10-18 20:49:32.693354: Epoch time: 167.17 s
+2026-10-18 20:49:34.534630: 
+2026-10-18 20:49:34.534985: Epoch 65
+2026-10-18 20:49:34.535149: Current learning rate: 0.00389
+2026-10-18 20:52:21.921774: train_loss -0.9589
+2026-10-18 20:52:21.922267: val_loss -0.6984
+2026-10-18 20:52:21.922417: Pseudo dice [np.float32(0.8884)]
+2026-10-18 20:52:21.922551: Epoch time: 167.39 s
+2026-10-18 20:52:23.460092: 
+2026-10-18 20:52:23.460471: Epoch 66
+2026-10-18 20:52:23.460636: Current learning rate: 0.00379
+2026-10-18 20:55:10.761513: train_loss -0.9608
+2026-10-18 20:55:10.762079: val_loss -0.7051
+2026-10-18 20:55:10.762403: Pseudo dice [np.float32(0.8902)]
+2026-10-18 20:55:10.762725: Epoch time: 167.3 s
+2026-10-18 20:55:12.232519: 
+2026-10-18 20:55:12.232920: Epoch 67
+2026-10-18 20:55:12.233095: Current learning rate: 0.00369
+2026-10-18 20:57:59.655096: train_loss -0.9619
+2026-10-18 20:57:59.655551: val_loss -0.7096
+2026-10-18 20:57:59.655843: Pseudo dice [np.float32(0.8917)]
+2026-10-18 20:57:59.656186: Epoch time: 167.42 s
+2026-10-18 20:58:01.162839: 
+2026-10-18 20:58:01.163255: Epoch 68
+2026-10-18 20:58:01.163504: Current learning rate: 0.00359
+2026-10-18 21:00:48.454044: train_loss -0.962
+2026-10-18 21:00:48.454381: val_loss -0.6982
+2026-10-18 21:00:48.454528: Pseudo dice [np.float32(0.8933)]
+2026-10-18 21:00:48.454677: Epoch time: 167.29 s
+2026-10-18 21:00:49.932889: 
+2026-10-18 21:00:49.933312: Epoch 69
+2026-10-18 21:00:49.933533: Current learning rate: 0.00349
+2026-10-18 21:03:37.273028: train_loss -0.9626
+2026-10-18 21:03:37.273713: val_loss -0.7068
+2026-10-18 21:03:37.274066: Pseudo dice [np.float32(0.8938)]
+2026-10-18 21:03:37.274419: Epoch time: 167.34 s
+2026-10-18 21:03:39.102826: 
+2026-10-18 21:03:39.103253: Epoch 70
+2026-10-18 21:03:39.103540: Current learning rate: 0.00338
+2026-10-18 21:06:26.330915: train_loss -0.9626
+2026-10-18 21:06:26.331421: val_loss -0.7018
+2026-10-18 21:06:26.331627: Pseudo dice [np.float32(0.8892)]
+2026-10-18 21:06:26.331840: Epoch time: 167.23 s
+2026-10-18 21:06:27.874202: 
+2026-10-18 21:06:27.874665: Epoch 71
+2026-10-18 21:06:27.874899: Current learning rate: 0.00328
+2026-10-18 21:09:15.147399: train_loss -0.9622
+2026-10-18 21:09:15.147963: val_loss -0.6958
+2026-10-18 21:09:15.148421: Pseudo dice [np.float32(0.8903)]
+2026-10-18 21:09:15.148716: Epoch time: 167.27 s
+2026-10-18 21:09:16.653642: 
+2026-10-18 21:09:16.654055: Epoch 72
+2026-10-18 21:09:16.654268: Current learning rate: 0.00318
+2026-10-18 21:12:03.998855: train_loss -0.9626
+2026-10-18 21:12:03.999461: val_loss -0.7263
+2026-10-18 21:12:03.999804: Pseudo dice [np.float32(0.9021)]
+2026-10-18 21:12:04.000185: Epoch time: 167.35 s
+2026-10-18 21:12:04.000435: Yayy! New best EMA pseudo Dice: 0.892300009727478
+2026-10-18 21:12:05.773320: 
+2026-10-18 21:12:05.773720: Epoch 73
+2026-10-18 21:12:05.773948: Current learning rate: 0.00308
+2026-10-18 21:14:53.119488: train_loss -0.9634
+2026-10-18 21:14:53.119940: val_loss -0.6972
+2026-10-18 21:14:53.120328: Pseudo dice [np.float32(0.8919)]
+2026-10-18 21:14:53.120582: Epoch time: 167.35 s
+2026-10-18 21:14:54.615331: 
+2026-10-18 21:14:54.615839: Epoch 74
+2026-10-18 21:14:54.616011: Current learning rate: 0.00297
+2026-10-18 21:17:42.114255: train_loss -0.9636
+2026-10-18 21:17:42.114802: val_loss -0.6745
+2026-10-18 21:17:42.115163: Pseudo dice [np.float32(0.8858)]
+2026-10-18 21:17:42.115453: Epoch time: 167.5 s
+2026-10-18 21:17:43.979373: 
+2026-10-18 21:17:43.979727: Epoch 75
+2026-10-18 21:17:43.979964: Current learning rate: 0.00287
+2026-10-18 21:20:31.462249: train_loss -0.9625
+2026-10-18 21:20:31.462926: val_loss -0.6871
+2026-10-18 21:20:31.463126: Pseudo dice [np.float32(0.8881)]
+2026-10-18 21:20:31.463269: Epoch time: 167.48 s
+2026-10-18 21:20:32.929239: 
+2026-10-18 21:20:32.929675: Epoch 76
+2026-10-18 21:20:32.929930: Current learning rate: 0.00277
+2026-10-18 21:23:20.209773: train_loss -0.9616
+2026-10-18 21:23:20.211087: val_loss -0.7004
+2026-10-18 21:23:20.211459: Pseudo dice [np.float32(0.8957)]
+2026-10-18 21:23:20.211816: Epoch time: 167.28 s
+2026-10-18 21:23:21.706131: 
+2026-10-18 21:23:21.706535: Epoch 77
+2026-10-18 21:23:21.706696: Current learning rate: 0.00266
+2026-10-18 21:26:09.144395: train_loss -0.9642
+2026-10-18 21:26:09.145167: val_loss -0.7106
+2026-10-18 21:26:09.145513: Pseudo dice [np.float32(0.8978)]
+2026-10-18 21:26:09.145924: Epoch time: 167.44 s
+2026-10-18 21:26:09.146146: Yayy! New best EMA pseudo Dice: 0.892300009727478
+2026-10-18 21:26:11.055333: 
+2026-10-18 21:26:11.055733: Epoch 78
+2026-10-18 21:26:11.055981: Current learning rate: 0.00256
+2026-10-18 21:28:58.473181: train_loss -0.9641
+2026-10-18 21:28:58.473789: val_loss -0.7073
+2026-10-18 21:28:58.474017: Pseudo dice [np.float32(0.8938)]
+2026-10-18 21:28:58.474232: Epoch time: 167.42 s
+2026-10-18 21:28:58.474401: Yayy! New best EMA pseudo Dice: 0.8924999833106995
+2026-10-18 21:29:00.778647: 
+2026-10-18 21:29:00.779007: Epoch 79
+2026-10-18 21:29:00.779267: Current learning rate: 0.00245
+2026-10-18 21:31:48.193827: train_loss -0.9652
+2026-10-18 21:31:48.194483: val_loss -0.6919
+2026-10-18 21:31:48.194775: Pseudo dice [np.float32(0.8938)]
+2026-10-18 21:31:48.195077: Epoch time: 167.42 s
+2026-10-18 21:31:48.615612: Yayy! New best EMA pseudo Dice: 0.8925999999046326
+2026-10-18 21:31:50.531554: 
+2026-10-18 21:31:50.531991: Epoch 80
+2026-10-18 21:31:50.532273: Current learning rate: 0.00235
+2026-10-18 21:34:37.823003: train_loss -0.9657
+2026-10-18 21:34:37.823669: val_loss -0.709
+2026-10-18 21:34:37.824258: Pseudo dice [np.float32(0.8982)]
+2026-10-18 21:34:37.824584: Epoch time: 167.29 s
+2026-10-18 21:34:37.824908: Yayy! New best EMA pseudo Dice: 0.8931999802589417
+2026-10-18 21:34:39.854883: 
+2026-10-18 21:34:39.855269: Epoch 81
+2026-10-18 21:34:39.855453: Current learning rate: 0.00224
+2026-10-18 21:37:27.117177: train_loss -0.9652
+2026-10-18 21:37:27.117610: val_loss -0.7097
+2026-10-18 21:37:27.117846: Pseudo dice [np.float32(0.8916)]
+2026-10-18 21:37:27.118561: Epoch time: 167.26 s
+2026-10-18 21:37:28.607712: 
+2026-10-18 21:37:28.608126: Epoch 82
+2026-10-18 21:37:28.608294: Current learning rate: 0.00214
+2026-10-18 21:40:16.007617: train_loss -0.9656
+2026-10-18 21:40:16.008171: val_loss -0.7252
+2026-10-18 21:40:16.008392: Pseudo dice [np.float32(0.9017)]
+2026-10-18 21:40:16.008673: Epoch time: 167.4 s
+2026-10-18 21:40:16.008887: Yayy! New best EMA pseudo Dice: 0.8938999772071838
+2026-10-18 21:40:17.873078: 
+2026-10-18 21:40:17.873554: Epoch 83
+2026-10-18 21:40:17.873724: Current learning rate: 0.00203
+2026-10-18 21:43:05.098985: train_loss -0.9658
+2026-10-18 21:43:05.099654: val_loss -0.7194
+2026-10-18 21:43:05.100178: Pseudo dice [np.float32(0.9012)]
+2026-10-18 21:43:05.100554: Epoch time: 167.23 s
+2026-10-18 21:43:05.100879: Yayy! New best EMA pseudo Dice: 0.894599974155426
+2026-10-18 21:43:06.954387: 
+2026-10-18 21:43:06.954884: Epoch 84
+2026-10-18 21:43:06.955264: Current learning rate: 0.00192
+2026-10-18 21:45:54.266992: train_loss -0.9657
+2026-10-18 21:45:54.267699: val_loss -0.7116
+2026-10-18 21:45:54.268066: Pseudo dice [np.float32(0.8976)]
+2026-10-18 21:45:54.268381: Epoch time: 167.32 s
+2026-10-18 21:45:54.669276: Yayy! New best EMA pseudo Dice: 0.8949000239372253
+2026-10-18 21:45:56.540836: 
+2026-10-18 21:45:56.541232: Epoch 85
+2026-10-18 21:45:56.541537: Current learning rate: 0.00181
+2026-10-18 21:48:43.862938: train_loss -0.9661
+2026-10-18 21:48:43.863343: val_loss -0.7433
+2026-10-18 21:48:43.863505: Pseudo dice [np.float32(0.9049)]
+2026-10-18 21:48:43.863654: Epoch time: 167.33 s
+2026-10-18 21:48:43.863790: Yayy! New best EMA pseudo Dice: 0.8959000110626221
+2026-10-18 21:48:45.700894: 
+2026-10-18 21:48:45.701320: Epoch 86
+2026-10-18 21:48:45.701492: Current learning rate: 0.0017
+2026-10-18 21:51:32.983999: train_loss -0.966
+2026-10-18 21:51:32.984944: val_loss -0.6923
+2026-10-18 21:51:32.985269: Pseudo dice [np.float32(0.8906)]
+2026-10-18 21:51:32.985655: Epoch time: 167.28 s
+2026-10-18 21:51:34.412470: 
+2026-10-18 21:51:34.412828: Epoch 87
+2026-10-18 21:51:34.413037: Current learning rate: 0.00159
+2026-10-18 21:54:21.829151: train_loss -0.9663
+2026-10-18 21:54:21.829543: val_loss -0.708
+2026-10-18 21:54:21.829755: Pseudo dice [np.float32(0.8984)]
+2026-10-18 21:54:21.830008: Epoch time: 167.42 s
+2026-10-18 21:54:23.329487: 
+2026-10-18 21:54:23.329831: Epoch 88
+2026-10-18 21:54:23.330142: Current learning rate: 0.00148
+2026-10-18 21:57:10.717569: train_loss -0.9674
+2026-10-18 21:57:10.718082: val_loss -0.7114
+2026-10-18 21:57:10.718236: Pseudo dice [np.float32(0.8978)]
+2026-10-18 21:57:10.718388: Epoch time: 167.39 s
+2026-10-18 21:57:12.144087: 
+2026-10-18 21:57:12.144536: Epoch 89
+2026-10-18 21:57:12.144781: Current learning rate: 0.00137
+2026-10-18 21:59:59.407850: train_loss -0.9681
+2026-10-18 21:59:59.408264: val_loss -0.7128
+2026-10-18 21:59:59.408684: Pseudo dice [np.float32(0.8975)]
+2026-10-18 21:59:59.408941: Epoch time: 167.27 s
+2026-10-18 21:59:59.843613: Yayy! New best EMA pseudo Dice: 0.8960999846458435
+2026-10-18 22:00:01.687034: 
+2026-10-18 22:00:01.687446: Epoch 90
+2026-10-18 22:00:01.687631: Current learning rate: 0.00126
+2026-10-18 22:02:49.018537: train_loss -0.9684
+2026-10-18 22:02:49.019188: val_loss -0.6982
+2026-10-18 22:02:49.019381: Pseudo dice [np.float32(0.8934)]
+2026-10-18 22:02:49.019562: Epoch time: 167.33 s
+2026-10-18 22:02:50.401389: 
+2026-10-18 22:02:50.401886: Epoch 91
+2026-10-18 22:02:50.402061: Current learning rate: 0.00115
+2026-10-18 22:05:37.769170: train_loss -0.9686
+2026-10-18 22:05:37.772204: val_loss -0.7127
+2026-10-18 22:05:37.772474: Pseudo dice [np.float32(0.8982)]
+2026-10-18 22:05:37.772711: Epoch time: 167.37 s
+2026-10-18 22:05:39.303422: 
+2026-10-18 22:05:39.303712: Epoch 92
+2026-10-18 22:05:39.303955: Current learning rate: 0.00103
+2026-10-18 22:08:26.628608: train_loss -0.9692
+2026-10-18 22:08:26.629316: val_loss -0.7113
+2026-10-18 22:08:26.629636: Pseudo dice [np.float32(0.8984)]
+2026-10-18 22:08:26.629961: Epoch time: 167.33 s
+2026-10-18 22:08:26.630258: Yayy! New best EMA pseudo Dice: 0.8963000178337097
+2026-10-18 22:08:28.503507: 
+2026-10-18 22:08:28.503829: Epoch 93
+2026-10-18 22:08:28.504113: Current learning rate: 0.00091
+2026-10-18 22:11:15.914072: train_loss -0.9694
+2026-10-18 22:11:15.914606: val_loss -0.6935
+2026-10-18 22:11:15.915047: Pseudo dice [np.float32(0.8948)]
+2026-10-18 22:11:15.915472: Epoch time: 167.41 s
+2026-10-18 22:11:17.384558: 
+2026-10-18 22:11:17.384954: Epoch 94
+2026-10-18 22:11:17.385121: Current learning rate: 0.00079
+2026-10-18 22:14:04.743641: train_loss -0.9697
+2026-10-18 22:14:04.744243: val_loss -0.6933
+2026-10-18 22:14:04.744629: Pseudo dice [np.float32(0.8941)]
+2026-10-18 22:14:04.745088: Epoch time: 167.36 s
+2026-10-18 22:14:06.666960: 
+2026-10-18 22:14:06.667237: Epoch 95
+2026-10-18 22:14:06.667406: Current learning rate: 0.00067
+2026-10-18 22:16:54.013024: train_loss -0.9691
+2026-10-18 22:16:54.013544: val_loss -0.7108
+2026-10-18 22:16:54.013694: Pseudo dice [np.float32(0.8963)]
+2026-10-18 22:16:54.013926: Epoch time: 167.35 s
+2026-10-18 22:16:55.419178: 
+2026-10-18 22:16:55.419587: Epoch 96
+2026-10-18 22:16:55.419803: Current learning rate: 0.00055
+2026-10-18 22:19:42.804511: train_loss -0.9697
+2026-10-18 22:19:42.804920: val_loss -0.7207
+2026-10-18 22:19:42.805288: Pseudo dice [np.float32(0.9012)]
+2026-10-18 22:19:42.805465: Epoch time: 167.39 s
+2026-10-18 22:19:42.805587: Yayy! New best EMA pseudo Dice: 0.8964999914169312
+2026-10-18 22:19:44.451045: 
+2026-10-18 22:19:44.451293: Epoch 97
+2026-10-18 22:19:44.451506: Current learning rate: 0.00043
+2026-10-18 22:22:31.710006: train_loss -0.9695
+2026-10-18 22:22:31.710398: val_loss -0.692
+2026-10-18 22:22:31.710552: Pseudo dice [np.float32(0.8955)]
+2026-10-18 22:22:31.710702: Epoch time: 167.26 s
+2026-10-18 22:22:33.039331: 
+2026-10-18 22:22:33.039698: Epoch 98
+2026-10-18 22:22:33.039913: Current learning rate: 0.0003
+2026-10-18 22:25:20.215275: train_loss -0.9672
+2026-10-18 22:25:20.215780: val_loss -0.6944
+2026-10-18 22:25:20.216037: Pseudo dice [np.float32(0.8951)]
+2026-10-18 22:25:20.216214: Epoch time: 167.18 s
+2026-10-18 22:25:21.583628: 
+2026-10-18 22:25:21.584040: Epoch 99
+2026-10-18 22:25:21.584208: Current learning rate: 0.00016
+2026-10-18 22:28:08.802052: train_loss -0.97
+2026-10-18 22:28:08.802486: val_loss -0.7006
+2026-10-18 22:28:08.802642: Pseudo dice [np.float32(0.8939)]
+2026-10-18 22:28:08.802867: Epoch time: 167.22 s
+2026-10-18 22:28:11.035930: Training done.
+2026-10-18 22:28:11 | INFO    | nnU-Net training finished in 282.4 min (100 epochs x 250 iterations, batch size 44, patch [256, 256])
+2026-10-18 22:28:11 | INFO    | Stage 'nnunet_train' finished in 04:43:34
+2026-10-18 22:28:11 | INFO    | ####################################################################################################
+2026-10-18 22:28:11 | INFO    | STAGE: NNUNET_TEST
+There are 176 cases in the source folder
+I am process 0 out of 1 (max process ID is 0, we start counting with 0!)
+There are 176 cases that I would like to predict
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+2026-10-18 22:28:42 | INFO    | Loaded cached preprocessed KVASIR/test (120 samples) from KVASIR_test_256x256_f6bcab0728730d19d59a2045.npz
+2026-10-18 22:28:42 | INFO    | Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA (+ nnU-Net's mirroring TTA reported separately)
+There are 120 cases in the source folder
+I am process 0 out of 1 (max process ID is 0, we start counting with 0!)
+There are 120 cases that I would like to predict
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+There are 120 cases in the source folder
+I am process 0 out of 1 (max process ID is 0, we start counting with 0!)
+There are 120 cases that I would like to predict
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+2026-10-18 22:29:33 | INFO    | TEST | nnU-Net | Dice (DSC) 0.8705 | mIoU 0.8738 | HD95 28.12 px | Sensitivity 0.9034 | Params 33.472 M | 10.86 ms/image | with mirroring TTA: Dice 0.8765
+2026-10-18 22:29:33 | INFO    | Stage 'nnunet_test' finished in 00:01:23
+2026-10-18 22:29:33 | INFO    | ####################################################################################################
+2026-10-18 22:29:33 | INFO    | STAGE: REPORT
+2026-10-18 22:29:33 | INFO    | Stage 'report' finished in 00:00:00
+================ nnU-Net RESULT ================
+
+Dataset: KVASIR
+Method: nnU-Net — baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split
+Seed: 47
+
+Training: 100 epochs x 250 iterations, batch size 44, patch [256, 256]
+Validation Dice (final checkpoint): 0.8935
+
+Final test (n = 120, evaluated once, no TTA):
+Dice (DSC):        87.05 %
+mIoU (class mean): 87.38 %
+Params:            33.472 M
+FLOPs:             133.82 G per batch of 8 (16.73 G per image)
+HD95:              28.12 px
+Sensitivity:       90.34 %
+IoU (foreground):  80.12 %
+Inference:         10.86 ms per image on cuda
+Dice with nnU-Net mirroring TTA: 87.65 %
+
+================================================
+
+2026-10-18 22:29:33 | INFO    | QENAS time on KVASIR (nnunet, seed 47): 04:46:01 from start to end (all stages) | this session: 04:46:07
+2026-10-18 22:29:57 | INFO    |   preprocessing CVC/all: 122/612 | Progress:  19.9% | Elapsed: 00:00:01 | ETA: 00:00:05
+2026-10-18 22:29:58 | INFO    |   preprocessing CVC/all: 244/612 | Progress:  39.9% | Elapsed: 00:00:03 | ETA: 00:00:04
+2026-10-18 22:30:00 | INFO    |   preprocessing CVC/all: 366/612 | Progress:  59.8% | Elapsed: 00:00:04 | ETA: 00:00:03
+2026-10-18 22:30:01 | INFO    |   preprocessing CVC/all: 488/612 | Progress:  79.7% | Elapsed: 00:00:05 | ETA: 00:00:01
+2026-10-18 22:30:02 | INFO    |   preprocessing CVC/all: 610/612 | Progress:  99.7% | Elapsed: 00:00:07 | ETA: 00:00:00
+2026-10-18 22:30:02 | INFO    |   preprocessing CVC/all: 612/612 | Progress: 100.0% | Elapsed: 00:00:07 | ETA: 00:00:00
+There are 612 cases in the source folder
+I am process 0 out of 1 (max process ID is 0, we start counting with 0!)
+There are 612 cases that I would like to predict
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+2026-10-18 22:31:45 | INFO    | EXTERNAL KVASIR -> CVC | nnunet seed 47 | Dice 0.8088 | mIoU 0.8418 | HD95 35.14 px | Sensitivity 0.8557

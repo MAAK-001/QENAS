@@ -1,0 +1,22 @@
+================ nnU-Net RESULT ================
+
+Dataset: BUSI
+Method: nnU-Net — baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split
+Seed: 47
+
+Training: 100 epochs x 250 iterations, batch size 26, patch [256, 256]
+Validation Dice (final checkpoint): 0.7947
+
+Final test (n = 129, evaluated once, no TTA):
+Dice (DSC):        79.00 %
+mIoU (class mean): 82.83 %
+Params:            33.472 M
+FLOPs:             133.82 G per batch of 8 (16.73 G per image)
+HD95:              28.74 px
+Sensitivity:       81.42 %
+IoU (foreground):  70.75 %
+Inference:         19.90 ms per image on cuda
+Dice with nnU-Net mirroring TTA: 79.69 %
+
+================================================
+QENAS time on BUSI (nnunet, seed 47): 03:04:44 from start to end (all stages) | this session: 03:04:45

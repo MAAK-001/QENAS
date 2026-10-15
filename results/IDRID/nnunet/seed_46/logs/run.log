@@ -1,0 +1,47 @@
+2026-10-17 00:28:19 | INFO    | QENAS | dataset IDRID | method nnunet | seed 46 | experiment /kaggle/working/QENAS_results/results/IDRID/nnunet/seed_46 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint 7c48292d24d5c1f3
+2026-10-17 00:28:19 | INFO    | Method nnunet (baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split) | stages: split -> nnunet_data -> nnunet_train -> nnunet_test -> report
+2026-10-17 00:28:19 | INFO    | ####################################################################################################
+2026-10-17 00:28:19 | INFO    | STAGE: SPLIT
+2026-10-17 00:28:57 | INFO    | Dataset structure: official train/test folders; one TIF mask per lesion type (absent file = lesion absent)
+2026-10-17 00:28:57 | INFO    | 
+IDRID
+Train: 43
+Validation: 11
+Test: 27
+2026-10-17 00:28:57 | INFO    | Stage 'split' finished in 00:00:38
+2026-10-17 00:28:57 | INFO    | ####################################################################################################
+2026-10-17 00:28:57 | INFO    | STAGE: NNUNET_DATA
+2026-10-17 00:29:02 | INFO    |   preprocessing IDRID/train: 8/43 | Progress:  18.6% | Elapsed: 00:00:05 | ETA: 00:00:21
+2026-10-17 00:29:07 | INFO    |   preprocessing IDRID/train: 16/43 | Progress:  37.2% | Elapsed: 00:00:09 | ETA: 00:00:16
+2026-10-17 00:29:12 | INFO    |   preprocessing IDRID/train: 24/43 | Progress:  55.8% | Elapsed: 00:00:15 | ETA: 00:00:12
+2026-10-17 00:29:17 | INFO    |   preprocessing IDRID/train: 32/43 | Progress:  74.4% | Elapsed: 00:00:19 | ETA: 00:00:07
+2026-10-17 00:29:21 | INFO    |   preprocessing IDRID/train: 40/43 | Progress:  93.0% | Elapsed: 00:00:24 | ETA: 00:00:02
+2026-10-17 00:29:23 | INFO    |   preprocessing IDRID/train: 43/43 | Progress: 100.0% | Elapsed: 00:00:26 | ETA: 00:00:00
+2026-10-17 00:29:25 | INFO    |   preprocessing IDRID/val: 2/11 | Progress:  18.2% | Elapsed: 00:00:01 | ETA: 00:00:05
+2026-10-17 00:29:26 | INFO    |   preprocessing IDRID/val: 4/11 | Progress:  36.4% | Elapsed: 00:00:02 | ETA: 00:00:04
+2026-10-17 00:29:27 | INFO    |   preprocessing IDRID/val: 6/11 | Progress:  54.5% | Elapsed: 00:00:03 | ETA: 00:00:03
+2026-10-17 00:29:28 | INFO    |   preprocessing IDRID/val: 8/11 | Progress:  72.7% | Elapsed: 00:00:04 | ETA: 00:00:02
+2026-10-17 00:29:29 | INFO    |   preprocessing IDRID/val: 10/11 | Progress:  90.9% | Elapsed: 00:00:06 | ETA: 00:00:01
+2026-10-17 00:29:30 | INFO    |   preprocessing IDRID/val: 11/11 | Progress: 100.0% | Elapsed: 00:00:06 | ETA: 00:00:00
+2026-10-17 00:29:30 | INFO    | Data ready: train 43, validation 11 (test held out) | normalisation mean [0.4571, 0.2219, 0.0631] std [0.3224, 0.166, 0.0849]
+2026-10-17 00:29:35 | INFO    | nnU-Net raw dataset Dataset903_IDRID: 43 training + 11 validation cases (320x512 PNG)
+2026-10-17 00:29:35 | INFO    | Stage 'nnunet_data' finished in 00:00:38
+2026-10-17 00:29:35 | INFO    | ####################################################################################################
+2026-10-17 00:29:35 | INFO    | STAGE: NNUNET_TRAIN
+2026-10-17 01:38:37 | INFO    | nnU-Net training finished in 68.3 min (100 epochs x 250 iterations, batch size 3, patch [320, 512])
+2026-10-17 01:38:37 | INFO    | Stage 'nnunet_train' finished in 01:09:02
+2026-10-17 01:38:37 | INFO    | ####################################################################################################
+2026-10-17 01:38:37 | INFO    | STAGE: NNUNET_TEST
+2026-10-17 01:38:47 | INFO    |   preprocessing IDRID/test: 5/27 | Progress:  18.5% | Elapsed: 00:00:03 | ETA: 00:00:12
+2026-10-17 01:38:49 | INFO    |   preprocessing IDRID/test: 10/27 | Progress:  37.0% | Elapsed: 00:00:05 | ETA: 00:00:09
+2026-10-17 01:38:52 | INFO    |   preprocessing IDRID/test: 15/27 | Progress:  55.6% | Elapsed: 00:00:08 | ETA: 00:00:07
+2026-10-17 01:38:55 | INFO    |   preprocessing IDRID/test: 20/27 | Progress:  74.1% | Elapsed: 00:00:11 | ETA: 00:00:04
+2026-10-17 01:38:57 | INFO    |   preprocessing IDRID/test: 25/27 | Progress:  92.6% | Elapsed: 00:00:13 | ETA: 00:00:01
+2026-10-17 01:38:59 | INFO    |   preprocessing IDRID/test: 27/27 | Progress: 100.0% | Elapsed: 00:00:14 | ETA: 00:00:00
+2026-10-17 01:38:59 | INFO    | Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA (+ nnU-Net's mirroring TTA reported separately)
+2026-10-17 01:39:31 | INFO    | TEST | nnU-Net | Dice (DSC) 0.9602 | mIoU 0.9618 | HD95 9.12 px | Sensitivity 0.9625 | Params 33.472 M | 14.92 ms/image | with mirroring TTA: Dice 0.9596
+2026-10-17 01:39:31 | INFO    | Stage 'nnunet_test' finished in 00:00:54
+2026-10-17 01:39:31 | INFO    | ####################################################################################################
+2026-10-17 01:39:31 | INFO    | STAGE: REPORT
+2026-10-17 01:39:31 | INFO    | Stage 'report' finished in 00:00:00
+2026-10-17 01:39:31 | INFO    | QENAS time on IDRID (nnunet, seed 46): 01:11:12 from start to end (all stages) | this session: 01:11:14

@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: CVC
+Method: QENAS — QENAS: NSGA-II on (params, ZiCo) + successive-halving learning-capability selection
+Seed: 46
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 217
+Hypervolume: 0.6501 (generation 0) -> 1.1220 (final)
+Final Pareto front size: 7
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [2, 0, 4, 4, 4, 4, 1, 2]
+Block sequence: ['Inception', 'Residual', 'DARTS', 'DARTS', 'DARTS', 'DARTS', 'Dense', 'Inception']
+ZiCo: 674.566
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.4988, 10 ep 0.6006, 20 ep 0.6870
+Selection: Candidate 8 selected: highest mean validation Dice over the last 5 of 20 epochs among the 4 eligible of 4 successive-halving finalists (0.6870; ΔLoss 0.0891, Dice trend tau 0.52, p=0.00055).
+
+Loss coefficients:
+alpha (BCE): 0.400   beta (soft-mIoU): 0.600
+
+Final training:
+Epochs run: 62 (best epoch 32) — overfitting: val Dice not improved for 30 epochs (best epoch 32); val loss increasing (Kendall tau=0.27, p=0.0492) while train loss decreasing (tau=-0.60, p=5.13e-05) over the last 20 epochs
+Best validation Dice: 0.7660   mIoU: 0.7980   HD95: 36.95 px
+
+Final test (n = 121, evaluated once):
+Dice (DSC):        69.34 %
+mIoU (class mean): 76.49 %
+Params:            0.627 M
+FLOPs:             25.04 G per batch of 8 (Mixed-GGNAS convention; 3.13 G per image)
+HD95:              58.68 px
+Sensitivity:       79.05 %
+IoU (foreground):  58.02 %
+Inference:         17.55 ms per image on cuda
+Test loss:         0.2140
+
+================================================
+QENAS time on CVC (qenas, seed 46): 01:29:17 from start to end (all stages) | this session: 01:29:19

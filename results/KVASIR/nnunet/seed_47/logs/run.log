@@ -1,0 +1,49 @@
+2026-10-18 17:43:32 | INFO    | QENAS | dataset KVASIR | method nnunet | seed 47 | experiment /kaggle/working/QENAS_results/results/KVASIR/nnunet/seed_47 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint 68ed2202b6bea788
+2026-10-18 17:43:32 | INFO    | Method nnunet (baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split) | stages: split -> nnunet_data -> nnunet_train -> nnunet_test -> report
+2026-10-18 17:43:32 | INFO    | ####################################################################################################
+2026-10-18 17:43:32 | INFO    | STAGE: SPLIT
+2026-10-18 17:43:55 | INFO    | Dataset structure: images/<id>.jpg paired with masks/<id>.jpg (JPEG masks, binarised); official train.txt / val.txt
+2026-10-18 17:43:55 | INFO    | 
+KVASIR
+Train: 704
+Validation: 176
+Test: 120
+2026-10-18 17:43:55 | INFO    | Stage 'split' finished in 00:00:23
+2026-10-18 17:43:55 | INFO    | ####################################################################################################
+2026-10-18 17:43:55 | INFO    | STAGE: NNUNET_DATA
+2026-10-18 17:43:57 | INFO    |   preprocessing KVASIR/train: 140/704 | Progress:  19.9% | Elapsed: 00:00:01 | ETA: 00:00:05
+2026-10-18 17:43:58 | INFO    |   preprocessing KVASIR/train: 280/704 | Progress:  39.8% | Elapsed: 00:00:02 | ETA: 00:00:04
+2026-10-18 17:43:59 | INFO    |   preprocessing KVASIR/train: 420/704 | Progress:  59.7% | Elapsed: 00:00:04 | ETA: 00:00:02
+2026-10-18 17:44:00 | INFO    |   preprocessing KVASIR/train: 560/704 | Progress:  79.5% | Elapsed: 00:00:05 | ETA: 00:00:01
+2026-10-18 17:44:01 | INFO    |   preprocessing KVASIR/train: 700/704 | Progress:  99.4% | Elapsed: 00:00:06 | ETA: 00:00:00
+2026-10-18 17:44:01 | INFO    |   preprocessing KVASIR/train: 704/704 | Progress: 100.0% | Elapsed: 00:00:06 | ETA: 00:00:00
+2026-10-18 17:44:07 | INFO    |   preprocessing KVASIR/val: 35/176 | Progress:  19.9% | Elapsed: 00:00:00 | ETA: 00:00:01
+2026-10-18 17:44:07 | INFO    |   preprocessing KVASIR/val: 70/176 | Progress:  39.8% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-18 17:44:07 | INFO    |   preprocessing KVASIR/val: 105/176 | Progress:  59.7% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-18 17:44:08 | INFO    |   preprocessing KVASIR/val: 140/176 | Progress:  79.5% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-18 17:44:08 | INFO    |   preprocessing KVASIR/val: 175/176 | Progress:  99.4% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-18 17:44:08 | INFO    |   preprocessing KVASIR/val: 176/176 | Progress: 100.0% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-18 17:44:11 | INFO    | Data ready: train 704, validation 176 (test held out) | normalisation mean [0.5591, 0.3216, 0.2354] std [0.3159, 0.2188, 0.1845]
+2026-10-18 17:44:36 | INFO    | nnU-Net raw dataset Dataset904_KVASIR: 704 training + 176 validation cases (256x256 PNG)
+2026-10-18 17:44:36 | INFO    | Stage 'nnunet_data' finished in 00:00:41
+2026-10-18 17:44:36 | INFO    | ####################################################################################################
+2026-10-18 17:44:36 | INFO    | STAGE: NNUNET_TRAIN
+2026-10-18 22:28:11 | INFO    | nnU-Net training finished in 282.4 min (100 epochs x 250 iterations, batch size 44, patch [256, 256])
+2026-10-18 22:28:11 | INFO    | Stage 'nnunet_train' finished in 04:43:34
+2026-10-18 22:28:11 | INFO    | ####################################################################################################
+2026-10-18 22:28:11 | INFO    | STAGE: NNUNET_TEST
+2026-10-18 22:28:42 | INFO    | Loaded cached preprocessed KVASIR/test (120 samples) from KVASIR_test_256x256_f6bcab0728730d19d59a2045.npz
+2026-10-18 22:28:42 | INFO    | Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA (+ nnU-Net's mirroring TTA reported separately)
+2026-10-18 22:29:33 | INFO    | TEST | nnU-Net | Dice (DSC) 0.8705 | mIoU 0.8738 | HD95 28.12 px | Sensitivity 0.9034 | Params 33.472 M | 10.86 ms/image | with mirroring TTA: Dice 0.8765
+2026-10-18 22:29:33 | INFO    | Stage 'nnunet_test' finished in 00:01:23
+2026-10-18 22:29:33 | INFO    | ####################################################################################################
+2026-10-18 22:29:33 | INFO    | STAGE: REPORT
+2026-10-18 22:29:33 | INFO    | Stage 'report' finished in 00:00:00
+2026-10-18 22:29:33 | INFO    | QENAS time on KVASIR (nnunet, seed 47): 04:46:01 from start to end (all stages) | this session: 04:46:07
+2026-10-18 22:29:57 | INFO    |   preprocessing CVC/all: 122/612 | Progress:  19.9% | Elapsed: 00:00:01 | ETA: 00:00:05
+2026-10-18 22:29:58 | INFO    |   preprocessing CVC/all: 244/612 | Progress:  39.9% | Elapsed: 00:00:03 | ETA: 00:00:04
+2026-10-18 22:30:00 | INFO    |   preprocessing CVC/all: 366/612 | Progress:  59.8% | Elapsed: 00:00:04 | ETA: 00:00:03
+2026-10-18 22:30:01 | INFO    |   preprocessing CVC/all: 488/612 | Progress:  79.7% | Elapsed: 00:00:05 | ETA: 00:00:01
+2026-10-18 22:30:02 | INFO    |   preprocessing CVC/all: 610/612 | Progress:  99.7% | Elapsed: 00:00:07 | ETA: 00:00:00
+2026-10-18 22:30:02 | INFO    |   preprocessing CVC/all: 612/612 | Progress: 100.0% | Elapsed: 00:00:07 | ETA: 00:00:00
+2026-10-18 22:31:45 | INFO    | EXTERNAL KVASIR -> CVC | nnunet seed 47 | Dice 0.8088 | mIoU 0.8418 | HD95 35.14 px | Sensitivity 0.8557

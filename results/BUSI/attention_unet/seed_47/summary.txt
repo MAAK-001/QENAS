@@ -1,0 +1,28 @@
+================ QENAS RESULT ================
+
+Dataset: BUSI
+Method: Attention U-Net — baseline: Attention U-Net (Oktay et al. 2018), 8.73 M parameters as in the Mixed-GGNAS tables
+Seed: 47
+
+Architecture: Attention U-Net (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.200   beta (soft-mIoU): 0.800
+
+Final training:
+Epochs run: 120 (best epoch 102)
+Best validation Dice: 0.7509   mIoU: 0.8080   HD95: 46.23 px
+
+Final test (n = 129, evaluated once):
+Dice (DSC):        74.18 %
+mIoU (class mean): 80.32 %
+Params:            8.726 M
+FLOPs:             133.92 G per batch of 8 (Mixed-GGNAS convention; 16.74 G per image)
+HD95:              50.96 px  (5 empty predictions scored as the image diagonal)
+Sensitivity:       75.37 %
+IoU (foreground):  66.07 %
+Inference:         8.72 ms per image on cuda
+Test loss:         0.2162
+
+================================================
+QENAS time on BUSI (attention_unet, seed 47): 00:37:15 from start to end (all stages) | this session: 00:37:16

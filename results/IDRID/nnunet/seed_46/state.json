@@ -1,0 +1,53 @@
+{
+  "fingerprint": "7c48292d24d5c1f3",
+  "created": "2026-10-17T00:28:18",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-17T00:28:57",
+      "train": 43,
+      "val": 11,
+      "test": 27,
+      "seconds": 37.9
+    },
+    "nnunet_data": {
+      "status": "done",
+      "finished": "2026-10-17T00:29:35",
+      "train": 43,
+      "val": 11,
+      "seconds": 38.3
+    },
+    "nnunet_train": {
+      "status": "done",
+      "finished": "2026-10-17T01:38:37",
+      "num_epochs": 100,
+      "iterations_per_epoch": 250,
+      "batch_size": 3,
+      "patch_size": [
+        320,
+        512
+      ],
+      "seconds": 4141.7
+    },
+    "nnunet_test": {
+      "status": "done",
+      "finished": "2026-10-17T01:39:31",
+      "test_dice": 0.9601693495178913,
+      "test_dice_mirroring_tta": 0.9595748792224754,
+      "seconds": 54.0
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-17T01:39:31",
+      "seconds": 0.0
+    }
+  },
+  "test_evaluated": true,
+  "method": "nnunet",
+  "dataset": "IDRID",
+  "seed": 46,
+  "updated": "2026-10-17T01:39:31",
+  "test_evaluated_at": "2026-10-17T01:39:23",
+  "total_seconds": 4271.9
+}

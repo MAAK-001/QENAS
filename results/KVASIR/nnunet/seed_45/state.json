@@ -1,0 +1,53 @@
+{
+  "fingerprint": "06cfe67487ffda58",
+  "created": "2026-10-16T06:11:44",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-16T06:12:08",
+      "train": 704,
+      "val": 176,
+      "test": 120,
+      "seconds": 17.2
+    },
+    "nnunet_data": {
+      "status": "done",
+      "finished": "2026-10-16T06:12:50",
+      "train": 704,
+      "val": 176,
+      "seconds": 42.2
+    },
+    "nnunet_train": {
+      "status": "done",
+      "finished": "2026-10-16T10:44:32",
+      "num_epochs": 100,
+      "iterations_per_epoch": 250,
+      "batch_size": 44,
+      "patch_size": [
+        256,
+        256
+      ],
+      "seconds": 16302.3
+    },
+    "nnunet_test": {
+      "status": "done",
+      "finished": "2026-10-16T10:46:06",
+      "test_dice": 0.8848192185156977,
+      "test_dice_mirroring_tta": 0.890899155859655,
+      "seconds": 93.4
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-16T10:46:06",
+      "seconds": 0.0
+    }
+  },
+  "test_evaluated": true,
+  "method": "nnunet",
+  "dataset": "KVASIR",
+  "seed": 45,
+  "updated": "2026-10-16T10:46:06",
+  "test_evaluated_at": "2026-10-16T10:46:01",
+  "total_seconds": 16455.1
+}

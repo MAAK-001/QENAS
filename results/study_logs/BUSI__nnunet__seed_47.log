@@ -1,0 +1,1213 @@
+2026-10-17 14:23:50 | INFO    | QENAS | dataset BUSI | method nnunet | seed 47 | experiment /kaggle/working/QENAS_results/results/BUSI/nnunet/seed_47 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint e379040fc4bb933b
+2026-10-17 14:23:50 | INFO    | Method nnunet (baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split) | stages: split -> nnunet_data -> nnunet_train -> nnunet_test -> report
+2026-10-17 14:23:50 | INFO    | ####################################################################################################
+2026-10-17 14:23:50 | INFO    | STAGE: SPLIT
+2026-10-17 14:23:57 | WARNING | BUSI exact duplicate ['benign/benign (433)', 'malignant/malignant (145)'] -> excluded all copies (conflicting masks/labels)
+2026-10-17 14:24:02 | INFO    | Dataset structure: class folders; masks '<stem>_mask[_k].png' (union of all masks per image)
+2026-10-17 14:24:02 | INFO    | 
+BUSI
+Train: 413
+Validation: 103
+Test: 129
+2026-10-17 14:24:02 | INFO    | Stage 'split' finished in 00:00:12
+2026-10-17 14:24:02 | INFO    | ####################################################################################################
+2026-10-17 14:24:02 | INFO    | STAGE: NNUNET_DATA
+2026-10-17 14:24:03 | INFO    | Loaded cached preprocessed BUSI/train (413 samples) from BUSI_train_256x256_cc2659c624a4af2aefb35328.npz
+2026-10-17 14:24:03 | INFO    | Loaded cached preprocessed BUSI/val (103 samples) from BUSI_val_256x256_e48eef9e064d813df9cc2544.npz
+2026-10-17 14:24:04 | INFO    | Data ready: train 413, validation 103 (test held out) | normalisation mean [0.3298, 0.3298, 0.3297] std [0.2205, 0.2205, 0.2205]
+2026-10-17 14:24:15 | INFO    | nnU-Net raw dataset Dataset901_BUSI: 413 training + 103 validation cases (256x256 PNG)
+2026-10-17 14:24:15 | INFO    | Stage 'nnunet_data' finished in 00:00:13
+2026-10-17 14:24:15 | INFO    | ####################################################################################################
+2026-10-17 14:24:15 | INFO    | STAGE: NNUNET_TRAIN
+Dataset901_BUSI
+Using <class 'nnunetv2.imageio.natural_image_reader_writer.NaturalImage2DIO'> as reader/writer
+
+####################
+verify_dataset_integrity Done. 
+If you didn't see any error messages then your dataset is most likely OK!
+####################
+
+Using <class 'nnunetv2.imageio.natural_image_reader_writer.NaturalImage2DIO'> as reader/writer
+Extracting dataset fingerprint:   0%|          | 0/516 [00:00<?, ?it/s]Extracting dataset fingerprint:   0%|          | 1/516 [00:03<30:10,  3.52s/it]Extracting dataset fingerprint:   1%|          | 3/516 [00:03<08:07,  1.05it/s]Extracting dataset fingerprint:   2%|▏         | 9/516 [00:03<02:01,  4.16it/s]Extracting dataset fingerprint:   3%|▎         | 16/516 [00:03<00:57,  8.76it/s]Extracting dataset fingerprint:   4%|▍         | 22/516 [00:03<00:36, 13.41it/s]Extracting dataset fingerprint:   6%|▌         | 29/516 [00:04<00:24, 19.89it/s]Extracting dataset fingerprint:   7%|▋         | 35/516 [00:04<00:18, 25.42it/s]Extracting dataset fingerprint:   8%|▊         | 41/516 [00:04<00:15, 31.16it/s]Extracting dataset fingerprint:   9%|▉         | 47/516 [00:04<00:12, 36.68it/s]Extracting dataset fingerprint:  10%|█         | 53/516 [00:04<00:11, 41.38it/s]Extracting dataset fingerprint:  11%|█▏        | 59/516 [00:04<00:10, 45.17it/s]Extracting dataset fingerprint:  13%|█▎        | 65/516 [00:04<00:09, 48.77it/s]Extracting dataset fingerprint:  14%|█▍        | 71/516 [00:04<00:08, 51.27it/s]Extracting dataset fingerprint:  15%|█▍        | 77/516 [00:04<00:08, 53.51it/s]Extracting dataset fingerprint:  16%|█▌        | 83/516 [00:04<00:07, 55.16it/s]Extracting dataset fingerprint:  17%|█▋        | 89/516 [00:05<00:07, 55.65it/s]Extracting dataset fingerprint:  18%|█▊        | 95/516 [00:05<00:07, 56.76it/s]Extracting dataset fingerprint:  20%|█▉        | 101/516 [00:05<00:07, 57.54it/s]Extracting dataset fingerprint:  21%|██        | 107/516 [00:05<00:09, 44.69it/s]Extracting dataset fingerprint:  22%|██▏       | 113/516 [00:05<00:08, 48.32it/s]Extracting dataset fingerprint:  23%|██▎       | 119/516 [00:05<00:07, 50.99it/s]Extracting dataset fingerprint:  24%|██▍       | 125/516 [00:05<00:07, 53.13it/s]Extracting dataset fingerprint:  25%|██▌       | 131/516 [00:05<00:07, 54.87it/s]Extracting dataset fingerprint:  27%|██▋       | 137/516 [00:05<00:06, 56.12it/s]Extracting dataset fingerprint:  28%|██▊       | 143/516 [00:06<00:06, 57.10it/s]Extracting dataset fingerprint:  29%|██▉       | 149/516 [00:06<00:06, 57.79it/s]Extracting dataset fingerprint:  30%|███       | 155/516 [00:06<00:06, 58.34it/s]Extracting dataset fingerprint:  31%|███       | 161/516 [00:06<00:06, 58.58it/s]Extracting dataset fingerprint:  32%|███▏      | 167/516 [00:06<00:05, 58.91it/s]Extracting dataset fingerprint:  34%|███▎      | 173/516 [00:06<00:05, 59.04it/s]Extracting dataset fingerprint:  35%|███▍      | 179/516 [00:06<00:05, 59.26it/s]Extracting dataset fingerprint:  36%|███▌      | 185/516 [00:06<00:05, 59.38it/s]Extracting dataset fingerprint:  37%|███▋      | 191/516 [00:06<00:07, 45.67it/s]Extracting dataset fingerprint:  38%|███▊      | 198/516 [00:07<00:06, 50.99it/s]Extracting dataset fingerprint:  40%|███▉      | 204/516 [00:07<00:05, 53.06it/s]Extracting dataset fingerprint:  41%|████      | 210/516 [00:07<00:05, 54.75it/s]Extracting dataset fingerprint:  42%|████▏     | 216/516 [00:07<00:05, 56.11it/s]Extracting dataset fingerprint:  43%|████▎     | 222/516 [00:07<00:05, 57.07it/s]Extracting dataset fingerprint:  44%|████▍     | 228/516 [00:07<00:04, 57.67it/s]Extracting dataset fingerprint:  45%|████▌     | 234/516 [00:07<00:04, 58.25it/s]Extracting dataset fingerprint:  47%|████▋     | 240/516 [00:07<00:04, 58.63it/s]Extracting dataset fingerprint:  48%|████▊     | 246/516 [00:07<00:04, 58.72it/s]Extracting dataset fingerprint:  49%|████▉     | 252/516 [00:07<00:04, 58.90it/s]Extracting dataset fingerprint:  50%|█████     | 258/516 [00:08<00:04, 58.91it/s]Extracting dataset fingerprint:  51%|█████     | 264/516 [00:08<00:04, 59.14it/s]Extracting dataset fingerprint:  52%|█████▏    | 270/516 [00:08<00:04, 59.13it/s]Extracting dataset fingerprint:  53%|█████▎    | 276/516 [00:08<00:04, 59.19it/s]Extracting dataset fingerprint:  55%|█████▍    | 282/516 [00:08<00:03, 59.36it/s]Extracting dataset fingerprint:  56%|█████▌    | 288/516 [00:08<00:03, 59.29it/s]Extracting dataset fingerprint:  57%|█████▋    | 294/516 [00:08<00:03, 59.35it/s]Extracting dataset fingerprint:  58%|█████▊    | 300/516 [00:08<00:03, 59.41it/s]Extracting dataset fingerprint:  59%|█████▉    | 306/516 [00:08<00:03, 59.18it/s]Extracting dataset fingerprint:  60%|██████    | 312/516 [00:08<00:03, 59.29it/s]Extracting dataset fingerprint:  62%|██████▏   | 318/516 [00:09<00:03, 59.04it/s]Extracting dataset fingerprint:  63%|██████▎   | 324/516 [00:09<00:03, 59.23it/s]Extracting dataset fingerprint:  64%|██████▍   | 330/516 [00:09<00:04, 45.71it/s]Extracting dataset fingerprint:  65%|██████▌   | 336/516 [00:09<00:03, 49.12it/s]Extracting dataset fingerprint:  66%|██████▋   | 342/516 [00:09<00:03, 51.89it/s]Extracting dataset fingerprint:  67%|██████▋   | 348/516 [00:09<00:03, 54.02it/s]Extracting dataset fingerprint:  69%|██████▊   | 354/516 [00:09<00:02, 55.06it/s]Extracting dataset fingerprint:  70%|██████▉   | 360/516 [00:09<00:02, 56.38it/s]Extracting dataset fingerprint:  71%|███████   | 366/516 [00:10<00:02, 57.37it/s]Extracting dataset fingerprint:  72%|███████▏  | 372/516 [00:10<00:02, 58.06it/s]Extracting dataset fingerprint:  73%|███████▎  | 378/516 [00:10<00:02, 58.46it/s]Extracting dataset fingerprint:  74%|███████▍  | 384/516 [00:10<00:02, 58.66it/s]Extracting dataset fingerprint:  76%|███████▌  | 390/516 [00:10<00:02, 45.53it/s]Extracting dataset fingerprint:  77%|███████▋  | 396/516 [00:10<00:02, 49.03it/s]Extracting dataset fingerprint:  78%|███████▊  | 402/516 [00:10<00:02, 51.77it/s]Extracting dataset fingerprint:  79%|███████▉  | 408/516 [00:10<00:02, 53.83it/s]Extracting dataset fingerprint:  80%|████████  | 414/516 [00:10<00:01, 55.19it/s]Extracting dataset fingerprint:  81%|████████▏ | 420/516 [00:11<00:01, 56.37it/s]Extracting dataset fingerprint:  83%|████████▎ | 426/516 [00:11<00:01, 57.23it/s]Extracting dataset fingerprint:  84%|████████▎ | 432/516 [00:11<00:01, 57.94it/s]Extracting dataset fingerprint:  85%|████████▍ | 438/516 [00:11<00:01, 58.24it/s]Extracting dataset fingerprint:  86%|████████▌ | 445/516 [00:11<00:01, 61.63it/s]Extracting dataset fingerprint:  88%|████████▊ | 452/516 [00:11<00:00, 64.02it/s]Extracting dataset fingerprint:  89%|████████▉ | 459/516 [00:11<00:00, 65.70it/s]Extracting dataset fingerprint:  90%|█████████ | 466/516 [00:11<00:00, 66.51it/s]Extracting dataset fingerprint:  92%|█████████▏| 473/516 [00:11<00:00, 67.46it/s]Extracting dataset fingerprint:  93%|█████████▎| 480/516 [00:11<00:00, 67.25it/s]Extracting dataset fingerprint:  94%|█████████▍| 487/516 [00:12<00:00, 67.96it/s]Extracting dataset fingerprint:  96%|█████████▌| 494/516 [00:12<00:00, 52.53it/s]Extracting dataset fingerprint:  97%|█████████▋| 500/516 [00:12<00:00, 54.23it/s]Extracting dataset fingerprint:  98%|█████████▊| 506/516 [00:12<00:00, 55.54it/s]Extracting dataset fingerprint:  99%|█████████▉| 512/516 [00:12<00:00, 56.30it/s]Extracting dataset fingerprint: 100%|██████████| 516/516 [00:12<00:00, 40.83it/s]
+
+############################
+INFO: You are using the old nnU-Net default planner. We have updated our recommendations. Please consider using those instead! Read more here: https://github.com/MIC-DKFZ/nnUNet/blob/master/documentation/resenc_presets.md
+############################
+
+2D U-Net configuration:
+{'data_identifier': 'nnUNetPlans_2d', 'preprocessor_name': 'DefaultPreprocessor', 'batch_size': 26, 'patch_size': (np.int64(256), np.int64(256)), 'median_image_size_in_voxels': array([256., 256.]), 'spacing': array([1., 1.]), 'normalization_schemes': ['ZScoreNormalization', 'ZScoreNormalization', 'ZScoreNormalization'], 'use_mask_for_norm': [False, False, False], 'resampling_fn_data': 'resample_data_or_seg_to_shape', 'resampling_fn_seg': 'resample_data_or_seg_to_shape', 'resampling_fn_data_kwargs': {'is_seg': False, 'order': 3, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_seg_kwargs': {'is_seg': True, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_probabilities': 'resample_data_or_seg_to_shape', 'resampling_fn_probabilities_kwargs': {'is_seg': False, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'architecture': {'network_class_name': 'dynamic_network_architectures.architectures.unet.PlainConvUNet', 'arch_kwargs': {'n_stages': 7, 'features_per_stage': (32, 64, 128, 256, 512, 512, 512), 'conv_op': 'torch.nn.modules.conv.Conv2d', 'kernel_sizes': ((3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3)), 'strides': ((1, 1), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2)), 'n_conv_per_stage': (2, 2, 2, 2, 2, 2, 2), 'n_conv_per_stage_decoder': (2, 2, 2, 2, 2, 2), 'conv_bias': True, 'norm_op': 'torch.nn.modules.instancenorm.InstanceNorm2d', 'norm_op_kwargs': {'eps': 1e-05, 'affine': True}, 'dropout_op': None, 'dropout_op_kwargs': None, 'nonlin': 'torch.nn.LeakyReLU', 'nonlin_kwargs': {'inplace': True}}, '_kw_requires_import': ('conv_op', 'norm_op', 'dropout_op', 'nonlin')}, 'batch_dice': True}
+
+Using <class 'nnunetv2.imageio.natural_image_reader_writer.NaturalImage2DIO'> as reader/writer
+Plans were saved to /kaggle/working/QENAS_results/results/BUSI/nnunet/seed_47/nnunet_work/preprocessed/Dataset901_BUSI/nnUNetPlans.json
+Preprocessing dataset Dataset901_BUSI
+Configuration: 2d...
+{'data_identifier': 'nnUNetPlans_2d', 'preprocessor_name': 'DefaultPreprocessor', 'batch_size': 26, 'patch_size': [256, 256], 'median_image_size_in_voxels': [256.0, 256.0], 'spacing': [1.0, 1.0], 'normalization_schemes': ['ZScoreNormalization', 'ZScoreNormalization', 'ZScoreNormalization'], 'use_mask_for_norm': [False, False, False], 'resampling_fn_data': 'resample_data_or_seg_to_shape', 'resampling_fn_seg': 'resample_data_or_seg_to_shape', 'resampling_fn_data_kwargs': {'is_seg': False, 'order': 3, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_seg_kwargs': {'is_seg': True, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_probabilities': 'resample_data_or_seg_to_shape', 'resampling_fn_probabilities_kwargs': {'is_seg': False, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'architecture': {'network_class_name': 'dynamic_network_architectures.architectures.unet.PlainConvUNet', 'arch_kwargs': {'n_stages': 7, 'features_per_stage': [32, 64, 128, 256, 512, 512, 512], 'conv_op': 'torch.nn.modules.conv.Conv2d', 'kernel_sizes': [[3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3]], 'strides': [[1, 1], [2, 2], [2, 2], [2, 2], [2, 2], [2, 2], [2, 2]], 'n_conv_per_stage': [2, 2, 2, 2, 2, 2, 2], 'n_conv_per_stage_decoder': [2, 2, 2, 2, 2, 2], 'conv_bias': True, 'norm_op': 'torch.nn.modules.instancenorm.InstanceNorm2d', 'norm_op_kwargs': {'eps': 1e-05, 'affine': True}, 'dropout_op': None, 'dropout_op_kwargs': None, 'nonlin': 'torch.nn.LeakyReLU', 'nonlin_kwargs': {'inplace': True}}, '_kw_requires_import': ['conv_op', 'norm_op', 'dropout_op', 'nonlin']}, 'batch_dice': True}
+Preprocessing cases:   0%|          | 0/516 [00:00<?, ?it/s]Preprocessing cases:   0%|          | 1/516 [00:03<30:12,  3.52s/it]Preprocessing cases:   0%|          | 2/516 [00:03<12:56,  1.51s/it]Preprocessing cases:   1%|          | 4/516 [00:03<05:04,  1.68it/s]Preprocessing cases:   2%|▏         | 8/516 [00:03<01:56,  4.36it/s]Preprocessing cases:   2%|▏         | 11/516 [00:03<01:15,  6.68it/s]Preprocessing cases:   3%|▎         | 15/516 [00:04<00:47, 10.50it/s]Preprocessing cases:   4%|▎         | 19/516 [00:04<00:33, 14.64it/s]Preprocessing cases:   4%|▍         | 23/516 [00:04<00:26, 18.86it/s]Preprocessing cases:   5%|▌         | 27/516 [00:04<00:21, 22.90it/s]Preprocessing cases:   6%|▌         | 31/516 [00:04<00:18, 26.36it/s]Preprocessing cases:   7%|▋         | 35/516 [00:04<00:20, 23.91it/s]Preprocessing cases:   8%|▊         | 39/516 [00:04<00:17, 27.21it/s]Preprocessing cases:   8%|▊         | 43/516 [00:04<00:15, 30.14it/s]Preprocessing cases:   9%|▉         | 47/516 [00:04<00:14, 32.55it/s]Preprocessing cases:  10%|▉         | 51/516 [00:05<00:13, 34.44it/s]Preprocessing cases:  11%|█         | 55/516 [00:05<00:12, 35.84it/s]Preprocessing cases:  11%|█▏        | 59/516 [00:05<00:15, 28.72it/s]Preprocessing cases:  12%|█▏        | 63/516 [00:05<00:14, 31.35it/s]Preprocessing cases:  13%|█▎        | 67/516 [00:05<00:13, 33.35it/s]Preprocessing cases:  14%|█▍        | 71/516 [00:05<00:12, 35.06it/s]Preprocessing cases:  15%|█▍        | 75/516 [00:05<00:15, 28.49it/s]Preprocessing cases:  15%|█▌        | 79/516 [00:05<00:14, 31.01it/s]Preprocessing cases:  16%|█▌        | 83/516 [00:06<00:13, 33.21it/s]Preprocessing cases:  17%|█▋        | 87/516 [00:06<00:12, 34.95it/s]Preprocessing cases:  18%|█▊        | 91/516 [00:06<00:11, 36.28it/s]Preprocessing cases:  18%|█▊        | 95/516 [00:06<00:11, 37.21it/s]Preprocessing cases:  19%|█▉        | 99/516 [00:06<00:14, 29.26it/s]Preprocessing cases:  20%|█▉        | 103/516 [00:06<00:12, 31.78it/s]Preprocessing cases:  21%|██        | 107/516 [00:06<00:12, 33.82it/s]Preprocessing cases:  22%|██▏       | 111/516 [00:06<00:11, 35.37it/s]Preprocessing cases:  22%|██▏       | 115/516 [00:06<00:10, 36.59it/s]Preprocessing cases:  23%|██▎       | 119/516 [00:07<00:10, 37.49it/s]Preprocessing cases:  24%|██▍       | 123/516 [00:07<00:10, 38.14it/s]Preprocessing cases:  25%|██▍       | 127/516 [00:07<00:10, 38.60it/s]Preprocessing cases:  25%|██▌       | 131/516 [00:07<00:12, 30.12it/s]Preprocessing cases:  26%|██▋       | 136/516 [00:07<00:10, 34.92it/s]Preprocessing cases:  27%|██▋       | 140/516 [00:07<00:10, 36.18it/s]Preprocessing cases:  28%|██▊       | 144/516 [00:07<00:10, 37.05it/s]Preprocessing cases:  29%|██▊       | 148/516 [00:07<00:09, 37.81it/s]Preprocessing cases:  30%|██▉       | 153/516 [00:07<00:08, 41.19it/s]Preprocessing cases:  31%|███       | 158/516 [00:08<00:08, 43.59it/s]Preprocessing cases:  32%|███▏      | 163/516 [00:08<00:07, 45.36it/s]Preprocessing cases:  33%|███▎      | 168/516 [00:08<00:07, 46.65it/s]Preprocessing cases:  34%|███▎      | 173/516 [00:08<00:09, 36.57it/s]Preprocessing cases:  34%|███▍      | 178/516 [00:08<00:08, 39.51it/s]Preprocessing cases:  35%|███▌      | 183/516 [00:08<00:09, 33.53it/s]Preprocessing cases:  36%|███▌      | 187/516 [00:08<00:09, 34.70it/s]Preprocessing cases:  37%|███▋      | 191/516 [00:08<00:09, 35.94it/s]Preprocessing cases:  38%|███▊      | 195/516 [00:09<00:08, 36.85it/s]Preprocessing cases:  39%|███▊      | 199/516 [00:09<00:08, 37.60it/s]Preprocessing cases:  39%|███▉      | 203/516 [00:09<00:08, 38.21it/s]Preprocessing cases:  40%|████      | 207/516 [00:09<00:08, 38.44it/s]Preprocessing cases:  41%|████      | 211/516 [00:09<00:10, 30.19it/s]Preprocessing cases:  42%|████▏     | 215/516 [00:09<00:09, 32.52it/s]Preprocessing cases:  42%|████▏     | 219/516 [00:09<00:08, 34.09it/s]Preprocessing cases:  43%|████▎     | 223/516 [00:09<00:08, 35.62it/s]Preprocessing cases:  44%|████▍     | 227/516 [00:09<00:07, 36.78it/s]Preprocessing cases:  45%|████▍     | 231/516 [00:10<00:07, 37.64it/s]Preprocessing cases:  46%|████▌     | 235/516 [00:10<00:09, 29.66it/s]Preprocessing cases:  46%|████▋     | 239/516 [00:10<00:08, 32.11it/s]Preprocessing cases:  47%|████▋     | 243/516 [00:10<00:08, 34.09it/s]Preprocessing cases:  48%|████▊     | 247/516 [00:10<00:07, 35.62it/s]Preprocessing cases:  49%|████▊     | 251/516 [00:10<00:07, 36.70it/s]Preprocessing cases:  49%|████▉     | 255/516 [00:10<00:07, 37.28it/s]Preprocessing cases:  50%|█████     | 259/516 [00:10<00:06, 38.00it/s]Preprocessing cases:  51%|█████     | 263/516 [00:11<00:08, 29.59it/s]Preprocessing cases:  52%|█████▏    | 267/516 [00:11<00:07, 32.06it/s]Preprocessing cases:  53%|█████▎    | 271/516 [00:11<00:07, 34.05it/s]Preprocessing cases:  53%|█████▎    | 275/516 [00:11<00:06, 35.52it/s]Preprocessing cases:  54%|█████▍    | 279/516 [00:11<00:06, 36.71it/s]Preprocessing cases:  55%|█████▍    | 283/516 [00:11<00:06, 37.59it/s]Preprocessing cases:  56%|█████▌    | 287/516 [00:11<00:05, 38.17it/s]Preprocessing cases:  56%|█████▋    | 291/516 [00:11<00:07, 29.95it/s]Preprocessing cases:  57%|█████▋    | 295/516 [00:12<00:06, 32.28it/s]Preprocessing cases:  58%|█████▊    | 299/516 [00:12<00:06, 34.23it/s]Preprocessing cases:  59%|█████▊    | 303/516 [00:12<00:05, 35.54it/s]Preprocessing cases:  59%|█████▉    | 307/516 [00:12<00:05, 36.73it/s]Preprocessing cases:  60%|██████    | 311/516 [00:12<00:05, 37.60it/s]Preprocessing cases:  61%|██████    | 315/516 [00:12<00:06, 29.70it/s]Preprocessing cases:  62%|██████▏   | 319/516 [00:12<00:06, 32.15it/s]Preprocessing cases:  63%|██████▎   | 323/516 [00:12<00:05, 34.08it/s]Preprocessing cases:  63%|██████▎   | 327/516 [00:12<00:05, 35.62it/s]Preprocessing cases:  64%|██████▍   | 331/516 [00:13<00:05, 36.78it/s]Preprocessing cases:  65%|██████▍   | 335/516 [00:13<00:04, 37.64it/s]Preprocessing cases:  66%|██████▌   | 339/516 [00:13<00:05, 29.72it/s]Preprocessing cases:  66%|██████▋   | 343/516 [00:13<00:05, 32.17it/s]Preprocessing cases:  67%|██████▋   | 347/516 [00:13<00:04, 34.14it/s]Preprocessing cases:  68%|██████▊   | 351/516 [00:13<00:04, 35.67it/s]Preprocessing cases:  69%|██████▉   | 355/516 [00:13<00:04, 36.83it/s]Preprocessing cases:  70%|██████▉   | 359/516 [00:13<00:04, 37.46it/s]Preprocessing cases:  70%|███████   | 363/516 [00:14<00:05, 29.64it/s]Preprocessing cases:  71%|███████   | 367/516 [00:14<00:04, 32.11it/s]Preprocessing cases:  72%|███████▏  | 371/516 [00:14<00:04, 34.09it/s]Preprocessing cases:  73%|███████▎  | 375/516 [00:14<00:05, 28.10it/s]Preprocessing cases:  73%|███████▎  | 379/516 [00:14<00:04, 30.82it/s]Preprocessing cases:  74%|███████▍  | 383/516 [00:14<00:04, 33.01it/s]Preprocessing cases:  75%|███████▌  | 387/516 [00:14<00:03, 34.79it/s]Preprocessing cases:  76%|███████▌  | 391/516 [00:14<00:03, 36.02it/s]Preprocessing cases:  77%|███████▋  | 395/516 [00:14<00:03, 37.09it/s]Preprocessing cases:  77%|███████▋  | 399/516 [00:15<00:03, 37.87it/s]Preprocessing cases:  78%|███████▊  | 403/516 [00:15<00:02, 38.18it/s]Preprocessing cases:  79%|███████▉  | 407/516 [00:15<00:02, 38.66it/s]Preprocessing cases:  80%|███████▉  | 411/516 [00:15<00:03, 29.96it/s]Preprocessing cases:  80%|████████  | 415/516 [00:15<00:03, 32.36it/s]Preprocessing cases:  81%|████████  | 419/516 [00:15<00:02, 34.12it/s]Preprocessing cases:  82%|████████▏ | 423/516 [00:15<00:02, 35.54it/s]Preprocessing cases:  83%|████████▎ | 427/516 [00:15<00:02, 36.73it/s]Preprocessing cases:  84%|████████▎ | 431/516 [00:15<00:02, 37.62it/s]Preprocessing cases:  84%|████████▍ | 435/516 [00:16<00:02, 38.26it/s]Preprocessing cases:  85%|████████▌ | 439/516 [00:16<00:02, 29.93it/s]Preprocessing cases:  86%|████████▌ | 443/516 [00:16<00:02, 32.35it/s]Preprocessing cases:  87%|████████▋ | 447/516 [00:16<00:02, 34.28it/s]Preprocessing cases:  87%|████████▋ | 451/516 [00:16<00:01, 35.79it/s]Preprocessing cases:  88%|████████▊ | 455/516 [00:16<00:01, 36.92it/s]Preprocessing cases:  89%|████████▉ | 459/516 [00:16<00:01, 37.75it/s]Preprocessing cases:  90%|████████▉ | 463/516 [00:16<00:01, 29.67it/s]Preprocessing cases:  91%|█████████ | 467/516 [00:17<00:01, 32.13it/s]Preprocessing cases:  91%|█████████▏| 471/516 [00:17<00:01, 34.03it/s]Preprocessing cases:  92%|█████████▏| 475/516 [00:17<00:01, 35.59it/s]Preprocessing cases:  93%|█████████▎| 479/516 [00:17<00:01, 36.76it/s]Preprocessing cases:  94%|█████████▎| 483/516 [00:17<00:00, 37.35it/s]Preprocessing cases:  94%|█████████▍| 487/516 [00:17<00:00, 29.49it/s]Preprocessing cases:  95%|█████████▌| 491/516 [00:17<00:00, 31.99it/s]Preprocessing cases:  96%|█████████▌| 495/516 [00:17<00:00, 33.99it/s]Preprocessing cases:  97%|█████████▋| 499/516 [00:17<00:00, 35.40it/s]Preprocessing cases:  97%|█████████▋| 503/516 [00:18<00:00, 36.63it/s]Preprocessing cases:  98%|█████████▊| 507/516 [00:18<00:00, 37.41it/s]Preprocessing cases:  99%|█████████▉| 511/516 [00:18<00:00, 38.12it/s]Preprocessing cases: 100%|█████████▉| 515/516 [00:18<00:00, 29.94it/s]Preprocessing cases: 100%|██████████| 516/516 [00:18<00:00, 27.80it/s]
+Using device: cuda:0
+
+#######################################################################
+Please cite the following paper when using nnU-Net:
+Isensee, F., Jaeger, P. F., Kohl, S. A., Petersen, J., & Maier-Hein, K. H. (2021). nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation. Nature methods, 18(2), 203-211.
+#######################################################################
+
+WARNING: Cannot continue training because there seems to be no checkpoint available to continue from. Starting a new training...
+2026-10-17 14:25:12.049747: do_dummy_2d_data_aug: False
+2026-10-17 14:25:12.051161: Using splits from existing split file: /kaggle/working/QENAS_results/results/BUSI/nnunet/seed_47/nnunet_work/preprocessed/Dataset901_BUSI/splits_final.json
+2026-10-17 14:25:12.051415: The split file contains 1 splits.
+2026-10-17 14:25:12.051505: Desired fold for training: 0
+2026-10-17 14:25:12.051581: This split has 413 training and 103 validation cases.
+using pin_memory on device 0
+/usr/local/lib/python3.13/dist-packages/torch/nn/functional.py:3504: UserWarning: nll_loss2d_forward_out_cuda_template does not have a deterministic implementation, but you set 'torch.use_deterministic_algorithms(True, warn_only=True)'. You can file an issue at https://github.com/pytorch/pytorch/issues to help us prioritize adding deterministic support for this operation. (Triggered internally at /pytorch/aten/src/ATen/Context.cpp:160.)
+  return torch._C._nn.cross_entropy_loss(
+using pin_memory on device 0
+
+This is the configuration used by this training:
+Configuration name: 2d
+ {'data_identifier': 'nnUNetPlans_2d', 'preprocessor_name': 'DefaultPreprocessor', 'batch_size': 26, 'patch_size': [256, 256], 'median_image_size_in_voxels': [256.0, 256.0], 'spacing': [1.0, 1.0], 'normalization_schemes': ['ZScoreNormalization', 'ZScoreNormalization', 'ZScoreNormalization'], 'use_mask_for_norm': [False, False, False], 'resampling_fn_data': 'resample_data_or_seg_to_shape', 'resampling_fn_seg': 'resample_data_or_seg_to_shape', 'resampling_fn_data_kwargs': {'is_seg': False, 'order': 3, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_seg_kwargs': {'is_seg': True, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_probabilities': 'resample_data_or_seg_to_shape', 'resampling_fn_probabilities_kwargs': {'is_seg': False, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'architecture': {'network_class_name': 'dynamic_network_architectures.architectures.unet.PlainConvUNet', 'arch_kwargs': {'n_stages': 7, 'features_per_stage': [32, 64, 128, 256, 512, 512, 512], 'conv_op': 'torch.nn.modules.conv.Conv2d', 'kernel_sizes': [[3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3]], 'strides': [[1, 1], [2, 2], [2, 2], [2, 2], [2, 2], [2, 2], [2, 2]], 'n_conv_per_stage': [2, 2, 2, 2, 2, 2, 2], 'n_conv_per_stage_decoder': [2, 2, 2, 2, 2, 2], 'conv_bias': True, 'norm_op': 'torch.nn.modules.instancenorm.InstanceNorm2d', 'norm_op_kwargs': {'eps': 1e-05, 'affine': True}, 'dropout_op': None, 'dropout_op_kwargs': None, 'nonlin': 'torch.nn.LeakyReLU', 'nonlin_kwargs': {'inplace': True}}, '_kw_requires_import': ['conv_op', 'norm_op', 'dropout_op', 'nonlin']}, 'batch_dice': True} 
+
+These are the global plan.json settings:
+ {'dataset_name': 'Dataset901_BUSI', 'plans_name': 'nnUNetPlans', 'original_median_spacing_after_transp': [999.0, 1.0, 1.0], 'original_median_shape_after_transp': [1, 256, 256], 'image_reader_writer': 'NaturalImage2DIO', 'transpose_forward': [0, 1, 2], 'transpose_backward': [0, 1, 2], 'experiment_planner_used': 'ExperimentPlanner', 'label_manager': 'LabelManager', 'foreground_intensity_properties_per_channel': {'0': {'max': 255.0, 'mean': 66.9409408569336, 'median': 61.0, 'min': 0.0, 'percentile_00_5': 1.0, 'percentile_99_5': 210.0, 'std': 46.45578384399414}, '1': {'max': 255.0, 'mean': 66.92334747314453, 'median': 61.0, 'min': 0.0, 'percentile_00_5': 1.0, 'percentile_99_5': 210.0, 'std': 46.44830322265625}, '2': {'max': 255.0, 'mean': 66.87966918945312, 'median': 61.0, 'min': 0.0, 'percentile_00_5': 1.0, 'percentile_99_5': 210.0, 'std': 46.41389465332031}}} 
+
+2026-10-17 14:25:13.449044: Unable to plot network architecture:
+2026-10-17 14:25:13.449397: No module named 'hiddenlayer'
+2026-10-17 14:25:13.471977: 
+2026-10-17 14:25:13.472295: Epoch 0
+2026-10-17 14:25:13.472667: Current learning rate: 0.01
+2026-10-17 14:27:41.428823: train_loss -0.1298
+2026-10-17 14:27:41.429536: val_loss -0.4387
+2026-10-17 14:27:41.429715: Pseudo dice [np.float32(0.6725)]
+2026-10-17 14:27:41.429879: Epoch time: 147.96 s
+2026-10-17 14:27:41.430006: Yayy! New best EMA pseudo Dice: 0.6725000143051147
+2026-10-17 14:27:42.968317: 
+2026-10-17 14:27:42.968746: Epoch 1
+2026-10-17 14:27:42.968939: Current learning rate: 0.00991
+2026-10-17 14:29:28.804273: train_loss -0.4828
+2026-10-17 14:29:28.804923: val_loss -0.5342
+2026-10-17 14:29:28.805194: Pseudo dice [np.float32(0.7298)]
+2026-10-17 14:29:28.805399: Epoch time: 105.84 s
+2026-10-17 14:29:28.805544: Yayy! New best EMA pseudo Dice: 0.6782000064849854
+2026-10-17 14:29:31.212064: 
+2026-10-17 14:29:31.212440: Epoch 2
+2026-10-17 14:29:31.212601: Current learning rate: 0.00982
+2026-10-17 14:31:17.147376: train_loss -0.5771
+2026-10-17 14:31:17.148011: val_loss -0.5388
+2026-10-17 14:31:17.148363: Pseudo dice [np.float32(0.7431)]
+2026-10-17 14:31:17.148724: Epoch time: 105.94 s
+2026-10-17 14:31:17.149022: Yayy! New best EMA pseudo Dice: 0.6847000122070312
+2026-10-17 14:31:19.164248: 
+2026-10-17 14:31:19.164629: Epoch 3
+2026-10-17 14:31:19.164796: Current learning rate: 0.00973
+2026-10-17 14:33:05.188118: train_loss -0.6354
+2026-10-17 14:33:05.188808: val_loss -0.5931
+2026-10-17 14:33:05.189123: Pseudo dice [np.float32(0.7674)]
+2026-10-17 14:33:05.189353: Epoch time: 106.03 s
+2026-10-17 14:33:05.189526: Yayy! New best EMA pseudo Dice: 0.6930000185966492
+2026-10-17 14:33:07.105181: 
+2026-10-17 14:33:07.105507: Epoch 4
+2026-10-17 14:33:07.105674: Current learning rate: 0.00964
+2026-10-17 14:34:52.702727: train_loss -0.674
+2026-10-17 14:34:52.703213: val_loss -0.6216
+2026-10-17 14:34:52.703413: Pseudo dice [np.float32(0.7943)]
+2026-10-17 14:34:52.703596: Epoch time: 105.6 s
+2026-10-17 14:34:53.038272: Yayy! New best EMA pseudo Dice: 0.7031000256538391
+2026-10-17 14:34:54.986017: 
+2026-10-17 14:34:54.986489: Epoch 5
+2026-10-17 14:34:54.986701: Current learning rate: 0.00955
+2026-10-17 14:36:40.749001: train_loss -0.7047
+2026-10-17 14:36:40.749540: val_loss -0.5742
+2026-10-17 14:36:40.749920: Pseudo dice [np.float32(0.7574)]
+2026-10-17 14:36:40.750263: Epoch time: 105.76 s
+2026-10-17 14:36:40.750495: Yayy! New best EMA pseudo Dice: 0.7085999846458435
+2026-10-17 14:36:42.758954: 
+2026-10-17 14:36:42.759328: Epoch 6
+2026-10-17 14:36:42.759497: Current learning rate: 0.00946
+2026-10-17 14:38:28.242436: train_loss -0.7336
+2026-10-17 14:38:28.242919: val_loss -0.6595
+2026-10-17 14:38:28.243283: Pseudo dice [np.float32(0.8053)]
+2026-10-17 14:38:28.243579: Epoch time: 105.49 s
+2026-10-17 14:38:28.243769: Yayy! New best EMA pseudo Dice: 0.7182000279426575
+2026-10-17 14:38:30.289624: 
+2026-10-17 14:38:30.290063: Epoch 7
+2026-10-17 14:38:30.290272: Current learning rate: 0.00937
+2026-10-17 14:40:16.060903: train_loss -0.7425
+2026-10-17 14:40:16.061349: val_loss -0.5991
+2026-10-17 14:40:16.061514: Pseudo dice [np.float32(0.7679)]
+2026-10-17 14:40:16.061682: Epoch time: 105.77 s
+2026-10-17 14:40:16.061812: Yayy! New best EMA pseudo Dice: 0.7232000231742859
+2026-10-17 14:40:18.133279: 
+2026-10-17 14:40:18.133761: Epoch 8
+2026-10-17 14:40:18.134005: Current learning rate: 0.00928
+2026-10-17 14:42:04.011145: train_loss -0.7589
+2026-10-17 14:42:04.011567: val_loss -0.5789
+2026-10-17 14:42:04.012391: Pseudo dice [np.float32(0.7678)]
+2026-10-17 14:42:04.012558: Epoch time: 105.88 s
+2026-10-17 14:42:04.012682: Yayy! New best EMA pseudo Dice: 0.7275999784469604
+2026-10-17 14:42:05.902772: 
+2026-10-17 14:42:05.903257: Epoch 9
+2026-10-17 14:42:05.903445: Current learning rate: 0.00919
+2026-10-17 14:43:51.875468: train_loss -0.7682
+2026-10-17 14:43:51.875929: val_loss -0.6248
+2026-10-17 14:43:51.876132: Pseudo dice [np.float32(0.7936)]
+2026-10-17 14:43:51.876318: Epoch time: 105.97 s
+2026-10-17 14:43:52.270192: Yayy! New best EMA pseudo Dice: 0.7342000007629395
+2026-10-17 14:43:54.251786: 
+2026-10-17 14:43:54.252207: Epoch 10
+2026-10-17 14:43:54.252397: Current learning rate: 0.0091
+2026-10-17 14:45:40.408611: train_loss -0.7797
+2026-10-17 14:45:40.409364: val_loss -0.637
+2026-10-17 14:45:40.409989: Pseudo dice [np.float32(0.7941)]
+2026-10-17 14:45:40.410452: Epoch time: 106.16 s
+2026-10-17 14:45:40.410804: Yayy! New best EMA pseudo Dice: 0.7401999831199646
+2026-10-17 14:45:42.364804: 
+2026-10-17 14:45:42.365317: Epoch 11
+2026-10-17 14:45:42.365585: Current learning rate: 0.009
+2026-10-17 14:47:28.138007: train_loss -0.7909
+2026-10-17 14:47:28.138445: val_loss -0.6402
+2026-10-17 14:47:28.138611: Pseudo dice [np.float32(0.7986)]
+2026-10-17 14:47:28.138868: Epoch time: 105.77 s
+2026-10-17 14:47:28.139233: Yayy! New best EMA pseudo Dice: 0.7461000084877014
+2026-10-17 14:47:30.142005: 
+2026-10-17 14:47:30.142435: Epoch 12
+2026-10-17 14:47:30.142626: Current learning rate: 0.00891
+2026-10-17 14:49:16.120039: train_loss -0.8013
+2026-10-17 14:49:16.120616: val_loss -0.6125
+2026-10-17 14:49:16.121004: Pseudo dice [np.float32(0.7799)]
+2026-10-17 14:49:16.121237: Epoch time: 105.98 s
+2026-10-17 14:49:16.121405: Yayy! New best EMA pseudo Dice: 0.7494000196456909
+2026-10-17 14:49:18.010115: 
+2026-10-17 14:49:18.010423: Epoch 13
+2026-10-17 14:49:18.010690: Current learning rate: 0.00882
+2026-10-17 14:51:03.919032: train_loss -0.8079
+2026-10-17 14:51:03.919622: val_loss -0.6025
+2026-10-17 14:51:03.919865: Pseudo dice [np.float32(0.7829)]
+2026-10-17 14:51:03.920110: Epoch time: 105.91 s
+2026-10-17 14:51:03.920298: Yayy! New best EMA pseudo Dice: 0.7527999877929688
+2026-10-17 14:51:05.954320: 
+2026-10-17 14:51:05.954702: Epoch 14
+2026-10-17 14:51:05.954894: Current learning rate: 0.00873
+2026-10-17 14:52:51.852751: train_loss -0.8188
+2026-10-17 14:52:51.853365: val_loss -0.6306
+2026-10-17 14:52:51.853511: Pseudo dice [np.float32(0.7984)]
+2026-10-17 14:52:51.853676: Epoch time: 105.9 s
+2026-10-17 14:52:52.220659: Yayy! New best EMA pseudo Dice: 0.7573999762535095
+2026-10-17 14:52:54.218241: 
+2026-10-17 14:52:54.218634: Epoch 15
+2026-10-17 14:52:54.218849: Current learning rate: 0.00864
+2026-10-17 14:54:39.905902: train_loss -0.8217
+2026-10-17 14:54:39.906316: val_loss -0.6205
+2026-10-17 14:54:39.906491: Pseudo dice [np.float32(0.7899)]
+2026-10-17 14:54:39.906746: Epoch time: 105.69 s
+2026-10-17 14:54:39.906909: Yayy! New best EMA pseudo Dice: 0.7605999708175659
+2026-10-17 14:54:41.888829: 
+2026-10-17 14:54:41.889180: Epoch 16
+2026-10-17 14:54:41.889366: Current learning rate: 0.00855
+2026-10-17 14:56:27.875407: train_loss -0.827
+2026-10-17 14:56:27.875871: val_loss -0.6315
+2026-10-17 14:56:27.876109: Pseudo dice [np.float32(0.7972)]
+2026-10-17 14:56:27.876343: Epoch time: 105.99 s
+2026-10-17 14:56:27.876616: Yayy! New best EMA pseudo Dice: 0.7642999887466431
+2026-10-17 14:56:30.029516: 
+2026-10-17 14:56:30.030050: Epoch 17
+2026-10-17 14:56:30.030416: Current learning rate: 0.00846
+2026-10-17 14:58:16.264299: train_loss -0.8323
+2026-10-17 14:58:16.264704: val_loss -0.5695
+2026-10-17 14:58:16.264911: Pseudo dice [np.float32(0.7742)]
+2026-10-17 14:58:16.265133: Epoch time: 106.24 s
+2026-10-17 14:58:16.265280: Yayy! New best EMA pseudo Dice: 0.7652999758720398
+2026-10-17 14:58:18.291786: 
+2026-10-17 14:58:18.292064: Epoch 18
+2026-10-17 14:58:18.292459: Current learning rate: 0.00836
+2026-10-17 15:00:04.127326: train_loss -0.8455
+2026-10-17 15:00:04.127780: val_loss -0.5853
+2026-10-17 15:00:04.127947: Pseudo dice [np.float32(0.7744)]
+2026-10-17 15:00:04.128161: Epoch time: 105.84 s
+2026-10-17 15:00:04.128353: Yayy! New best EMA pseudo Dice: 0.7662000060081482
+2026-10-17 15:00:06.733157: 
+2026-10-17 15:00:06.733554: Epoch 19
+2026-10-17 15:00:06.733728: Current learning rate: 0.00827
+2026-10-17 15:01:52.843266: train_loss -0.8331
+2026-10-17 15:01:52.843894: val_loss -0.5931
+2026-10-17 15:01:52.844334: Pseudo dice [np.float32(0.7814)]
+2026-10-17 15:01:52.844758: Epoch time: 106.11 s
+2026-10-17 15:01:53.218392: Yayy! New best EMA pseudo Dice: 0.7677000164985657
+2026-10-17 15:01:55.200530: 
+2026-10-17 15:01:55.200925: Epoch 20
+2026-10-17 15:01:55.201260: Current learning rate: 0.00818
+2026-10-17 15:03:41.471675: train_loss -0.8443
+2026-10-17 15:03:41.472286: val_loss -0.6217
+2026-10-17 15:03:41.472531: Pseudo dice [np.float32(0.7962)]
+2026-10-17 15:03:41.472766: Epoch time: 106.27 s
+2026-10-17 15:03:41.473005: Yayy! New best EMA pseudo Dice: 0.7705000042915344
+2026-10-17 15:03:43.396914: 
+2026-10-17 15:03:43.397285: Epoch 21
+2026-10-17 15:03:43.397490: Current learning rate: 0.00809
+2026-10-17 15:05:29.580811: train_loss -0.85
+2026-10-17 15:05:29.581323: val_loss -0.6407
+2026-10-17 15:05:29.581595: Pseudo dice [np.float32(0.7985)]
+2026-10-17 15:05:29.581790: Epoch time: 106.19 s
+2026-10-17 15:05:29.581939: Yayy! New best EMA pseudo Dice: 0.7732999920845032
+2026-10-17 15:05:31.574187: 
+2026-10-17 15:05:31.574624: Epoch 22
+2026-10-17 15:05:31.574801: Current learning rate: 0.008
+2026-10-17 15:07:17.597702: train_loss -0.8529
+2026-10-17 15:07:17.598214: val_loss -0.5586
+2026-10-17 15:07:17.598529: Pseudo dice [np.float32(0.7563)]
+2026-10-17 15:07:17.598839: Epoch time: 106.03 s
+2026-10-17 15:07:19.513021: 
+2026-10-17 15:07:19.513445: Epoch 23
+2026-10-17 15:07:19.513621: Current learning rate: 0.0079
+2026-10-17 15:09:05.996901: train_loss -0.8613
+2026-10-17 15:09:05.997421: val_loss -0.573
+2026-10-17 15:09:05.997647: Pseudo dice [np.float32(0.7664)]
+2026-10-17 15:09:05.997862: Epoch time: 106.49 s
+2026-10-17 15:09:08.248167: 
+2026-10-17 15:09:08.248599: Epoch 24
+2026-10-17 15:09:08.248918: Current learning rate: 0.00781
+2026-10-17 15:10:54.835184: train_loss -0.8586
+2026-10-17 15:10:54.844694: val_loss -0.5831
+2026-10-17 15:10:54.844988: Pseudo dice [np.float32(0.7709)]
+2026-10-17 15:10:54.845330: Epoch time: 106.59 s
+2026-10-17 15:10:57.520013: 
+2026-10-17 15:10:57.520524: Epoch 25
+2026-10-17 15:10:57.520719: Current learning rate: 0.00772
+2026-10-17 15:12:44.196048: train_loss -0.8562
+2026-10-17 15:12:44.196822: val_loss -0.5776
+2026-10-17 15:12:44.197175: Pseudo dice [np.float32(0.7697)]
+2026-10-17 15:12:44.197430: Epoch time: 106.68 s
+2026-10-17 15:12:46.286742: 
+2026-10-17 15:12:46.287138: Epoch 26
+2026-10-17 15:12:46.287395: Current learning rate: 0.00763
+2026-10-17 15:14:32.823014: train_loss -0.8602
+2026-10-17 15:14:32.823610: val_loss -0.5625
+2026-10-17 15:14:32.824019: Pseudo dice [np.float32(0.767)]
+2026-10-17 15:14:32.824373: Epoch time: 106.54 s
+2026-10-17 15:14:34.929734: 
+2026-10-17 15:14:34.930045: Epoch 27
+2026-10-17 15:14:34.930381: Current learning rate: 0.00753
+2026-10-17 15:16:21.613487: train_loss -0.8694
+2026-10-17 15:16:21.614121: val_loss -0.6207
+2026-10-17 15:16:21.614340: Pseudo dice [np.float32(0.793)]
+2026-10-17 15:16:21.614555: Epoch time: 106.69 s
+2026-10-17 15:16:23.702979: 
+2026-10-17 15:16:23.703334: Epoch 28
+2026-10-17 15:16:23.703488: Current learning rate: 0.00744
+2026-10-17 15:18:10.784932: train_loss -0.8705
+2026-10-17 15:18:10.785596: val_loss -0.6077
+2026-10-17 15:18:10.785832: Pseudo dice [np.float32(0.7885)]
+2026-10-17 15:18:10.786155: Epoch time: 107.08 s
+2026-10-17 15:18:10.786428: Yayy! New best EMA pseudo Dice: 0.774399995803833
+2026-10-17 15:18:13.225652: 
+2026-10-17 15:18:13.226141: Epoch 29
+2026-10-17 15:18:13.226423: Current learning rate: 0.00735
+2026-10-17 15:19:59.656477: train_loss -0.8694
+2026-10-17 15:19:59.657217: val_loss -0.5877
+2026-10-17 15:19:59.657530: Pseudo dice [np.float32(0.7736)]
+2026-10-17 15:19:59.657907: Epoch time: 106.43 s
+2026-10-17 15:20:02.190665: 
+2026-10-17 15:20:02.191104: Epoch 30
+2026-10-17 15:20:02.191331: Current learning rate: 0.00725
+2026-10-17 15:21:48.645005: train_loss -0.8745
+2026-10-17 15:21:48.646349: val_loss -0.5833
+2026-10-17 15:21:48.646581: Pseudo dice [np.float32(0.7764)]
+2026-10-17 15:21:48.646787: Epoch time: 106.46 s
+2026-10-17 15:21:48.646949: Yayy! New best EMA pseudo Dice: 0.7745000123977661
+2026-10-17 15:21:51.231165: 
+2026-10-17 15:21:51.231585: Epoch 31
+2026-10-17 15:21:51.231781: Current learning rate: 0.00716
+2026-10-17 15:23:37.417309: train_loss -0.8758
+2026-10-17 15:23:37.419708: val_loss -0.614
+2026-10-17 15:23:37.420330: Pseudo dice [np.float32(0.7825)]
+2026-10-17 15:23:37.420585: Epoch time: 106.19 s
+2026-10-17 15:23:37.420766: Yayy! New best EMA pseudo Dice: 0.7753000259399414
+2026-10-17 15:23:39.791022: 
+2026-10-17 15:23:39.791367: Epoch 32
+2026-10-17 15:23:39.791520: Current learning rate: 0.00707
+2026-10-17 15:25:26.269377: train_loss -0.8776
+2026-10-17 15:25:26.270536: val_loss -0.6209
+2026-10-17 15:25:26.270856: Pseudo dice [np.float32(0.7943)]
+2026-10-17 15:25:26.271249: Epoch time: 106.48 s
+2026-10-17 15:25:26.271500: Yayy! New best EMA pseudo Dice: 0.7771999835968018
+2026-10-17 15:25:28.711784: 
+2026-10-17 15:25:28.712214: Epoch 33
+2026-10-17 15:25:28.712371: Current learning rate: 0.00697
+2026-10-17 15:27:15.107684: train_loss -0.8809
+2026-10-17 15:27:15.109493: val_loss -0.5957
+2026-10-17 15:27:15.109956: Pseudo dice [np.float32(0.7847)]
+2026-10-17 15:27:15.110234: Epoch time: 106.4 s
+2026-10-17 15:27:15.110497: Yayy! New best EMA pseudo Dice: 0.777899980545044
+2026-10-17 15:27:18.019903: 
+2026-10-17 15:27:18.020482: Epoch 34
+2026-10-17 15:27:18.020703: Current learning rate: 0.00688
+2026-10-17 15:29:04.400669: train_loss -0.8845
+2026-10-17 15:29:04.401219: val_loss -0.6323
+2026-10-17 15:29:04.401682: Pseudo dice [np.float32(0.7967)]
+2026-10-17 15:29:04.402025: Epoch time: 106.38 s
+2026-10-17 15:29:04.845575: Yayy! New best EMA pseudo Dice: 0.7797999978065491
+2026-10-17 15:29:07.346729: 
+2026-10-17 15:29:07.347167: Epoch 35
+2026-10-17 15:29:07.347470: Current learning rate: 0.00679
+2026-10-17 15:30:53.674038: train_loss -0.8842
+2026-10-17 15:30:53.676278: val_loss -0.629
+2026-10-17 15:30:53.676557: Pseudo dice [np.float32(0.7933)]
+2026-10-17 15:30:53.677189: Epoch time: 106.33 s
+2026-10-17 15:30:53.677440: Yayy! New best EMA pseudo Dice: 0.7811999917030334
+2026-10-17 15:30:56.215367: 
+2026-10-17 15:30:56.215711: Epoch 36
+2026-10-17 15:30:56.215873: Current learning rate: 0.00669
+2026-10-17 15:32:42.771174: train_loss -0.8864
+2026-10-17 15:32:42.771987: val_loss -0.6129
+2026-10-17 15:32:42.772703: Pseudo dice [np.float32(0.7861)]
+2026-10-17 15:32:42.773288: Epoch time: 106.56 s
+2026-10-17 15:32:42.773540: Yayy! New best EMA pseudo Dice: 0.7817000150680542
+2026-10-17 15:32:46.068494: 
+2026-10-17 15:32:46.068918: Epoch 37
+2026-10-17 15:32:46.069155: Current learning rate: 0.0066
+2026-10-17 15:34:32.361061: train_loss -0.8957
+2026-10-17 15:34:32.361652: val_loss -0.5628
+2026-10-17 15:34:32.361973: Pseudo dice [np.float32(0.7573)]
+2026-10-17 15:34:32.362278: Epoch time: 106.29 s
+2026-10-17 15:34:34.556753: 
+2026-10-17 15:34:34.557037: Epoch 38
+2026-10-17 15:34:34.557232: Current learning rate: 0.0065
+2026-10-17 15:36:21.144248: train_loss -0.8944
+2026-10-17 15:36:21.144751: val_loss -0.613
+2026-10-17 15:36:21.144999: Pseudo dice [np.float32(0.7869)]
+2026-10-17 15:36:21.145277: Epoch time: 106.59 s
+2026-10-17 15:36:23.259832: 
+2026-10-17 15:36:23.260242: Epoch 39
+2026-10-17 15:36:23.260517: Current learning rate: 0.00641
+2026-10-17 15:38:09.656562: train_loss -0.8897
+2026-10-17 15:38:09.657024: val_loss -0.5842
+2026-10-17 15:38:09.657402: Pseudo dice [np.float32(0.7814)]
+2026-10-17 15:38:09.657840: Epoch time: 106.4 s
+2026-10-17 15:38:12.246622: 
+2026-10-17 15:38:12.247209: Epoch 40
+2026-10-17 15:38:12.247502: Current learning rate: 0.00631
+2026-10-17 15:39:58.918757: train_loss -0.8918
+2026-10-17 15:39:58.919528: val_loss -0.5536
+2026-10-17 15:39:58.919879: Pseudo dice [np.float32(0.7679)]
+2026-10-17 15:39:58.920269: Epoch time: 106.68 s
+2026-10-17 15:40:00.910499: 
+2026-10-17 15:40:00.910904: Epoch 41
+2026-10-17 15:40:00.911121: Current learning rate: 0.00622
+2026-10-17 15:41:47.261207: train_loss -0.8937
+2026-10-17 15:41:47.261673: val_loss -0.5442
+2026-10-17 15:41:47.263405: Pseudo dice [np.float32(0.7721)]
+2026-10-17 15:41:47.263659: Epoch time: 106.35 s
+2026-10-17 15:41:49.274380: 
+2026-10-17 15:41:49.274715: Epoch 42
+2026-10-17 15:41:49.274907: Current learning rate: 0.00612
+2026-10-17 15:43:35.602481: train_loss -0.9015
+2026-10-17 15:43:35.603008: val_loss -0.5624
+2026-10-17 15:43:35.603320: Pseudo dice [np.float32(0.7746)]
+2026-10-17 15:43:35.603736: Epoch time: 106.33 s
+2026-10-17 15:43:37.651288: 
+2026-10-17 15:43:37.651563: Epoch 43
+2026-10-17 15:43:37.651768: Current learning rate: 0.00603
+2026-10-17 15:45:23.939747: train_loss -0.8975
+2026-10-17 15:45:23.940376: val_loss -0.6336
+2026-10-17 15:45:23.940770: Pseudo dice [np.float32(0.8038)]
+2026-10-17 15:45:23.941031: Epoch time: 106.29 s
+2026-10-17 15:45:25.795588: 
+2026-10-17 15:45:25.796347: Epoch 44
+2026-10-17 15:45:25.796766: Current learning rate: 0.00593
+2026-10-17 15:47:12.028910: train_loss -0.9013
+2026-10-17 15:47:12.029561: val_loss -0.5974
+2026-10-17 15:47:12.029866: Pseudo dice [np.float32(0.7876)]
+2026-10-17 15:47:12.030206: Epoch time: 106.24 s
+2026-10-17 15:47:14.626803: 
+2026-10-17 15:47:14.627258: Epoch 45
+2026-10-17 15:47:14.627541: Current learning rate: 0.00584
+2026-10-17 15:49:01.194894: train_loss -0.9059
+2026-10-17 15:49:01.195475: val_loss -0.6446
+2026-10-17 15:49:01.195672: Pseudo dice [np.float32(0.814)]
+2026-10-17 15:49:01.195859: Epoch time: 106.57 s
+2026-10-17 15:49:01.196003: Yayy! New best EMA pseudo Dice: 0.784500002861023
+2026-10-17 15:49:03.728533: 
+2026-10-17 15:49:03.728734: Epoch 46
+2026-10-17 15:49:03.728982: Current learning rate: 0.00574
+2026-10-17 15:50:50.385363: train_loss -0.9107
+2026-10-17 15:50:50.387104: val_loss -0.6015
+2026-10-17 15:50:50.387293: Pseudo dice [np.float32(0.7946)]
+2026-10-17 15:50:50.387536: Epoch time: 106.66 s
+2026-10-17 15:50:50.387701: Yayy! New best EMA pseudo Dice: 0.7854999899864197
+2026-10-17 15:50:52.912416: 
+2026-10-17 15:50:52.912642: Epoch 47
+2026-10-17 15:50:52.913031: Current learning rate: 0.00565
+2026-10-17 15:52:39.600054: train_loss -0.9083
+2026-10-17 15:52:39.600542: val_loss -0.5794
+2026-10-17 15:52:39.600811: Pseudo dice [np.float32(0.7819)]
+2026-10-17 15:52:39.601089: Epoch time: 106.69 s
+2026-10-17 15:52:41.761938: 
+2026-10-17 15:52:41.762437: Epoch 48
+2026-10-17 15:52:41.762710: Current learning rate: 0.00555
+2026-10-17 15:54:28.293460: train_loss -0.9051
+2026-10-17 15:54:28.294015: val_loss -0.6273
+2026-10-17 15:54:28.294267: Pseudo dice [np.float32(0.8029)]
+2026-10-17 15:54:28.294534: Epoch time: 106.53 s
+2026-10-17 15:54:28.294737: Yayy! New best EMA pseudo Dice: 0.786899983882904
+2026-10-17 15:54:30.990052: 
+2026-10-17 15:54:30.990468: Epoch 49
+2026-10-17 15:54:30.990650: Current learning rate: 0.00546
+2026-10-17 15:56:17.591533: train_loss -0.9053
+2026-10-17 15:56:17.592466: val_loss -0.5733
+2026-10-17 15:56:17.592877: Pseudo dice [np.float32(0.7759)]
+2026-10-17 15:56:17.593329: Epoch time: 106.6 s
+2026-10-17 15:56:20.368213: 
+2026-10-17 15:56:20.368767: Epoch 50
+2026-10-17 15:56:20.369061: Current learning rate: 0.00536
+2026-10-17 15:58:07.082739: train_loss -0.9118
+2026-10-17 15:58:07.083254: val_loss -0.606
+2026-10-17 15:58:07.083642: Pseudo dice [np.float32(0.8013)]
+2026-10-17 15:58:07.084129: Epoch time: 106.72 s
+2026-10-17 15:58:07.084419: Yayy! New best EMA pseudo Dice: 0.7872999906539917
+2026-10-17 15:58:09.596319: 
+2026-10-17 15:58:09.596812: Epoch 51
+2026-10-17 15:58:09.597120: Current learning rate: 0.00526
+2026-10-17 15:59:56.404623: train_loss -0.9142
+2026-10-17 15:59:56.408415: val_loss -0.5878
+2026-10-17 15:59:56.408682: Pseudo dice [np.float32(0.7822)]
+2026-10-17 15:59:56.408958: Epoch time: 106.81 s
+2026-10-17 15:59:58.652146: 
+2026-10-17 15:59:58.652621: Epoch 52
+2026-10-17 15:59:58.652857: Current learning rate: 0.00517
+2026-10-17 16:01:45.166101: train_loss -0.9152
+2026-10-17 16:01:45.168918: val_loss -0.6206
+2026-10-17 16:01:45.169270: Pseudo dice [np.float32(0.8044)]
+2026-10-17 16:01:45.169874: Epoch time: 106.52 s
+2026-10-17 16:01:45.171167: Yayy! New best EMA pseudo Dice: 0.7886000275611877
+2026-10-17 16:01:47.668279: 
+2026-10-17 16:01:47.668583: Epoch 53
+2026-10-17 16:01:47.668728: Current learning rate: 0.00507
+2026-10-17 16:03:34.463879: train_loss -0.9153
+2026-10-17 16:03:34.467761: val_loss -0.573
+2026-10-17 16:03:34.468064: Pseudo dice [np.float32(0.7934)]
+2026-10-17 16:03:34.468397: Epoch time: 106.8 s
+2026-10-17 16:03:34.468678: Yayy! New best EMA pseudo Dice: 0.7890999913215637
+2026-10-17 16:03:37.684983: 
+2026-10-17 16:03:37.685397: Epoch 54
+2026-10-17 16:03:37.685652: Current learning rate: 0.00497
+2026-10-17 16:05:24.821764: train_loss -0.9158
+2026-10-17 16:05:24.822203: val_loss -0.5722
+2026-10-17 16:05:24.822393: Pseudo dice [np.float32(0.7763)]
+2026-10-17 16:05:24.822573: Epoch time: 107.14 s
+2026-10-17 16:05:27.342779: 
+2026-10-17 16:05:27.343134: Epoch 55
+2026-10-17 16:05:27.343319: Current learning rate: 0.00487
+2026-10-17 16:07:14.526830: train_loss -0.9172
+2026-10-17 16:07:14.527481: val_loss -0.5849
+2026-10-17 16:07:14.527841: Pseudo dice [np.float32(0.7743)]
+2026-10-17 16:07:14.528165: Epoch time: 107.19 s
+2026-10-17 16:07:16.804265: 
+2026-10-17 16:07:16.804705: Epoch 56
+2026-10-17 16:07:16.805476: Current learning rate: 0.00478
+2026-10-17 16:09:03.315536: train_loss -0.9173
+2026-10-17 16:09:03.316208: val_loss -0.5521
+2026-10-17 16:09:03.316545: Pseudo dice [np.float32(0.7795)]
+2026-10-17 16:09:03.316846: Epoch time: 106.51 s
+2026-10-17 16:09:05.401337: 
+2026-10-17 16:09:05.401738: Epoch 57
+2026-10-17 16:09:05.401928: Current learning rate: 0.00468
+2026-10-17 16:10:52.122777: train_loss -0.9219
+2026-10-17 16:10:52.123391: val_loss -0.5595
+2026-10-17 16:10:52.124285: Pseudo dice [np.float32(0.7783)]
+2026-10-17 16:10:52.124535: Epoch time: 106.72 s
+2026-10-17 16:10:54.378126: 
+2026-10-17 16:10:54.378422: Epoch 58
+2026-10-17 16:10:54.378726: Current learning rate: 0.00458
+2026-10-17 16:12:41.228042: train_loss -0.9173
+2026-10-17 16:12:41.228842: val_loss -0.5774
+2026-10-17 16:12:41.229953: Pseudo dice [np.float32(0.7861)]
+2026-10-17 16:12:41.230465: Epoch time: 106.85 s
+2026-10-17 16:12:43.305608: 
+2026-10-17 16:12:43.305991: Epoch 59
+2026-10-17 16:12:43.306209: Current learning rate: 0.00448
+2026-10-17 16:14:29.799359: train_loss -0.9205
+2026-10-17 16:14:29.800844: val_loss -0.5465
+2026-10-17 16:14:29.801134: Pseudo dice [np.float32(0.7649)]
+2026-10-17 16:14:29.801396: Epoch time: 106.5 s
+2026-10-17 16:14:32.264298: 
+2026-10-17 16:14:32.264815: Epoch 60
+2026-10-17 16:14:32.265066: Current learning rate: 0.00438
+2026-10-17 16:16:18.663821: train_loss -0.9218
+2026-10-17 16:16:18.666763: val_loss -0.54
+2026-10-17 16:16:18.667160: Pseudo dice [np.float32(0.7769)]
+2026-10-17 16:16:18.667557: Epoch time: 106.4 s
+2026-10-17 16:16:20.536093: 
+2026-10-17 16:16:20.537396: Epoch 61
+2026-10-17 16:16:20.537727: Current learning rate: 0.00429
+2026-10-17 16:18:07.414977: train_loss -0.9252
+2026-10-17 16:18:07.416644: val_loss -0.497
+2026-10-17 16:18:07.416978: Pseudo dice [np.float32(0.7704)]
+2026-10-17 16:18:07.417339: Epoch time: 106.88 s
+2026-10-17 16:18:09.648778: 
+2026-10-17 16:18:09.649246: Epoch 62
+2026-10-17 16:18:09.649420: Current learning rate: 0.00419
+2026-10-17 16:19:56.178479: train_loss -0.9262
+2026-10-17 16:19:56.179225: val_loss -0.5863
+2026-10-17 16:19:56.179654: Pseudo dice [np.float32(0.7862)]
+2026-10-17 16:19:56.179950: Epoch time: 106.53 s
+2026-10-17 16:19:58.334848: 
+2026-10-17 16:19:58.335266: Epoch 63
+2026-10-17 16:19:58.335506: Current learning rate: 0.00409
+2026-10-17 16:21:44.867556: train_loss -0.9219
+2026-10-17 16:21:44.868107: val_loss -0.5705
+2026-10-17 16:21:44.869647: Pseudo dice [np.float32(0.7866)]
+2026-10-17 16:21:44.870709: Epoch time: 106.53 s
+2026-10-17 16:21:47.122245: 
+2026-10-17 16:21:47.123468: Epoch 64
+2026-10-17 16:21:47.123714: Current learning rate: 0.00399
+2026-10-17 16:23:33.463719: train_loss -0.9211
+2026-10-17 16:23:33.464201: val_loss -0.5435
+2026-10-17 16:23:33.464536: Pseudo dice [np.float32(0.764)]
+2026-10-17 16:23:33.465149: Epoch time: 106.34 s
+2026-10-17 16:23:35.992620: 
+2026-10-17 16:23:35.993048: Epoch 65
+2026-10-17 16:23:35.993366: Current learning rate: 0.00389
+2026-10-17 16:25:22.384454: train_loss -0.9269
+2026-10-17 16:25:22.387417: val_loss -0.5219
+2026-10-17 16:25:22.389135: Pseudo dice [np.float32(0.7542)]
+2026-10-17 16:25:22.389364: Epoch time: 106.39 s
+2026-10-17 16:25:24.792389: 
+2026-10-17 16:25:24.794458: Epoch 66
+2026-10-17 16:25:24.794929: Current learning rate: 0.00379
+2026-10-17 16:27:11.202768: train_loss -0.927
+2026-10-17 16:27:11.203666: val_loss -0.6032
+2026-10-17 16:27:11.204215: Pseudo dice [np.float32(0.7952)]
+2026-10-17 16:27:11.204667: Epoch time: 106.41 s
+2026-10-17 16:27:13.050244: 
+2026-10-17 16:27:13.050617: Epoch 67
+2026-10-17 16:27:13.050772: Current learning rate: 0.00369
+2026-10-17 16:28:59.162524: train_loss -0.9291
+2026-10-17 16:28:59.163122: val_loss -0.51
+2026-10-17 16:28:59.163485: Pseudo dice [np.float32(0.7621)]
+2026-10-17 16:28:59.163834: Epoch time: 106.11 s
+2026-10-17 16:29:01.259722: 
+2026-10-17 16:29:01.260191: Epoch 68
+2026-10-17 16:29:01.260416: Current learning rate: 0.00359
+2026-10-17 16:30:47.638983: train_loss -0.9334
+2026-10-17 16:30:47.640287: val_loss -0.5834
+2026-10-17 16:30:47.640594: Pseudo dice [np.float32(0.7947)]
+2026-10-17 16:30:47.640901: Epoch time: 106.38 s
+2026-10-17 16:30:50.013728: 
+2026-10-17 16:30:50.014161: Epoch 69
+2026-10-17 16:30:50.014461: Current learning rate: 0.00349
+2026-10-17 16:32:36.560122: train_loss -0.933
+2026-10-17 16:32:36.561985: val_loss -0.5596
+2026-10-17 16:32:36.563672: Pseudo dice [np.float32(0.7854)]
+2026-10-17 16:32:36.563898: Epoch time: 106.55 s
+2026-10-17 16:32:39.143972: 
+2026-10-17 16:32:39.144290: Epoch 70
+2026-10-17 16:32:39.144688: Current learning rate: 0.00338
+2026-10-17 16:34:25.525648: train_loss -0.9327
+2026-10-17 16:34:25.526989: val_loss -0.6082
+2026-10-17 16:34:25.527325: Pseudo dice [np.float32(0.7992)]
+2026-10-17 16:34:25.527694: Epoch time: 106.38 s
+2026-10-17 16:34:28.120041: 
+2026-10-17 16:34:28.120581: Epoch 71
+2026-10-17 16:34:28.120788: Current learning rate: 0.00328
+2026-10-17 16:36:14.775026: train_loss -0.936
+2026-10-17 16:36:14.775538: val_loss -0.5614
+2026-10-17 16:36:14.775684: Pseudo dice [np.float32(0.788)]
+2026-10-17 16:36:14.775828: Epoch time: 106.66 s
+2026-10-17 16:36:16.935006: 
+2026-10-17 16:36:16.935447: Epoch 72
+2026-10-17 16:36:16.935688: Current learning rate: 0.00318
+2026-10-17 16:38:03.808155: train_loss -0.9364
+2026-10-17 16:38:03.808719: val_loss -0.5558
+2026-10-17 16:38:03.808988: Pseudo dice [np.float32(0.7722)]
+2026-10-17 16:38:03.809269: Epoch time: 106.88 s
+2026-10-17 16:38:05.888771: 
+2026-10-17 16:38:05.889178: Epoch 73
+2026-10-17 16:38:05.889351: Current learning rate: 0.00308
+2026-10-17 16:39:52.215197: train_loss -0.9344
+2026-10-17 16:39:52.216730: val_loss -0.577
+2026-10-17 16:39:52.217059: Pseudo dice [np.float32(0.7917)]
+2026-10-17 16:39:52.217402: Epoch time: 106.33 s
+2026-10-17 16:39:54.533000: 
+2026-10-17 16:39:54.533625: Epoch 74
+2026-10-17 16:39:54.533978: Current learning rate: 0.00297
+2026-10-17 16:41:40.901346: train_loss -0.9377
+2026-10-17 16:41:40.904447: val_loss -0.5541
+2026-10-17 16:41:40.904835: Pseudo dice [np.float32(0.7822)]
+2026-10-17 16:41:40.905234: Epoch time: 106.37 s
+2026-10-17 16:41:43.701746: 
+2026-10-17 16:41:43.702183: Epoch 75
+2026-10-17 16:41:43.702628: Current learning rate: 0.00287
+2026-10-17 16:43:30.149255: train_loss -0.9342
+2026-10-17 16:43:30.149871: val_loss -0.6072
+2026-10-17 16:43:30.150275: Pseudo dice [np.float32(0.8)]
+2026-10-17 16:43:30.150892: Epoch time: 106.45 s
+2026-10-17 16:43:32.318291: 
+2026-10-17 16:43:32.318921: Epoch 76
+2026-10-17 16:43:32.319350: Current learning rate: 0.00277
+2026-10-17 16:45:18.567349: train_loss -0.9386
+2026-10-17 16:45:18.570333: val_loss -0.5507
+2026-10-17 16:45:18.570611: Pseudo dice [np.float32(0.7704)]
+2026-10-17 16:45:18.570980: Epoch time: 106.25 s
+2026-10-17 16:45:20.775258: 
+2026-10-17 16:45:20.775736: Epoch 77
+2026-10-17 16:45:20.776011: Current learning rate: 0.00266
+2026-10-17 16:47:07.118931: train_loss -0.9407
+2026-10-17 16:47:07.119565: val_loss -0.5635
+2026-10-17 16:47:07.119780: Pseudo dice [np.float32(0.7767)]
+2026-10-17 16:47:07.119981: Epoch time: 106.35 s
+2026-10-17 16:47:09.202772: 
+2026-10-17 16:47:09.203195: Epoch 78
+2026-10-17 16:47:09.203475: Current learning rate: 0.00256
+2026-10-17 16:48:55.986854: train_loss -0.9404
+2026-10-17 16:48:55.987301: val_loss -0.584
+2026-10-17 16:48:55.988813: Pseudo dice [np.float32(0.7887)]
+2026-10-17 16:48:55.989190: Epoch time: 106.79 s
+2026-10-17 16:48:58.356430: 
+2026-10-17 16:48:58.356857: Epoch 79
+2026-10-17 16:48:58.357139: Current learning rate: 0.00245
+2026-10-17 16:50:44.771793: train_loss -0.9389
+2026-10-17 16:50:44.772474: val_loss -0.5739
+2026-10-17 16:50:44.772908: Pseudo dice [np.float32(0.7874)]
+2026-10-17 16:50:44.773210: Epoch time: 106.42 s
+2026-10-17 16:50:47.518646: 
+2026-10-17 16:50:47.521403: Epoch 80
+2026-10-17 16:50:47.521654: Current learning rate: 0.00235
+2026-10-17 16:52:34.094495: train_loss -0.9417
+2026-10-17 16:52:34.098005: val_loss -0.5752
+2026-10-17 16:52:34.098413: Pseudo dice [np.float32(0.782)]
+2026-10-17 16:52:34.098753: Epoch time: 106.58 s
+2026-10-17 16:52:36.091888: 
+2026-10-17 16:52:36.092330: Epoch 81
+2026-10-17 16:52:36.092583: Current learning rate: 0.00224
+2026-10-17 16:54:22.824615: train_loss -0.9409
+2026-10-17 16:54:22.826111: val_loss -0.585
+2026-10-17 16:54:22.826531: Pseudo dice [np.float32(0.7941)]
+2026-10-17 16:54:22.826841: Epoch time: 106.73 s
+2026-10-17 16:54:25.246231: 
+2026-10-17 16:54:25.246655: Epoch 82
+2026-10-17 16:54:25.246868: Current learning rate: 0.00214
+2026-10-17 16:56:11.637306: train_loss -0.9411
+2026-10-17 16:56:11.637845: val_loss -0.571
+2026-10-17 16:56:11.638233: Pseudo dice [np.float32(0.7857)]
+2026-10-17 16:56:11.639485: Epoch time: 106.39 s
+2026-10-17 16:56:13.663248: 
+2026-10-17 16:56:13.663589: Epoch 83
+2026-10-17 16:56:13.663893: Current learning rate: 0.00203
+2026-10-17 16:58:00.279619: train_loss -0.9421
+2026-10-17 16:58:00.280246: val_loss -0.5369
+2026-10-17 16:58:00.280526: Pseudo dice [np.float32(0.7712)]
+2026-10-17 16:58:00.280775: Epoch time: 106.62 s
+2026-10-17 16:58:02.372030: 
+2026-10-17 16:58:02.372559: Epoch 84
+2026-10-17 16:58:02.372915: Current learning rate: 0.00192
+2026-10-17 16:59:48.873992: train_loss -0.9422
+2026-10-17 16:59:48.874879: val_loss -0.6258
+2026-10-17 16:59:48.875859: Pseudo dice [np.float32(0.8122)]
+2026-10-17 16:59:48.876198: Epoch time: 106.51 s
+2026-10-17 16:59:51.386798: 
+2026-10-17 16:59:51.387126: Epoch 85
+2026-10-17 16:59:51.387285: Current learning rate: 0.00181
+2026-10-17 17:01:37.874606: train_loss -0.9431
+2026-10-17 17:01:37.875151: val_loss -0.5884
+2026-10-17 17:01:37.875465: Pseudo dice [np.float32(0.7917)]
+2026-10-17 17:01:37.875839: Epoch time: 106.49 s
+2026-10-17 17:01:40.079703: 
+2026-10-17 17:01:40.080012: Epoch 86
+2026-10-17 17:01:40.080410: Current learning rate: 0.0017
+2026-10-17 17:03:26.818883: train_loss -0.9445
+2026-10-17 17:03:26.819412: val_loss -0.5789
+2026-10-17 17:03:26.819615: Pseudo dice [np.float32(0.7921)]
+2026-10-17 17:03:26.819781: Epoch time: 106.74 s
+2026-10-17 17:03:29.022601: 
+2026-10-17 17:03:29.022976: Epoch 87
+2026-10-17 17:03:29.023191: Current learning rate: 0.00159
+2026-10-17 17:05:15.511471: train_loss -0.9462
+2026-10-17 17:05:15.511942: val_loss -0.5728
+2026-10-17 17:05:15.512207: Pseudo dice [np.float32(0.7884)]
+2026-10-17 17:05:15.512563: Epoch time: 106.49 s
+2026-10-17 17:05:18.169842: 
+2026-10-17 17:05:18.170312: Epoch 88
+2026-10-17 17:05:18.170564: Current learning rate: 0.00148
+2026-10-17 17:07:04.915494: train_loss -0.9462
+2026-10-17 17:07:04.915918: val_loss -0.5453
+2026-10-17 17:07:04.916376: Pseudo dice [np.float32(0.7832)]
+2026-10-17 17:07:04.916876: Epoch time: 106.75 s
+2026-10-17 17:07:07.120455: 
+2026-10-17 17:07:07.120908: Epoch 89
+2026-10-17 17:07:07.121109: Current learning rate: 0.00137
+2026-10-17 17:08:53.434813: train_loss -0.9495
+2026-10-17 17:08:53.435250: val_loss -0.5602
+2026-10-17 17:08:53.435460: Pseudo dice [np.float32(0.7852)]
+2026-10-17 17:08:53.435744: Epoch time: 106.32 s
+2026-10-17 17:08:56.065983: 
+2026-10-17 17:08:56.066461: Epoch 90
+2026-10-17 17:08:56.066709: Current learning rate: 0.00126
+2026-10-17 17:10:42.571908: train_loss -0.9437
+2026-10-17 17:10:42.572538: val_loss -0.5161
+2026-10-17 17:10:42.572851: Pseudo dice [np.float32(0.767)]
+2026-10-17 17:10:42.573174: Epoch time: 106.51 s
+2026-10-17 17:10:44.462687: 
+2026-10-17 17:10:44.463042: Epoch 91
+2026-10-17 17:10:44.463328: Current learning rate: 0.00115
+2026-10-17 17:12:30.932852: train_loss -0.9481
+2026-10-17 17:12:30.933594: val_loss -0.5481
+2026-10-17 17:12:30.933961: Pseudo dice [np.float32(0.7797)]
+2026-10-17 17:12:30.934240: Epoch time: 106.47 s
+2026-10-17 17:12:32.702204: 
+2026-10-17 17:12:32.702577: Epoch 92
+2026-10-17 17:12:32.702843: Current learning rate: 0.00103
+2026-10-17 17:14:19.515073: train_loss -0.9487
+2026-10-17 17:14:19.515669: val_loss -0.5141
+2026-10-17 17:14:19.515918: Pseudo dice [np.float32(0.771)]
+2026-10-17 17:14:19.516163: Epoch time: 106.81 s
+2026-10-17 17:14:21.532677: 
+2026-10-17 17:14:21.533267: Epoch 93
+2026-10-17 17:14:21.533642: Current learning rate: 0.00091
+2026-10-17 17:16:07.988702: train_loss -0.9476
+2026-10-17 17:16:07.989223: val_loss -0.5174
+2026-10-17 17:16:07.989763: Pseudo dice [np.float32(0.7721)]
+2026-10-17 17:16:07.990144: Epoch time: 106.46 s
+2026-10-17 17:16:10.050727: 
+2026-10-17 17:16:10.051383: Epoch 94
+2026-10-17 17:16:10.051739: Current learning rate: 0.00079
+2026-10-17 17:17:56.476650: train_loss -0.9487
+2026-10-17 17:17:56.477369: val_loss -0.5411
+2026-10-17 17:17:56.477769: Pseudo dice [np.float32(0.7803)]
+2026-10-17 17:17:56.478144: Epoch time: 106.43 s
+2026-10-17 17:17:58.977837: 
+2026-10-17 17:17:58.978282: Epoch 95
+2026-10-17 17:17:58.978561: Current learning rate: 0.00067
+2026-10-17 17:19:45.417948: train_loss -0.9492
+2026-10-17 17:19:45.418620: val_loss -0.5548
+2026-10-17 17:19:45.418916: Pseudo dice [np.float32(0.7852)]
+2026-10-17 17:19:45.419311: Epoch time: 106.44 s
+2026-10-17 17:19:47.611505: 
+2026-10-17 17:19:47.612005: Epoch 96
+2026-10-17 17:19:47.612308: Current learning rate: 0.00055
+2026-10-17 17:21:34.216371: train_loss -0.9488
+2026-10-17 17:21:34.216985: val_loss -0.5255
+2026-10-17 17:21:34.217358: Pseudo dice [np.float32(0.7725)]
+2026-10-17 17:21:34.217655: Epoch time: 106.61 s
+2026-10-17 17:21:36.301924: 
+2026-10-17 17:21:36.302352: Epoch 97
+2026-10-17 17:21:36.302641: Current learning rate: 0.00043
+2026-10-17 17:23:22.812596: train_loss -0.9513
+2026-10-17 17:23:22.814365: val_loss -0.5535
+2026-10-17 17:23:22.814723: Pseudo dice [np.float32(0.788)]
+2026-10-17 17:23:22.816072: Epoch time: 106.51 s
+2026-10-17 17:23:24.812236: 
+2026-10-17 17:23:24.812601: Epoch 98
+2026-10-17 17:23:24.812761: Current learning rate: 0.0003
+2026-10-17 17:25:11.366609: train_loss -0.9503
+2026-10-17 17:25:11.367296: val_loss -0.5635
+2026-10-17 17:25:11.367517: Pseudo dice [np.float32(0.7793)]
+2026-10-17 17:25:11.367759: Epoch time: 106.56 s
+2026-10-17 17:25:13.461243: 
+2026-10-17 17:25:13.461600: Epoch 99
+2026-10-17 17:25:13.461754: Current learning rate: 0.00016
+2026-10-17 17:27:00.186818: train_loss -0.951
+2026-10-17 17:27:00.187540: val_loss -0.5106
+2026-10-17 17:27:00.187861: Pseudo dice [np.float32(0.7681)]
+2026-10-17 17:27:00.188193: Epoch time: 106.73 s
+2026-10-17 17:27:03.122532: Training done.
+2026-10-17 17:27:03 | INFO    | nnU-Net training finished in 181.9 min (100 epochs x 250 iterations, batch size 26, patch [256, 256])
+2026-10-17 17:27:03 | INFO    | Stage 'nnunet_train' finished in 03:02:48
+2026-10-17 17:27:03 | INFO    | ####################################################################################################
+2026-10-17 17:27:03 | INFO    | STAGE: NNUNET_TEST
+There are 103 cases in the source folder
+I am process 0 out of 1 (max process ID is 0, we start counting with 0!)
+There are 103 cases that I would like to predict
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+2026-10-17 17:27:27 | INFO    | Loaded cached preprocessed BUSI/test (129 samples) from BUSI_test_256x256_553d5ed013a49a5aa52355de.npz
+2026-10-17 17:27:27 | INFO    | Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA (+ nnU-Net's mirroring TTA reported separately)
+There are 129 cases in the source folder
+I am process 0 out of 1 (max process ID is 0, we start counting with 0!)
+There are 129 cases that I would like to predict
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+There are 129 cases in the source folder
+I am process 0 out of 1 (max process ID is 0, we start counting with 0!)
+There are 129 cases that I would like to predict
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+perform_everything_on_device: True
+2026-10-17 17:28:34 | INFO    | TEST | nnU-Net | Dice (DSC) 0.7900 | mIoU 0.8283 | HD95 28.74 px | Sensitivity 0.8142 | Params 33.472 M | 19.90 ms/image | with mirroring TTA: Dice 0.7969
+2026-10-17 17:28:34 | INFO    | Stage 'nnunet_test' finished in 00:01:31
+2026-10-17 17:28:34 | INFO    | ####################################################################################################
+2026-10-17 17:28:34 | INFO    | STAGE: REPORT
+2026-10-17 17:28:34 | INFO    | Stage 'report' finished in 00:00:00
+================ nnU-Net RESULT ================
+
+Dataset: BUSI
+Method: nnU-Net — baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split
+Seed: 47
+
+Training: 100 epochs x 250 iterations, batch size 26, patch [256, 256]
+Validation Dice (final checkpoint): 0.7947
+
+Final test (n = 129, evaluated once, no TTA):
+Dice (DSC):        79.00 %
+mIoU (class mean): 82.83 %
+Params:            33.472 M
+FLOPs:             133.82 G per batch of 8 (16.73 G per image)
+HD95:              28.74 px
+Sensitivity:       81.42 %
+IoU (foreground):  70.75 %
+Inference:         19.90 ms per image on cuda
+Dice with nnU-Net mirroring TTA: 79.69 %
+
+================================================
+
+2026-10-17 17:28:34 | INFO    | QENAS time on BUSI (nnunet, seed 47): 03:04:44 from start to end (all stages) | this session: 03:04:45

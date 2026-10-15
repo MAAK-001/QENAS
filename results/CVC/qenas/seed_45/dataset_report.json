@@ -1,0 +1,74 @@
+{
+  "layout": "PNG/Original/<frame>.png paired with PNG/Ground Truth/<frame>.png; metadata.csv frame->sequence",
+  "directory": "/kaggle/input/datasets/maak01/e-nas-datasets/Datasets/CVC-ClinicD (Polyp)",
+  "tree": [
+    "CVC-ClinicD (Polyp)/  [2 .csv]",
+    "  PNG/",
+    "    Ground Truth/  [612 .png]",
+    "    Original/  [612 .png]",
+    "  TIF/",
+    "    Ground Truth/  [612 .tif]",
+    "    Original/  [612 .tif]"
+  ],
+  "extensions": {
+    ".csv": 2,
+    ".tif": 1224,
+    ".png": 1224
+  },
+  "n_sequences": 29,
+  "frames_per_sequence": {
+    "seq_1": 25,
+    "seq_2": 25,
+    "seq_3": 17,
+    "seq_4": 11,
+    "seq_5": 25,
+    "seq_6": 23,
+    "seq_7": 25,
+    "seq_8": 26,
+    "seq_9": 22,
+    "seq_10": 6,
+    "seq_11": 22,
+    "seq_12": 25,
+    "seq_13": 25,
+    "seq_14": 20,
+    "seq_15": 20,
+    "seq_16": 25,
+    "seq_17": 21,
+    "seq_18": 20,
+    "seq_19": 25,
+    "seq_20": 20,
+    "seq_21": 19,
+    "seq_22": 19,
+    "seq_23": 12,
+    "seq_24": 25,
+    "seq_25": 25,
+    "seq_26": 18,
+    "seq_27": 25,
+    "seq_28": 20,
+    "seq_29": 21
+  },
+  "tif_copies": "ignored (not decodable by Pillow; PNG copies are lossless and identical in content)",
+  "official_split": null,
+  "leakage_unit": "sequence (all frames of one colonoscopy sequence stay in one split)",
+  "validation": {
+    "n_samples": 612,
+    "image_modes": {
+      "RGB": 612
+    },
+    "n_distinct_image_sizes": 1,
+    "most_common_image_sizes": [
+      [
+        [
+          384,
+          288
+        ],
+        612
+      ]
+    ],
+    "mask_intermediate_pixel_fraction_max": 0.08164243344907407,
+    "mask_intermediate_pixel_fraction_mean": 0.00134515219812848,
+    "foreground_fraction_mean": 0.09165658722256265,
+    "n_empty_masks": 0,
+    "warnings": []
+  }
+}

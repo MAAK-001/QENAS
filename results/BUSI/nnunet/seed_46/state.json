@@ -1,0 +1,53 @@
+{
+  "fingerprint": "586257c409b867c5",
+  "created": "2026-10-16T21:23:38",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-16T21:23:56",
+      "train": 413,
+      "val": 103,
+      "test": 129,
+      "seconds": 16.5
+    },
+    "nnunet_data": {
+      "status": "done",
+      "finished": "2026-10-16T21:24:23",
+      "train": 413,
+      "val": 103,
+      "seconds": 26.8
+    },
+    "nnunet_train": {
+      "status": "done",
+      "finished": "2026-10-17T00:26:19",
+      "num_epochs": 100,
+      "iterations_per_epoch": 250,
+      "batch_size": 26,
+      "patch_size": [
+        256,
+        256
+      ],
+      "seconds": 10916.1
+    },
+    "nnunet_test": {
+      "status": "done",
+      "finished": "2026-10-17T00:27:57",
+      "test_dice": 0.7827051362495585,
+      "test_dice_mirroring_tta": 0.7887122151320627,
+      "seconds": 98.1
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-17T00:27:57",
+      "seconds": 0.0
+    }
+  },
+  "test_evaluated": true,
+  "method": "nnunet",
+  "dataset": "BUSI",
+  "seed": 46,
+  "updated": "2026-10-17T00:27:57",
+  "test_evaluated_at": "2026-10-17T00:27:51",
+  "total_seconds": 11057.5
+}

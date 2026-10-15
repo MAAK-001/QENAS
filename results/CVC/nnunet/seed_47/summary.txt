@@ -1,0 +1,22 @@
+================ nnU-Net RESULT ================
+
+Dataset: CVC
+Method: nnU-Net — baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split
+Seed: 47
+
+Training: 100 epochs x 250 iterations, batch size 25, patch [256, 256]
+Validation Dice (final checkpoint): 0.6679
+
+Final test (n = 121, evaluated once, no TTA):
+Dice (DSC):        75.80 %
+mIoU (class mean): 81.57 %
+Params:            33.472 M
+FLOPs:             133.82 G per batch of 8 (16.73 G per image)
+HD95:              36.30 px
+Sensitivity:       78.11 %
+IoU (foreground):  66.22 %
+Inference:         15.31 ms per image on cuda
+Dice with nnU-Net mirroring TTA: 77.79 %
+
+================================================
+QENAS time on CVC (nnunet, seed 47): 02:55:24 from start to end (all stages) | this session: 02:55:27

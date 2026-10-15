@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: QENAS, random candidate — ablation: a uniformly random one of QENAS' 16 candidates instead of learning-capability selection
+Seed: 45
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 217
+Hypervolume: 0.7443 (generation 0) -> 1.1150 (final)
+Final Pareto front size: 11
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [2, 1, 4, 4, 4, 2, 2, 2]
+Block sequence: ['Inception', 'Dense', 'DARTS', 'DARTS', 'DARTS', 'Inception', 'Inception', 'Inception']
+ZiCo: 736.061
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.5572
+Selection: Candidate 4 selected: uniformly random candidate (rng seed derived from seed 45 and dataset KVASIR). Learning-capability selection would have chosen candidate 16.
+
+Loss coefficients:
+alpha (BCE): 0.500   beta (soft-mIoU): 0.500
+
+Final training:
+Epochs run: 120 (best epoch 119)
+Best validation Dice: 0.8772   mIoU: 0.8797   HD95: 29.82 px
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        83.47 %
+mIoU (class mean): 84.27 %
+Params:            0.871 M
+FLOPs:             33.64 G per batch of 8 (Mixed-GGNAS convention; 4.21 G per image)
+HD95:              33.76 px
+Sensitivity:       85.48 %
+IoU (foreground):  75.15 %
+Inference:         21.66 ms per image on cuda
+Test loss:         0.2170
+
+================================================
+QENAS time on KVASIR (qenas_random_pick, seed 45): 02:14:00 from start to end (all stages) | this session: 02:14:02

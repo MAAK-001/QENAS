@@ -1,0 +1,123 @@
+{
+  "chromosome": [
+    1,
+    4,
+    4,
+    4,
+    4,
+    0,
+    4,
+    0
+  ],
+  "blocks": [
+    "Dense",
+    "DARTS",
+    "DARTS",
+    "DARTS",
+    "DARTS",
+    "Residual",
+    "DARTS",
+    "Residual"
+  ],
+  "base_channels": 32,
+  "scale": 3,
+  "darts_genotype": "darts_cell_cvc",
+  "input": "3x256x256",
+  "stem_params": 928,
+  "head_params": 33,
+  "positions": [
+    {
+      "position": "enc1",
+      "gene": 1,
+      "block": "Dense",
+      "in_channels": 32,
+      "out_channels": 64,
+      "in_resolution": "256x256",
+      "out_resolution": "128x128",
+      "kernel_scale": "3 dense layers (3x3 gconv, growth 32) + 1x1",
+      "params": 17344
+    },
+    {
+      "position": "enc2",
+      "gene": 4,
+      "block": "DARTS",
+      "in_channels": 64,
+      "out_channels": 128,
+      "in_resolution": "128x128",
+      "out_resolution": "64x64",
+      "kernel_scale": "darts_cell_cvc down: n2<-avg_pool(s1), n2<-avg_pool(s0), n3<-avg_pool(s1), n3<-avg_pool(s0), n4<-down_conv(s0), n4<-avg_pool(s1), n5<-down_dep_conv(s1), n5<-avg_pool(s0)",
+      "params": 13856
+    },
+    {
+      "position": "enc3",
+      "gene": 4,
+      "block": "DARTS",
+      "in_channels": 128,
+      "out_channels": 256,
+      "in_resolution": "64x64",
+      "out_resolution": "32x32",
+      "kernel_scale": "darts_cell_cvc down: n2<-avg_pool(s1), n2<-avg_pool(s0), n3<-avg_pool(s1), n3<-avg_pool(s0), n4<-down_conv(s0), n4<-avg_pool(s1), n5<-down_dep_conv(s1), n5<-avg_pool(s0)",
+      "params": 54336
+    },
+    {
+      "position": "enc4",
+      "gene": 4,
+      "block": "DARTS",
+      "in_channels": 256,
+      "out_channels": 512,
+      "in_resolution": "32x32",
+      "out_resolution": "16x16",
+      "kernel_scale": "darts_cell_cvc down: n2<-avg_pool(s1), n2<-avg_pool(s0), n3<-avg_pool(s1), n3<-avg_pool(s0), n4<-down_conv(s0), n4<-avg_pool(s1), n5<-down_dep_conv(s1), n5<-avg_pool(s0)",
+      "params": 215168
+    },
+    {
+      "position": "dec1",
+      "gene": 4,
+      "block": "DARTS",
+      "in_channels": 512,
+      "out_channels": 256,
+      "in_resolution": "16x16",
+      "out_resolution": "32x32",
+      "kernel_scale": "darts_cell_cvc up: n2<-dep_conv(s0), n2<-up_dil_conv(s1), n3<-dil_conv(n2), n3<-up_dep_conv(s1), n4<-dep_conv(n3), n4<-up_dep_conv(s1), n5<-up_dep_conv(s1), n5<-dil_conv(n2)",
+      "params": 184384
+    },
+    {
+      "position": "dec2",
+      "gene": 0,
+      "block": "Residual",
+      "in_channels": 256,
+      "out_channels": 128,
+      "in_resolution": "32x32",
+      "out_resolution": "64x64",
+      "kernel_scale": "2x[3x3 gconv] + identity",
+      "params": 192288
+    },
+    {
+      "position": "dec3",
+      "gene": 4,
+      "block": "DARTS",
+      "in_channels": 128,
+      "out_channels": 64,
+      "in_resolution": "64x64",
+      "out_resolution": "128x128",
+      "kernel_scale": "darts_cell_cvc up: n2<-dep_conv(s0), n2<-up_dil_conv(s1), n3<-dil_conv(n2), n3<-up_dep_conv(s1), n4<-dep_conv(n3), n4<-up_dep_conv(s1), n5<-up_dep_conv(s1), n5<-dil_conv(n2)",
+      "params": 12304
+    },
+    {
+      "position": "dec4",
+      "gene": 0,
+      "block": "Residual",
+      "in_channels": 64,
+      "out_channels": 32,
+      "in_resolution": "128x128",
+      "out_resolution": "256x256",
+      "kernel_scale": "2x[3x3 gconv] + identity",
+      "params": 12360
+    }
+  ],
+  "total_params": 703001,
+  "params_m": 0.703001,
+  "flops_batch_size": 8,
+  "gflops_mixed_ggnas": 20.123030784,
+  "gflops_per_image": 2.515378848
+}

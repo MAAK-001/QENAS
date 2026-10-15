@@ -1,0 +1,63 @@
+{
+  "fingerprint": "a44660a2c2485053",
+  "created": "2026-10-17T18:01:53",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-17T18:02:10",
+      "train": 413,
+      "val": 103,
+      "test": 129,
+      "seconds": 14.8
+    },
+    "inherit": {
+      "status": "done",
+      "finished": "2026-10-17T18:02:10",
+      "inherited_from": "/kaggle/working/QENAS_results/results/BUSI/qenas/seed_47",
+      "seconds": 0.0
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-17T18:02:16",
+      "selected_candidate": 16,
+      "rule": "random",
+      "relaxed_gates": [],
+      "seconds": 5.8
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-17T18:42:43",
+      "alpha": 0.2,
+      "beta": 0.8,
+      "seconds": 2427.4
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-17T19:13:43",
+      "best_epoch": 57,
+      "best_val_dice": 0.7999761641119113,
+      "seconds": 1859.6
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-17T19:13:49",
+      "test_dice": 0.7817367456561167,
+      "test_miou": 0.8180810490191385,
+      "test_hd95": 33.59450134034757,
+      "seconds": 6.0
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-17T19:13:54",
+      "seconds": 4.9
+    }
+  },
+  "test_evaluated": true,
+  "method": "qenas_random_pick",
+  "dataset": "BUSI",
+  "seed": 47,
+  "updated": "2026-10-17T19:13:54",
+  "test_evaluated_at": "2026-10-17T19:13:47",
+  "total_seconds": 4318.5
+}

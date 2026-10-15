@@ -1,0 +1,22 @@
+================ nnU-Net RESULT ================
+
+Dataset: KVASIR
+Method: nnU-Net — baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split
+Seed: 47
+
+Training: 100 epochs x 250 iterations, batch size 44, patch [256, 256]
+Validation Dice (final checkpoint): 0.8935
+
+Final test (n = 120, evaluated once, no TTA):
+Dice (DSC):        87.05 %
+mIoU (class mean): 87.38 %
+Params:            33.472 M
+FLOPs:             133.82 G per batch of 8 (16.73 G per image)
+HD95:              28.12 px
+Sensitivity:       90.34 %
+IoU (foreground):  80.12 %
+Inference:         10.86 ms per image on cuda
+Dice with nnU-Net mirroring TTA: 87.65 %
+
+================================================
+QENAS time on KVASIR (nnunet, seed 47): 04:46:01 from start to end (all stages) | this session: 04:46:07

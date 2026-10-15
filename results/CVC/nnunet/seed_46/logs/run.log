@@ -1,0 +1,46 @@
+2026-10-16 22:00:13 | INFO    | QENAS | dataset CVC | method nnunet | seed 46 | experiment /kaggle/working/QENAS_results/results/CVC/nnunet/seed_46 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint b7f564bdaadba5af
+2026-10-16 22:00:13 | INFO    | Method nnunet (baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split) | stages: split -> nnunet_data -> nnunet_train -> nnunet_test -> report
+2026-10-16 22:00:13 | INFO    | ####################################################################################################
+2026-10-16 22:00:13 | INFO    | STAGE: SPLIT
+2026-10-16 22:00:21 | INFO    | Dataset structure: PNG/Original/<frame>.png paired with PNG/Ground Truth/<frame>.png; metadata.csv frame->sequence
+2026-10-16 22:00:21 | INFO    | 
+CVC
+Train: 395
+Validation: 96
+Test: 121
+2026-10-16 22:00:21 | INFO    | Stage 'split' finished in 00:00:08
+2026-10-16 22:00:21 | INFO    | ####################################################################################################
+2026-10-16 22:00:21 | INFO    | STAGE: NNUNET_DATA
+2026-10-16 22:00:22 | INFO    |   preprocessing CVC/train: 79/395 | Progress:  20.0% | Elapsed: 00:00:01 | ETA: 00:00:05
+2026-10-16 22:00:23 | INFO    |   preprocessing CVC/train: 158/395 | Progress:  40.0% | Elapsed: 00:00:02 | ETA: 00:00:03
+2026-10-16 22:00:25 | INFO    |   preprocessing CVC/train: 237/395 | Progress:  60.0% | Elapsed: 00:00:03 | ETA: 00:00:02
+2026-10-16 22:00:26 | INFO    |   preprocessing CVC/train: 316/395 | Progress:  80.0% | Elapsed: 00:00:05 | ETA: 00:00:01
+2026-10-16 22:00:27 | INFO    |   preprocessing CVC/train: 395/395 | Progress: 100.0% | Elapsed: 00:00:06 | ETA: 00:00:00
+2026-10-16 22:00:30 | INFO    |   preprocessing CVC/val: 19/96 | Progress:  19.8% | Elapsed: 00:00:00 | ETA: 00:00:01
+2026-10-16 22:00:30 | INFO    |   preprocessing CVC/val: 38/96 | Progress:  39.6% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-16 22:00:31 | INFO    |   preprocessing CVC/val: 57/96 | Progress:  59.4% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-16 22:00:31 | INFO    |   preprocessing CVC/val: 76/96 | Progress:  79.2% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-16 22:00:31 | INFO    |   preprocessing CVC/val: 95/96 | Progress:  99.0% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-16 22:00:31 | INFO    |   preprocessing CVC/val: 96/96 | Progress: 100.0% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-16 22:00:33 | INFO    | Data ready: train 395, validation 96 (test held out) | normalisation mean [0.4059, 0.2754, 0.1878] std [0.3025, 0.211, 0.1451]
+2026-10-16 22:00:46 | INFO    | nnU-Net raw dataset Dataset902_CVC: 395 training + 96 validation cases (256x256 PNG)
+2026-10-16 22:00:46 | INFO    | Stage 'nnunet_data' finished in 00:00:25
+2026-10-16 22:00:46 | INFO    | ####################################################################################################
+2026-10-16 22:00:46 | INFO    | STAGE: NNUNET_TRAIN
+2026-10-17 00:41:51 | INFO    | nnU-Net training finished in 160.1 min (100 epochs x 250 iterations, batch size 25, patch [256, 256])
+2026-10-17 00:41:51 | INFO    | Stage 'nnunet_train' finished in 02:41:05
+2026-10-17 00:41:51 | INFO    | ####################################################################################################
+2026-10-17 00:41:51 | INFO    | STAGE: NNUNET_TEST
+2026-10-17 00:42:14 | INFO    |   preprocessing CVC/test: 24/121 | Progress:  19.8% | Elapsed: 00:00:00 | ETA: 00:00:02
+2026-10-17 00:42:15 | INFO    |   preprocessing CVC/test: 48/121 | Progress:  39.7% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-17 00:42:15 | INFO    |   preprocessing CVC/test: 72/121 | Progress:  59.5% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-17 00:42:15 | INFO    |   preprocessing CVC/test: 96/121 | Progress:  79.3% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-17 00:42:16 | INFO    |   preprocessing CVC/test: 120/121 | Progress:  99.2% | Elapsed: 00:00:02 | ETA: 00:00:00
+2026-10-17 00:42:16 | INFO    |   preprocessing CVC/test: 121/121 | Progress: 100.0% | Elapsed: 00:00:02 | ETA: 00:00:00
+2026-10-17 00:42:17 | INFO    | Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA (+ nnU-Net's mirroring TTA reported separately)
+2026-10-17 00:43:20 | INFO    | TEST | nnU-Net | Dice (DSC) 0.7805 | mIoU 0.8282 | HD95 30.57 px | Sensitivity 0.7972 | Params 33.472 M | 13.34 ms/image | with mirroring TTA: Dice 0.7842
+2026-10-17 00:43:20 | INFO    | Stage 'nnunet_test' finished in 00:01:29
+2026-10-17 00:43:20 | INFO    | ####################################################################################################
+2026-10-17 00:43:20 | INFO    | STAGE: REPORT
+2026-10-17 00:43:20 | INFO    | Stage 'report' finished in 00:00:00
+2026-10-17 00:43:20 | INFO    | QENAS time on CVC (nnunet, seed 46): 02:43:07 from start to end (all stages) | this session: 02:43:08

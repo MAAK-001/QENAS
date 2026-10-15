@@ -1,0 +1,33 @@
+2026-10-17 14:23:50 | INFO    | QENAS | dataset BUSI | method nnunet | seed 47 | experiment /kaggle/working/QENAS_results/results/BUSI/nnunet/seed_47 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint e379040fc4bb933b
+2026-10-17 14:23:50 | INFO    | Method nnunet (baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split) | stages: split -> nnunet_data -> nnunet_train -> nnunet_test -> report
+2026-10-17 14:23:50 | INFO    | ####################################################################################################
+2026-10-17 14:23:50 | INFO    | STAGE: SPLIT
+2026-10-17 14:23:57 | WARNING | BUSI exact duplicate ['benign/benign (433)', 'malignant/malignant (145)'] -> excluded all copies (conflicting masks/labels)
+2026-10-17 14:24:02 | INFO    | Dataset structure: class folders; masks '<stem>_mask[_k].png' (union of all masks per image)
+2026-10-17 14:24:02 | INFO    | 
+BUSI
+Train: 413
+Validation: 103
+Test: 129
+2026-10-17 14:24:02 | INFO    | Stage 'split' finished in 00:00:12
+2026-10-17 14:24:02 | INFO    | ####################################################################################################
+2026-10-17 14:24:02 | INFO    | STAGE: NNUNET_DATA
+2026-10-17 14:24:03 | INFO    | Loaded cached preprocessed BUSI/train (413 samples) from BUSI_train_256x256_cc2659c624a4af2aefb35328.npz
+2026-10-17 14:24:03 | INFO    | Loaded cached preprocessed BUSI/val (103 samples) from BUSI_val_256x256_e48eef9e064d813df9cc2544.npz
+2026-10-17 14:24:04 | INFO    | Data ready: train 413, validation 103 (test held out) | normalisation mean [0.3298, 0.3298, 0.3297] std [0.2205, 0.2205, 0.2205]
+2026-10-17 14:24:15 | INFO    | nnU-Net raw dataset Dataset901_BUSI: 413 training + 103 validation cases (256x256 PNG)
+2026-10-17 14:24:15 | INFO    | Stage 'nnunet_data' finished in 00:00:13
+2026-10-17 14:24:15 | INFO    | ####################################################################################################
+2026-10-17 14:24:15 | INFO    | STAGE: NNUNET_TRAIN
+2026-10-17 17:27:03 | INFO    | nnU-Net training finished in 181.9 min (100 epochs x 250 iterations, batch size 26, patch [256, 256])
+2026-10-17 17:27:03 | INFO    | Stage 'nnunet_train' finished in 03:02:48
+2026-10-17 17:27:03 | INFO    | ####################################################################################################
+2026-10-17 17:27:03 | INFO    | STAGE: NNUNET_TEST
+2026-10-17 17:27:27 | INFO    | Loaded cached preprocessed BUSI/test (129 samples) from BUSI_test_256x256_553d5ed013a49a5aa52355de.npz
+2026-10-17 17:27:27 | INFO    | Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA (+ nnU-Net's mirroring TTA reported separately)
+2026-10-17 17:28:34 | INFO    | TEST | nnU-Net | Dice (DSC) 0.7900 | mIoU 0.8283 | HD95 28.74 px | Sensitivity 0.8142 | Params 33.472 M | 19.90 ms/image | with mirroring TTA: Dice 0.7969
+2026-10-17 17:28:34 | INFO    | Stage 'nnunet_test' finished in 00:01:31
+2026-10-17 17:28:34 | INFO    | ####################################################################################################
+2026-10-17 17:28:34 | INFO    | STAGE: REPORT
+2026-10-17 17:28:34 | INFO    | Stage 'report' finished in 00:00:00
+2026-10-17 17:28:34 | INFO    | QENAS time on BUSI (nnunet, seed 47): 03:04:44 from start to end (all stages) | this session: 03:04:45

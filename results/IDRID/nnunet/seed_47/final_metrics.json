@@ -1,0 +1,65 @@
+{
+  "dataset": "IDRID",
+  "split_unit": "dataset",
+  "method": "nnunet",
+  "method_label": "nnU-Net",
+  "seed": 47,
+  "architecture": {
+    "type": "nnunet",
+    "configuration": "2d",
+    "trainer": "nnUNetTrainer_100epochs",
+    "plans": "nnUNetPlans",
+    "nnunetv2": "2.8.1"
+  },
+  "architecture_label": "nnU-Net 2d (nnUNetTrainer_100epochs)",
+  "blocks": null,
+  "total_params": 33472396,
+  "params_m": 33.472396,
+  "flops_batch_size": 4,
+  "gflops_mixed_ggnas": 167.27474176,
+  "gflops_per_image": 41.81868544,
+  "inference_ms_per_image": 14.095010003075004,
+  "inference_device": "cuda",
+  "alpha": null,
+  "beta": null,
+  "best_epoch": 100,
+  "epochs_run": 100,
+  "train": null,
+  "validation": {
+    "dice": 0.9557106774931413,
+    "iou": 0.9165394673892652,
+    "miou": 0.9574239256780916,
+    "hd95": 20.194086600271746,
+    "sensitivity": 0.9735423787234642,
+    "hd95_empty_pred": 0
+  },
+  "test": {
+    "dice": 0.9575707202343854,
+    "iou": 0.9205237766897464,
+    "miou": 0.9595376440992632,
+    "hd95": 16.424088532151288,
+    "sensitivity": 0.9585447087420976,
+    "hd95_empty_pred": 0
+  },
+  "n_test": 27,
+  "test_with_nnunet_mirroring_tta": {
+    "dice": 0.9604338868846197,
+    "iou": 0.9254228402574417,
+    "miou": 0.9620370673110161,
+    "hd95": 16.96537179371402,
+    "sensitivity": 0.9590595420797209,
+    "hd95_empty_pred": 0
+  },
+  "nnunet_training": {
+    "status": "done",
+    "finished": "2026-10-17T18:34:55",
+    "num_epochs": 100,
+    "iterations_per_epoch": 250,
+    "batch_size": 3,
+    "patch_size": [
+      320,
+      512
+    ],
+    "seconds": 3924.9
+  }
+}

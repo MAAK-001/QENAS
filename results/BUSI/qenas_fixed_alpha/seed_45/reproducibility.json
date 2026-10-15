@@ -1,0 +1,207 @@
+{
+  "fingerprint": "6283e074aa4bdc41",
+  "config": {
+    "method": "qenas_fixed_alpha",
+    "seed": 45,
+    "device": "cuda",
+    "paths": {
+      "results": "/kaggle/working/QENAS_results/results",
+      "cache": "/kaggle/working/QENAS/cache"
+    },
+    "data": {
+      "dataset": "BUSI",
+      "root": "/kaggle/input/datasets/maak01/e-nas-datasets/Datasets",
+      "image_size": [
+        256,
+        256
+      ],
+      "in_channels": 3,
+      "test_fraction": 0.2,
+      "val_fraction": 0.2,
+      "split_seed": 42,
+      "split_unit": "dataset",
+      "mask_threshold": 127,
+      "num_workers": 1
+    },
+    "augmentation": {
+      "hflip": 0.5,
+      "vflip": 0.0,
+      "affine_p": 0.5,
+      "rotate_deg": 15.0,
+      "scale": [
+        0.9,
+        1.1
+      ],
+      "translate": 0.05,
+      "brightness": 0.1,
+      "contrast": 0.1
+    },
+    "model": {
+      "base_channels": 32,
+      "scale": 3,
+      "num_classes": 1
+    },
+    "search": {
+      "population_size": 20,
+      "generations": 10,
+      "crossover_prob": 0.9,
+      "mutation_prob_var": 0.125,
+      "plot_every": 5
+    },
+    "pareto": {
+      "max_candidates": 16
+    },
+    "candidate_training": {
+      "epochs": 20,
+      "rungs": [
+        5,
+        10,
+        20
+      ],
+      "keep_fraction": 0.5,
+      "batch_size": 8,
+      "lr": 0.001,
+      "weight_decay": 5e-05,
+      "scheduler": "none",
+      "loss_alpha": 0.5
+    },
+    "selection": {
+      "significance": 0.05,
+      "criterion_window": 5
+    },
+    "loss_weights": {
+      "alphas": [
+        0.2,
+        0.4,
+        0.5,
+        0.6,
+        0.8
+      ],
+      "criterion_window": 5
+    },
+    "final_training": {
+      "epochs": 120,
+      "batch_size": 8,
+      "lr": 0.001,
+      "weight_decay": 5e-05,
+      "scheduler": "poly",
+      "warmup_epochs": 1,
+      "poly_power": 0.9,
+      "early_stopping": {
+        "patience": 20,
+        "min_epochs": 30,
+        "significance": 0.05
+      }
+    }
+  },
+  "environment": {
+    "python_version": "3.13.15",
+    "python_implementation": "CPython",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "cpu_count": 4,
+    "torch_version": "2.11.0+cu128",
+    "torch_num_threads": 2,
+    "cuda_available": true,
+    "cuda_version": "12.8",
+    "cudnn_version": 91900,
+    "device": "cuda",
+    "numpy_version": "2.1.3",
+    "gpu_name": "Tesla T4",
+    "gpu_memory_gb": 14.56,
+    "pymoo_version": "0.6.2",
+    "scipy_version": "1.16.3",
+    "PIL_version": "12.3.0",
+    "matplotlib_version": "3.10.0"
+  },
+  "split_summary": {
+    "train": {
+      "n": 413,
+      "n_groups": 413,
+      "per_stratum": {
+        "benign": 279,
+        "malignant": 134
+      },
+      "fraction": 0.6403
+    },
+    "val": {
+      "n": 103,
+      "n_groups": 103,
+      "per_stratum": {
+        "benign": 70,
+        "malignant": 33
+      },
+      "fraction": 0.1597
+    },
+    "test": {
+      "n": 129,
+      "n_groups": 129,
+      "per_stratum": {
+        "benign": 87,
+        "malignant": 42
+      },
+      "fraction": 0.2
+    }
+  },
+  "selected_architecture": {
+    "architecture": {
+      "type": "qenas",
+      "chromosome": [
+        4,
+        4,
+        0,
+        0,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    "params": 1022813
+  },
+  "loss_coefficients": {
+    "alpha_bce": 0.5,
+    "beta_soft_miou": 0.5,
+    "rule": "fixed"
+  },
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-15T20:13:10",
+      "train": 413,
+      "val": 103,
+      "test": 129,
+      "seconds": 13.7
+    },
+    "inherit": {
+      "status": "done",
+      "finished": "2026-10-15T20:13:10",
+      "inherited_from": "/kaggle/working/QENAS_results/results/BUSI/qenas/seed_45",
+      "seconds": 0.0
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-15T20:13:15",
+      "selected_candidate": 2,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 4.9
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-15T20:28:17",
+      "best_epoch": 72,
+      "best_val_dice": 0.8038864243506809,
+      "seconds": 902.1
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-15T20:28:22",
+      "test_dice": 0.786002005669872,
+      "test_miou": 0.8198115393110991,
+      "test_hd95": 29.18977046268833,
+      "seconds": 5.3
+    }
+  },
+  "zico_batches_sha256": "cc4a9506946e70c17e04b3b0"
+}
