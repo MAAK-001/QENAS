@@ -37,26 +37,25 @@ def regenerate(results: Path) -> List[str]:
                                          title=f"Final population and Pareto front (generation {last})")
             plots.plot_search_progress(hist, load_json(d / "nsga2_generations.json"), f / "search_progress")
             if (d / "pareto_candidates.json").exists():
-                front, cands = load_json(d / "pareto_front.json"), load_json(d / "pareto_candidates.json")
-                plots.plot_front_3d(front, arch, f / "pareto_front_3d", cands)
                 plots.plot_pareto_population([r for r in hist if r["generation"] == last], arch, last, G,
-                                             f / "pareto_front_final_with_candidates", highlight=cands,
-                                             title="Final Pareto front and candidates selected for supervised evaluation",
-                                             candidate_epochs=cfg["candidate_training"]["epochs"])
-        if (d / "selection.json").exists():
+                                             f / "pareto_front_final_with_candidates",
+                                             highlight=load_json(d / "pareto_candidates.json"),
+                                             title="Final population and the candidates trained by successive halving")
+        if (d / "selection.json").exists() and (d / "successive_halving.json").exists():
             res, sel = load_json(d / "candidate_results.json"), load_json(d / "selection.json")
+            sh = load_json(d / "successive_halving.json")
             cl = sorted(res, key=lambda r: r["candidate_id"])
-            plots.plot_candidate_curves(cl, "val_dice", "Validation Dice", "Pareto candidates — validation Dice",
+            plots.plot_candidate_curves(cl, "val_dice", "Validation Dice", "Candidates — validation Dice",
                                         f / "candidates_val_dice", sel["selected_id"])
             plots.plot_candidate_curves(cl, "val_loss", "Validation loss (α·BCE + β·soft-mIoU)",
-                                        "Pareto candidates — validation loss", f / "candidates_val_loss",
-                                        sel["selected_id"])
-            plots.plot_delta_dice(sel["analysis"], f / "candidates_delta_dice")
-            for key, label, title, name in (("params", "Trainable parameters (millions)", "Complexity vs segmentation quality", "params_vs_val_dice"),
-                                            ("synflow_log", "ln(1 + SynFlow)", "SynFlow vs segmentation quality", "synflow_vs_val_dice"),
-                                            ("zico", "ZiCo", "ZiCo vs segmentation quality", "zico_vs_val_dice")):
-                plots.plot_scatter_vs_dice(sel["analysis"], key, label, title, f / name)
-            plots.plot_capability_ranking(sel, f / "learning_capability_ranking")
+                                        "Candidates — validation loss", f / "candidates_val_loss", sel["selected_id"])
+            plots.plot_successive_halving(sh, sel["analysis"], f / "successive_halving")
+            first = str(sh["rung_epochs"][0])
+            for key, label, title, name in (("params", "Trainable parameters (millions)",
+                                             "Complexity vs early validation quality", "params_vs_val_dice"),
+                                            ("zico", "ZiCo", "ZiCo vs early validation quality", "zico_vs_val_dice")):
+                plots.plot_scatter_vs_dice(sel["analysis"], key, label, title, f / name, first)
+            plots.plot_capability_ranking(sel, int(sh["window"]), f / "learning_capability_ranking")
         if (d / "loss_weights.json").exists():
             lw = load_json(d / "loss_weights.json")
             plots.plot_loss_weight_search(lw["runs"], lw["alpha"], f / "loss_weight_selection")

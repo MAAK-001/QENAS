@@ -1,10 +1,12 @@
-"""The QENAS evaluation study (STUDY.md): QENAS vs baselines, ablations, random search, external validation and the
-CVC leakage study, 3 seeds each, identical splits. QENAS itself is run exactly as by main.py.
+"""The QENAS evaluation study v2 (STUDY.md): QENAS vs U-Net, Attention U-Net and nnU-Net, the loss-coefficient and
+selection ablations, random search and external validation, 3 seeds each, identical splits. QENAS itself is run
+exactly as by main.py.
 
     python study.py run --gpus 0 1            # run / resume the whole plan (Kaggle: both T4 GPUs)
     python study.py run --gpus cpu            # same on the CPU (slow)
     python study.py status                    # which jobs are done
     python study.py analyse                   # paper tables, statistics and figures -> results/analysis/
+    python study.py analyse --v1-results results_v1   # ... plus the study v1 -> v2 comparison
     python study.py figures                   # regenerate every experiment's figures from its saved results
     python study.py archive results.zip       # results without model checkpoints, as one zip
 
@@ -33,8 +35,19 @@ def cmd_job(a) -> int:
                                   "paths.results": a.results})
     rc = run_experiment(cfg)
     if rc == 0 and Job(a.dataset, a.method, a.seed, a.split_unit).external:
-        from qenas.study.external import external_validation
-        external_validation(cfg, resolve_device(cfg["device"]))
+        from qenas.study.external import ExternalUnavailable, external_validation, unavailable_path
+        from qenas.utils.io import save_json
+        try:
+            external_validation(cfg, resolve_device(cfg["device"]))
+        except ExternalUnavailable as exc:   # recorded, so that the job does not fail in every later session
+            print(f"[external] not available: {exc}", file=sys.stderr)
+            save_json(unavailable_path(cfg), {"reason": str(exc)})
+    if rc == 0 and METHODS[a.method]["kind"] == "nnunet":
+        # nnU-Net's working folder (exported images, preprocessed data, weights) is no longer needed once the
+        # experiment and its external validation are finished; its plans and logs are kept in <experiment>/nnunet.
+        import shutil
+        from qenas.experiment import experiment_dir
+        shutil.rmtree(experiment_dir(cfg) / "nnunet_work", ignore_errors=True)
     return rc
 
 
@@ -59,7 +72,7 @@ def cmd_status(a) -> int:
 
 def cmd_analyse(a) -> int:
     from qenas.study.analysis import analyse
-    analyse(Path(a.results), data_root=a.data_root)
+    analyse(Path(a.results), data_root=a.data_root, v1_results=Path(a.v1_results) if a.v1_results else None)
     return 0
 
 
@@ -73,7 +86,8 @@ def cmd_archive(a) -> int:
     root = Path(a.results)
     with zipfile.ZipFile(a.out, "w", zipfile.ZIP_DEFLATED) as z:
         for p in sorted(root.rglob("*")):
-            if p.is_file() and "checkpoints" not in p.relative_to(root).parts:
+            parts = p.relative_to(root).parts
+            if p.is_file() and "checkpoints" not in parts and "nnunet_work" not in parts:
                 z.write(p, Path("results") / p.relative_to(root))
     print(f"wrote {a.out}")
     return 0
@@ -98,7 +112,8 @@ def main(argv=None) -> int:
     j.add_argument("--device", default="auto")
     j.add_argument("--num-workers", type=int, default=0)
     sub.add_parser("status", parents=[common], help="list done / pending jobs")
-    sub.add_parser("analyse", parents=[common], help="write the paper tables, statistics and figures")
+    an = sub.add_parser("analyse", parents=[common], help="write the paper tables, statistics and figures")
+    an.add_argument("--v1-results", default=None, help="results of study v1 (adds the v1 -> v2 comparison)")
     sub.add_parser("figures", parents=[common], help="regenerate every experiment's figures from its saved results")
     ar = sub.add_parser("archive", parents=[common], help="zip the results without checkpoints")
     ar.add_argument("out")

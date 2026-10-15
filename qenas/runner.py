@@ -10,6 +10,7 @@ from typing import Any, Dict, Optional
 from .config import config_fingerprint
 from .datasets.discovery import locate_data_root
 from .experiment import Experiment, ResumeConflict
+from .methods import method_spec
 from .pipeline import Pipeline
 from .utils.env import environment_info, resolve_device
 from .utils.io import save_json
@@ -47,8 +48,11 @@ def run_experiment(cfg: Dict[str, Any], stop_after: Optional[str] = None) -> int
     if device.type == "cpu":
         log.warning("Running on CPU. The training-free search takes hours and the supervised stages days on a CPU; "
                     "a CUDA GPU is strongly recommended.")
+    pipeline_class = Pipeline
+    if method_spec(cfg["method"])["kind"] == "nnunet":
+        from .study.nnunet import NNUNetPipeline as pipeline_class
     try:
-        Pipeline(cfg, exp, device).run(stop_after=stop_after)
+        pipeline_class(cfg, exp, device).run(stop_after=stop_after)
     except KeyboardInterrupt:
         log.warning("Interrupted. All completed epochs/generations are checkpointed; re-run the same command to resume.")
         return 130

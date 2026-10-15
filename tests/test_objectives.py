@@ -7,8 +7,7 @@ import torch.nn as nn
 
 from qenas.config import build_config
 from qenas.models.network import build_model
-from qenas.search.objectives import (ObjectiveError, bypass_normalization, evaluate_architecture, getzico,
-                                     synflow_objective, synflow_score, zico_objective)
+from qenas.search.objectives import OBJECTIVE_NAMES, ObjectiveError, evaluate_architecture, getzico, zico_objective
 from qenas.training.losses import BCESoftMIoULoss
 
 DEV = torch.device("cpu")
@@ -26,42 +25,6 @@ def batches(n=2, b=4, hw=64, seed=0):
         y = (torch.rand(b, 1, hw, hw, generator=g) > 0.7).float()
         out.append((x, y))
     return out
-
-
-# ---------------------------------------------------------------------------------------------- SynFlow
-def test_synflow_objective_direction_and_positivity():
-    vals = [0.0, 1.0, 1e3, 1e20, 1e60]
-    f2 = [synflow_objective(v)[1] for v in vals]
-    assert all(0.0 < f <= 1.0 for f in f2)
-    assert f2[0] == 1.0
-    assert all(a > b for a, b in zip(f2, f2[1:]))
-
-
-@pytest.mark.parametrize("bad", [float("nan"), float("inf"), -1.0])
-def test_invalid_synflow_rejected(bad):
-    with pytest.raises(ObjectiveError):
-        synflow_objective(bad)
-
-
-def test_normalisation_free_equals_official_eval_mode_for_batchnorm_networks():
-    """For BN-only networks, bypassing BN equals the official eval-mode procedure (BN = identity at init)."""
-    cfg = small_cfg()
-    ch = [0, 1, 2, 3, 0, 1, 2, 3]   # no DARTS cell -> BatchNorm only
-    torch.manual_seed(7)
-    s_official = synflow_score(build_model(ch, cfg), [3, 64, 64], DEV)
-    torch.manual_seed(7)
-    m2 = build_model(ch, cfg)
-    bypass_normalization(m2)
-    assert synflow_score(m2, [3, 64, 64], DEV) == pytest.approx(s_official, rel=1e-3)
-
-
-def test_synflow_restores_weight_signs():
-    torch.manual_seed(0)
-    m = build_model([0] * 8, small_cfg()).double()
-    before = {k: v.clone() for k, v in m.state_dict().items()}
-    synflow_score(m, [3, 64, 64], DEV)
-    for k, v in m.state_dict().items():
-        assert torch.equal(v, before[k]), k
 
 
 # ---------------------------------------------------------------------------------------------- ZiCo
@@ -111,14 +74,14 @@ def test_zico_is_non_negative_with_two_batches():
 
 def test_zico_objective_direction():
     vals = [0.0, 1.0, 10.0, 500.0]
-    f3 = [zico_objective(v) for v in vals]
-    assert f3[0] == 1.0 and all(0 < f <= 1 for f in f3) and all(a > b for a, b in zip(f3, f3[1:]))
+    f2 = [zico_objective(v) for v in vals]
+    assert f2[0] == 1.0 and all(0 < f <= 1 for f in f2) and all(a > b for a, b in zip(f2, f2[1:]))
     for bad in (float("nan"), float("inf"), -1.0):
         with pytest.raises(ObjectiveError):
             zico_objective(bad)
 
 
-# ---------------------------------------------------------------------------------------------- all three
+# ---------------------------------------------------------------------------------------------- both objectives
 def test_evaluation_is_deterministic_positive_and_leaves_global_rng_untouched():
     cfg, data = small_cfg(), batches()
     torch.manual_seed(123)
@@ -127,7 +90,8 @@ def test_evaluation_is_deterministic_positive_and_leaves_global_rng_untouched():
     a = evaluate_architecture([0, 1, 2, 3, 4, 3, 2, 1], cfg, DEV, data)
     assert torch.equal(torch.rand(3), expected)
     b = evaluate_architecture([0, 1, 2, 3, 4, 3, 2, 1], cfg, DEV, data)
-    for k in ("params", "synflow_raw", "zico", "f1_params", "f2_synflow", "f3_zico"):
+    assert OBJECTIVE_NAMES == ("f1_params", "f2_zico")
+    for k in ("params", "zico", "f1_params", "f2_zico"):
         assert a[k] == b[k], k
-    assert a["params"] > 0 and a["synflow_raw"] > 0 and a["zico"] > 0
-    assert all(math.isfinite(a[k]) and a[k] > 0 for k in ("f1_params", "f2_synflow", "f3_zico"))
+    assert a["params"] > 0 and a["zico"] > 0 and "synflow_raw" not in a
+    assert all(math.isfinite(a[k]) and a[k] > 0 for k in OBJECTIVE_NAMES)

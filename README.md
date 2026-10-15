@@ -1,48 +1,47 @@
-# QENAS — Quick Evolutionary NAS for medical image segmentation
+# QENAS — Quick Evolutionary NAS for medical image segmentation (version 3.0)
 
 QENAS searches U-shaped segmentation networks built from **five block types**: four manually designed blocks
 (Residual, Dense, Inception, ConvNeXt) and a DARTS block. These are the blocks of the Mixed-GGNAS search space,
 implemented from the official code.
 
-The search uses **NSGA-II (pymoo)** with **three training-free objectives**. No weight is updated during the
-search.
+The search uses **NSGA-II (pymoo)** with **two training-free objectives**. No weight is updated during the search.
 
 | objective | measures | direction |
 |---|---|---|
 | f1 = number of parameters | model complexity | minimised |
-| f2 = 1/(1+ln(1+SynFlow)) | signal propagation of the initialised network (data-free) | SynFlow maximised |
-| f3 = 1/(1+ZiCo) | gradient signal-to-noise of the segmentation loss on two training batches (official ZiCo code) | ZiCo maximised |
+| f2 = 1/(1+ZiCo) | gradient signal-to-noise of the segmentation loss on two training batches (official ZiCo code) | ZiCo maximised |
 
 After the search:
 
-1. A representative subset (≤ 8) of the final Pareto front is trained for 20 epochs.
-2. The architecture with the strongest **learning capability** is selected (validation ΔDice with pathology
-   gates).
+1. **16 candidates** of the final population are trained by **successive halving**: all 16 for 5 epochs, the best
+   8 to 10 epochs, the best 4 to 20 epochs (160 epochs in total).
+2. The finalist with the strongest **learning capability** is selected: the highest mean validation Dice of its
+   last 5 epochs, among the finalists that pass the pathology gates.
 3. The loss weights are chosen on the validation set.
-4. The selected architecture is trained normally (100 epochs) with a validation set. The best-validation
-   checkpoint is kept, and the validation set decides whether flip test-time augmentation is used.
+4. The selected architecture is trained normally (**120 epochs**) with a validation set; the best-validation
+   checkpoint is kept.
 5. It is tested **once**. The test reports:
    * the Mixed-GGNAS metrics: **Dice (= DSC)**, **mIoU**, **Params**, **FLOPs**;
    * **HD95** (boundary) and **Sensitivity** (clinical);
    * the inference time.
 
 QENAS is **one pipeline with one protocol** (`main.py`). The **evaluation study** of the paper is run by
-`study.py`:
+`study.py`. Study v1 (QENAS 2.1) is finished; QENAS 3.0 contains the changes it motivated, and study v2 tests them:
 
-* comparison with U-Net and Attention U-Net on identical splits;
-* ablations;
+* comparison with U-Net, Attention U-Net and **nnU-Net** on identical splits;
+* the **loss-coefficient ablation** (α grid vs fixed α = 0.5) and the selection ablations;
 * random search;
-* 3 seeds per experiment;
-* external validation;
-* the CVC split study.
+* 3 new seeds per experiment;
+* external validation.
 
 | document | contents |
 |---|---|
 | [METHODOLOGY.md](METHODOLOGY.md) | the method |
-| [STUDY.md](STUDY.md) | the experimental protocol of the evaluation study |
-| [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) | every decision, with reasons and evidence |
+| [STUDY.md](STUDY.md) | the experimental protocol of study v2 (and what v1 already answered) |
+| [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) | every decision, with reasons and evidence (incl. the v1 results behind every 3.0 change) |
 | [PAPER_POSITIONING.md](PAPER_POSITIONING.md) | related work and what QENAS adds |
 | [DATASETS.md](DATASETS.md) | dataset structure and splits |
+| `reports/QENAS_Study_v1.pdf` | the complete report of study v1 (local file; PDFs are not pushed) |
 
 ---
 
@@ -62,23 +61,37 @@ GGNAS/
     │   ├── pipeline.py    the stages (split → … → report), shared by all conditions
     │   ├── datasets/      discovery (per dataset), leakage-free splits, preprocessing, augmentation, loaders
     │   ├── models/        Mixed-GGNAS blocks, DARTS cells, QENASNet, U-Net / Attention U-Net, params & FLOPs
-    │   ├── search/        objectives (params, SynFlow, ZiCo), cache, NSGA-II, random search, Pareto subset
-    │   ├── training/      loss, metrics (Dice, IoU, mIoU, sensitivity, HD95), trainer, early stopping, selection
-    │   ├── study/         study plan, GPU scheduler, external validation, analysis (tables, tests, figures)
+    │   ├── search/        objectives (params, ZiCo), cache, NSGA-II, random search, candidate subset
+    │   ├── training/      loss, metrics (Dice, IoU, mIoU, sensitivity, HD95), trainer, early stopping,
+    │   │                  successive halving and selection
+    │   ├── study/         study plan, GPU scheduler, nnU-Net baseline, external validation, analysis
     │   ├── visualization/ figures
     │   └── utils/         atomic I/O, checkpoints, seeding, environment, logging/ETA
+    ├── reports/       build_study_v1_pdf.py (the v1 report)
     ├── scripts/inspect_datasets.py   dataset inspection (no model, no training)
     ├── tests/         unit tests + end-to-end tests of QENAS and of the whole study (pytest)
-    ├── results/       created by runs (not in this branch; the study's results are on the kaggle-study branch)
+    ├── results/       created by runs (not on main; results are on the branches kaggle-study / kaggle-study-v2)
+    ├── results_v1/    local copy of the study v1 results (not on main)
     └── cache/         zero-cost evaluation cache, preprocessed-image cache (created by runs)
 ```
 
 ## 2. Installation
 
-Python ≥ 3.9 (tested with 3.13.7). Install PyTorch for your platform/CUDA from <https://pytorch.org>, then:
+Python ≥ 3.10 (tested with 3.13.7). Install PyTorch for your platform/CUDA from <https://pytorch.org>, then:
 
 ```bash
 pip install -r requirements.txt
+```
+
+The nnU-Net baseline of the study additionally needs nnunetv2. Every nnunetv2 2.x release excludes torch 2.9.*
+(DESIGN_DECISIONS D46), so it is installed without its dependencies and the dependencies separately:
+
+```bash
+pip install --no-deps nnunetv2==2.8.1
+```
+
+```bash
+pip install acvl-utils==0.2.6 dynamic-network-architectures==0.4.4 batchgeneratorsv2==0.3.5 batchgenerators==0.25.3 "blosc2>=3.3.2" "SimpleITK>=2.2.1" nibabel imagecodecs yacs einops graphviz tifffile seaborn
 ```
 
 The datasets must be in `GGNAS/Datasets/` (default) or another folder given with `--data-root`. The folder names
@@ -87,7 +100,8 @@ only need to *start with* `BUSI`, `CVC`, `IDRID` and `Kvasir`.
 ## 3. Verify the installation
 
 The unit tests and the end-to-end tests run all of QENAS and every study condition on small synthetic datasets.
-They take about 10 minutes on a CPU:
+They take about 10 minutes on a CPU (the nnU-Net test runs only where nnunetv2 is installed, about 5 minutes
+more):
 
 ```bash
 python -m pytest -q tests
@@ -125,12 +139,12 @@ end; its last line is the time QENAS took on the dataset from start to end.
 | Stage | What happens | Main outputs |
 |---|---|---|
 | `split` | dataset discovery, integrity checks, fixed leakage-free split | `dataset_report.json`, `split.json` |
-| `search` | training-free NSGA-II (params, SynFlow, ZiCo), population 20, generation 0 + 10 generations | `search_results.*`, `search_population_history.*`, `nsga2_generations.*` (incl. hypervolume), `pareto_front.*`, `search_summary.json` |
-| `pareto` | representative subset of the final front (≤ 8) | `pareto_candidates.*` |
-| `candidates` | 20-epoch supervised training of each candidate | `candidate_training.csv`, `candidate_histories/` |
-| `selection` | learning-capability selection | `selection.json`, `candidate_comparison.*` |
+| `search` | training-free NSGA-II (params, ZiCo), population 20, generation 0 + 10 generations | `search_results.*`, `search_population_history.*`, `nsga2_generations.*` (incl. hypervolume), `pareto_front.*`, `search_summary.json` |
+| `pareto` | 16 candidates: the final front, filled up in NSGA-II's survival order | `pareto_candidates.*` |
+| `candidates` | successive halving: 16 × 5 → 8 × 10 → 4 × 20 epochs | `successive_halving.json`, `candidate_results.json`, `candidate_training.csv`, `candidate_histories/` |
+| `selection` | learning-capability selection among the 4 finalists | `selection.json`, `candidate_comparison.*` |
 | `loss_weights` | α/β grid on validation (α = 0.5 run reused) | `loss_weights.*` |
-| `final` | supervised training with validation (100 epochs), best checkpoint, flip-TTA decision on validation | `final_training.csv`, `final_validation.json` |
+| `final` | supervised training with validation (120 epochs), best checkpoint | `final_training.csv`, `final_validation.json` |
 | `test` | **single** test evaluation | `final_metrics.json`, `final_result.*`, `test_per_image.csv`, `test_predictions.npz` |
 | `report` | model summary, architecture figure, tables, reproducibility record, research summary | `model_summary.*`, `reproducibility.json`, `summary.txt` |
 
@@ -147,22 +161,22 @@ The method is fixed in `qenas/config.py`. The command line only takes run settin
 | `--seed N` | run seed (default 42); the split is the same for every seed |
 | `--stop-after STAGE` | stop cleanly after a stage; the same command without it continues from there |
 
-For example, QENAS on BUSI with seed 43 on a GPU:
+For example, QENAS on BUSI with seed 45 on a GPU:
 
 ```bash
-python main.py --dataset BUSI --seed 43 --device cuda
+python main.py --dataset BUSI --seed 45 --device cuda
 ```
 
 ## 5. The evaluation study (`study.py`)
 
-STUDY.md describes the research questions, the conditions and the statistics. The plan has 78 experiments:
+STUDY.md describes the research questions, the conditions and the statistics. The plan of study v2 has 84
+experiments, each with the seeds 45, 46 and 47:
 
-* QENAS, U-Net and Attention U-Net on 4 datasets;
-* 4 ablations on BUSI and Kvasir-SEG;
+* QENAS, U-Net, Attention U-Net and nnU-Net on 4 datasets;
+* the loss-coefficient ablation (`qenas_fixed_alpha`) on 4 datasets;
+* the selection ablations (`qenas_random_pick`, `qenas_zico_pick`) on BUSI and Kvasir-SEG;
 * random search on 4 datasets;
-* the CVC frame-split study;
-* each with seeds 42, 43 and 44;
-* plus external validation inside the Kvasir-SEG jobs.
+* plus external validation inside the Kvasir-SEG jobs of QENAS, U-Net, Attention U-Net and nnU-Net.
 
 Run or resume the whole plan (one job per listed GPU):
 
@@ -177,10 +191,10 @@ python study.py status
 ```
 
 Write all paper tables, statistical tests and figures to `results/analysis/` (`--data-root` enables the
-qualitative figures):
+qualitative figures, `--v1-results` the comparison with study v1):
 
 ```bash
-python study.py analyse --data-root ../Datasets
+python study.py analyse --data-root ../Datasets --v1-results results_v1
 ```
 
 Regenerate every experiment's figures from its saved results (PNG files are not stored on GitHub):
@@ -195,27 +209,34 @@ Zip all results without model checkpoints:
 python study.py archive QENAS_results.zip
 ```
 
+Rebuild the report of study v1 (needs `pip install reportlab`):
+
+```bash
+python reports/build_study_v1_pdf.py . reports/QENAS_Study_v1.pdf cache/report_figures
+```
+
 On Kaggle, use the cell of §6, which runs the plan on both T4 GPUs and saves everything to GitHub.
 
-## 6. Running the study on Kaggle
+## 6. Running study v2 on Kaggle
 
 ### One-time setup
 
-1. The code must be on GitHub `main`: commit and push from your PC.
+1. The code must be on GitHub `main` (done for QENAS 3.0).
 2. GitHub token (fine-grained, only the QENAS repository, **Contents: Read and write**) stored as the Kaggle
-   secret `GITHUB_TOKEN`, switched on for the notebook.
+   secret `GITHUB_TOKEN`, switched on for the notebook — the same secret as for study v1.
 3. Notebook settings: **Accelerator GPU T4 x2**, **Internet on**, and the dataset input containing `BUSI…`,
-   `CVC…`, `IDRID…` and `Kvasir-SEG`.
+   `CVC…`, `IDRID…` and `Kvasir-SEG` — the same notebook as for study v1 works.
 
 ### Every session
 
-Paste the cell, then **Save Version → Save & Run All (Commit)**. Repeat with the same cell until
-`[study] … 78/78 jobs done` appears in the log.
+Paste the cell (it replaces the v1 cell), then **Save Version → Save & Run All (Commit)**. Repeat with the same
+cell until `[study] … 84/84 jobs done` appears in the log.
 
 * Each session takes the latest code from `main`.
-* It continues the results of the branch `kaggle-study`: finished experiments are skipped and unfinished ones
-  resume from their last checkpoint.
+* It continues the results of the branch `kaggle-study-v2`: finished experiments are skipped and unfinished ones
+  resume from their last checkpoint. The v1 results on `kaggle-study` are never touched.
 * It starts no job that cannot finish before the 12-hour limit.
+* Results are pushed every 30 minutes and at the end of the session.
 
 ```python
 import os, subprocess, threading, time
@@ -223,7 +244,7 @@ import os, subprocess, threading, time
 # ---------------- settings ----------------
 REPO_PATH   = "github.com/MAAK-001/QENAS.git"
 CODE_BRANCH = "main"               # code: always the latest main
-RUN_BRANCH  = "kaggle-study"       # results only; main is never touched
+RUN_BRANCH  = "kaggle-study-v2"    # results of study v2 only; main and kaggle-study (v1) are never touched
 GPUS        = ["0", "1"]           # Kaggle "GPU T4 x2"
 SESSION_H   = 11.0                 # no job is started that would not finish within this time of the session
 SYNC_EVERY  = 30 * 60              # push results every 30 minutes
@@ -250,23 +271,36 @@ def log(text):
     with open(f"{RES}/kaggle_notebook.log", "a") as f:
         f.write(line + "\n")
 
-# 1) Code (latest main) and results (branch kaggle-study, created on the first session)
+# 1) Code (latest main) and results (branch kaggle-study-v2, created on the first session)
 if not os.path.exists(CODE):
     sh(["git", "clone", "--depth", "1", "--branch", CODE_BRANCH, url, CODE])
 if not os.path.exists(f"{RES}/.git"):
     r = sh(["git", "clone", "--depth", "1", "--single-branch", "--branch", RUN_BRANCH, url, RES], check=False)
-    if r.returncode != 0:                          # first session: new, empty results branch
+    if r.returncode != 0:                          # branch not there yet: new, empty results branch
         os.makedirs(RES, exist_ok=True)
         sh(["git", "init", "-q"], RES)
         sh(["git", "checkout", "-q", "-b", RUN_BRANCH], RES)
         sh(["git", "remote", "add", "origin", url], RES)
 sh(["git", "config", "user.email", "kaggle@run"], RES)
 sh(["git", "config", "user.name", "Kaggle run"], RES)
-with open(f"{RES}/.git/info/exclude", "w") as f:   # never pushed: images, checkpoint backups, baseline weights
-    f.write("*.png\n*.pdf\n*.prev\nresults/*/unet/*/checkpoints/\nresults/*/attention_unet/*/checkpoints/\n")
-sh(["pip", "install", "-q", "pymoo>=0.6.2,<0.7"])
+with open(f"{RES}/.git/info/exclude", "w") as f:   # never pushed: images, checkpoint backups, big weights, nnU-Net work
+    f.write("*.png\n*.pdf\n*.prev\nresults/*/unet/*/checkpoints/\nresults/*/attention_unet/*/checkpoints/\n"
+            "results/*/*/*/checkpoints/candidates/\nresults/*/nnunet/*/nnunet_work/\n")
 
-# 2) Push the results (one amended commit, so the branch keeps only the latest state)
+# 2) Packages: pymoo, and nnU-Net for the baseline. nnunetv2 excludes torch 2.9.*, which may be preinstalled; its
+#    2D networks do not need that exclusion, so it is installed without dependencies (DESIGN_DECISIONS D46).
+torch_before = sh(["python", "-c", "import torch; print(torch.__version__)"]).stdout.strip()
+sh(["pip", "install", "-q", "pymoo>=0.6.2,<0.7"])
+sh(["pip", "install", "-q", "--no-deps", "nnunetv2==2.8.1"])
+sh(["pip", "install", "-q", "acvl-utils==0.2.6", "dynamic-network-architectures==0.4.4", "batchgeneratorsv2==0.3.5",
+    "batchgenerators==0.25.3", "blosc2>=3.3.2", "SimpleITK>=2.2.1", "nibabel", "imagecodecs", "yacs", "einops",
+    "graphviz", "tifffile", "seaborn"])
+torch_after = sh(["python", "-c", "import torch, nnunetv2, pymoo; print(torch.__version__)"]).stdout.strip()
+if torch_after != torch_before:
+    raise RuntimeError(f"the package installation changed torch ({torch_before} -> {torch_after}); stopping")
+log(f"torch {torch_after} | nnunetv2 2.8.1 | pymoo installed")
+
+# 3) Push the results (one amended commit, so the branch keeps only the latest state)
 lock = threading.Lock()
 def push(note=""):
     with lock:
@@ -292,7 +326,7 @@ def periodic():
         push("[periodic]")
 threading.Thread(target=periodic, daemon=True).start()
 
-# 3) Run the study plan on both GPUs
+# 4) Run the study plan on both GPUs
 data_root = sh(["python", "-c", "from qenas.datasets.discovery import locate_data_root; "
                 "print(locate_data_root('/nonexistent', 'BUSI'))"], CODE).stdout.strip()
 hours = SESSION_H - (time.time() - T0) / 3600
@@ -301,53 +335,56 @@ proc = subprocess.run(["python", "study.py", "run", "--gpus", *GPUS, "--hours", 
                        "--results", f"{RES}/results", "--data-root", data_root], cwd=CODE)
 log(f"study session finished (exit {proc.returncode})")
 
-# 4) Paper tables + figures, final push, and a zip of everything (with figures, without weights) in Output
+# 5) Paper tables + figures, final push, and a zip of everything (with figures, without weights) in Output
 subprocess.run(["python", "study.py", "analyse", "--results", f"{RES}/results", "--data-root", data_root], cwd=CODE)
 subprocess.run(["python", "study.py", "status", "--results", f"{RES}/results"], cwd=CODE)
 stop.set()
 push("[session end]")
-subprocess.run(["python", "study.py", "archive", f"{WORK}/QENAS_study_results.zip", "--results", f"{RES}/results"],
+subprocess.run(["python", "study.py", "archive", f"{WORK}/QENAS_study_v2_results.zip", "--results", f"{RES}/results"],
                cwd=CODE)
-log("Done. Results: GitHub branch kaggle-study, and Output: QENAS_study_results.zip")
+log("Done. Results: GitHub branch kaggle-study-v2, and Output: QENAS_study_v2_results.zip")
 ```
 
 ### Getting the results onto your PC
 
-Fetch the results branch:
+Fetch the results branch of study v2:
 
 ```bash
-git fetch origin kaggle-study
+git fetch origin kaggle-study-v2
 ```
 
-Copy its `results/` folder into the working tree:
+Extract its `results/` folder into `results_v2/` (nothing is staged on `main`):
 
 ```bash
-git checkout origin/kaggle-study -- results
+mkdir results_v2 && git archive origin/kaggle-study-v2 results | tar -x -C results_v2 --strip-components=1
 ```
 
-Regenerate the figures and the paper tables locally:
+Regenerate the figures, and the paper tables including the comparison with study v1:
 
 ```bash
-python study.py figures
+python study.py figures --results results_v2
 ```
 
 ```bash
-python study.py analyse --data-root ../Datasets
+python study.py analyse --results results_v2 --data-root ../Datasets --v1-results results_v1
 ```
 
-The Kaggle version's Output also contains `QENAS_study_results.zip` with all figures.
+The Kaggle version's Output also contains `QENAS_study_v2_results.zip` with all figures.
 
 **What is not on GitHub:**
 
 * PNG figures (regenerate them with the commands above);
-* the U-Net / Attention U-Net weights (larger than GitHub's file limit; their predictions and metrics are saved).
+* the U-Net / Attention U-Net / nnU-Net weights (larger than GitHub's file limit; their predictions and metrics
+  are saved).
 
 ## 7. Interruptions and resume
 
 Nothing long runs without a checkpoint:
 
 * the search is checkpointed after every generation;
-* every training run is checkpointed after every epoch (optimiser, scheduler, scaler and RNG states included).
+* every training run is checkpointed after every epoch (optimiser, scheduler, scaler and RNG states included);
+* successive halving saves every candidate's history after each run;
+* nnU-Net writes a checkpoint every 5 epochs.
 
 Re-run the same command (or the Kaggle cell), and the experiment continues from the last checkpoint.
 
@@ -356,13 +393,16 @@ Re-run the same command (or the Kaggle cell), and the experiment continues from 
   list of differing keys. Delete its folder to run it again.
 * The device and the data root are not part of the configuration, so an experiment can move between machines.
 * Checkpoints a finished stage no longer needs are deleted; a finished experiment keeps only its final weights.
+* On Kaggle the candidate checkpoints and nnU-Net's working folder are not pushed. If a session ends inside such
+  a stage, the next session repeats that stage (the scheduler normally prevents this by not starting jobs that
+  cannot finish).
 
 ## 8. Compute time
 
-* **QENAS on a Kaggle T4** (single run, measured with the two-objective predecessor and estimated for the
-  current version): about 30 min (IDRiD) to 3 h (Kvasir-SEG). The search itself takes minutes; supervised
-  training dominates.
-* **The whole study:** about 120 GPU-hours, i.e. about 60 hours with two GPUs, which is 5–6 Kaggle sessions.
+* **QENAS on a Kaggle T4** (study v1, QENAS 2.1, measured): 33 min (IDRiD) to 106 min (Kvasir-SEG) per run from
+  start to end; the search itself 5–10 min. QENAS 3.0 has the same candidate budget and 20 % longer final training.
+* **Study v2:** about 90 GPU-hours (nnU-Net estimated conservatively), i.e. about 45 hours with two GPUs, which is
+  4–5 Kaggle sessions. Measured durations replace the estimates as jobs finish.
 * **On a CPU:** the search alone takes hours and the supervised stages days.
 
 **OneDrive:** this project lives in a OneDrive folder. Sync clients briefly lock new files. QENAS retries locked
@@ -371,12 +411,12 @@ writes automatically, but pausing sync during long local runs is recommended.
 ## 9. Outputs of one experiment
 
 ```
-results/BUSI/qenas/seed_42/
+results/BUSI/qenas/seed_45/
 ├── config.json  environment.json  state.json  reproducibility.json  summary.txt
 ├── dataset_report.json  split.json
 ├── search_results.*  search_population_history.*  search_summary.json  nsga2_generations.*
 ├── pareto_front.*  pareto_candidates.*
-├── candidate_training.csv  candidate_results.json  candidate_histories/
+├── successive_halving.json  candidate_training.csv  candidate_results.json  candidate_histories/
 ├── selection.json  candidate_comparison.*
 ├── loss_weights.*  loss_weight_histories/
 ├── final_training.csv  final_validation.json
@@ -390,19 +430,20 @@ results/BUSI/qenas/seed_42/
 ## 10. Scientific safeguards (summary)
 
 * **Search:** training-free; no weight is ever updated.
-  * Three objectives (parameters, SynFlow, ZiCo). No TOPSIS, no weighted sum, no proxy combination.
+  * Two objectives (parameters, ZiCo). No TOPSIS, no weighted sum, no proxy combination.
   * ZiCo is computed with the unmodified official code on two training batches. The search never uses
     validation or test images.
 * **Isolation:** the test split is loaded only by the final test stage, exactly once. Nothing is ever selected
   on test data.
-* **Splits:** leakage-free and identical for all methods and seeds:
+* **Splits:** leakage-free and identical for all methods, seeds and both studies:
   * CVC is split by colonoscopy sequence;
   * BUSI is stratified, with a conflicting duplicate removed;
   * IDRiD and Kvasir-SEG keep their official test splits.
-* **Fair comparisons:** baselines are trained with exactly QENAS' protocol. Ablations differ from QENAS in one
-  component only. Paired tests are run on the same test images.
-* **Consistency:** the same network class and the same initialisation are used for SynFlow, ZiCo, candidate
-  training and final training.
+* **Fair comparisons:** U-Net and Attention U-Net are trained with exactly QENAS' protocol; nnU-Net runs its own
+  pipeline on the identical images and split. Ablations differ from QENAS in one component only. Paired tests are
+  run on the same test images.
+* **Consistency:** the same network class and the same initialisation are used for ZiCo, candidate training and
+  final training.
 * **Honesty:** results are reported as they are. Every design choice is documented in DESIGN_DECISIONS.md.
 
 ## 11. Known limitations
@@ -411,7 +452,10 @@ results/BUSI/qenas/seed_42/
   duplicates are handled).
 * The dataset-specific DARTS genotypes were derived by the Mixed-GGNAS authors on their own (unknown) split
   (DESIGN_DECISIONS D5). Kvasir-SEG uses the CVC-ClinicDB genotype.
-* SynFlow and ZiCo are zero-cost *proxies*; their link to trained quality is measured, not assumed (study T9).
+* ZiCo is a zero-cost *proxy*; inside the search elite it did not predict trained quality in study v1, which is
+  why QENAS selects with supervised successive halving.
+* nnU-Net is trained for 100 instead of 1000 epochs (compute; DESIGN_DECISIONS D47).
 * Mixed-GGNAS cannot be re-run on these splits (no released architectures/weights; about 26 h of search per
   dataset). Its published numbers come from its own splits.
-* Bit-exact reproducibility is verified on CPU. Some CUDA kernels may differ in the last bits.
+* Bit-exact reproducibility is verified on CPU. Some CUDA kernels may differ in the last bits; nnU-Net's data
+  loading is not seeded.

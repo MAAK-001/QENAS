@@ -1,23 +1,23 @@
-# QENAS — Methodology
+# QENAS — Methodology (QENAS 3.0)
 
 **QENAS (Quick Evolutionary NAS)** searches U-shaped segmentation networks in a mixed search space of manually
-designed and DARTS blocks. The search is **training-free**: NSGA-II optimises three objectives computed on the
+designed and DARTS blocks. The search is **training-free**: NSGA-II optimises two objectives computed on the
 *initialised* network, without updating a single weight:
 
 * the number of parameters (complexity);
-* **SynFlow**, a data-independent measure of signal propagation;
 * **ZiCo**, a measure of the gradients that the segmentation loss produces on real training images.
 
 Supervised training is used only after the search, to:
 
-1. compare a small, representative set of final Pareto architectures by their *learning capability* over a
-   short budget;
+1. compare 16 candidates of the final population by their *learning capability*, with successive halving (most
+   candidates get a short run, the promising ones a full 20-epoch run);
 2. choose the loss weights on the validation set;
-3. train the selected architecture normally with a validation set. The validation set also decides whether
-   flip test-time augmentation is used.
+3. train the selected architecture normally with a validation set.
 
 The test set is used exactly once, at the very end. There is one pipeline and one protocol. Nothing in the
-method is optional.
+method is optional. (QENAS 2.x additionally optimised SynFlow, selected by ΔDice among 8 candidates trained for
+20 epochs each, trained for 100 epochs and decided flip-TTA on validation; DESIGN_DECISIONS lists every change
+and the study-v1 evidence for it.)
 
 ```
 Dataset ─► dataset-specific train / validation / test split (leakage-free)
@@ -25,13 +25,12 @@ Dataset ─► dataset-specific train / validation / test split (leakage-free)
         ─► random initial population (generation 0)
         ─► NSGA-II (pymoo), population 20, 10 generations; every individual evaluated training-free:
                f1 = #trainable parameters                (minimise)
-               f2 = 1 / (1 + ln(1 + SynFlow))           (minimise ⇔ maximise SynFlow)
-               f3 = 1 / (1 + ZiCo)                       (minimise ⇔ maximise ZiCo)
-        ─► final non-dominated front ─► representative subset (≤ 8, diversity-preserving)
-        ─► 20-epoch supervised training of every candidate
-        ─► learning-capability selection (ΔDice with pathology gates)
+               f2 = 1 / (1 + ZiCo)                       (minimise ⇔ maximise ZiCo)
+        ─► 16 candidates: the final non-dominated front, filled up in NSGA-II's survival order
+        ─► successive halving: 16 × 5 epochs → best 8 to 10 epochs → best 4 to 20 epochs (160 epochs)
+        ─► learning-capability selection (mean validation Dice of the last 5 epochs, with pathology gates)
         ─► loss-weight (α, β) selection on validation
-        ─► ordinary supervised training (100 epochs, best-validation checkpoint) → flip-TTA decision on validation
+        ─► ordinary supervised training (120 epochs, best-validation checkpoint)
         ─► single test evaluation: Dice (DSC), mIoU, Params, FLOPs, HD95, Sensitivity
 ```
 
@@ -81,27 +80,14 @@ the *supervised* loss. This needs training, so it is not part of QENAS. Every ma
 (scale 3 of Mixed-GGNAS Table 1) in the search, in candidate training and in final training. There is no
 scale-selection stage, no scale collapse and no differentiable scale weight anywhere.
 
-The same `QENASNet` class with the same seeded initialisation is used for SynFlow, ZiCo, candidate training and
-final training. The networks the proxies score are therefore bit-identical to the networks that start supervised
-training.
+The same `QENASNet` class with the same seeded initialisation is used for ZiCo, candidate training and final
+training. The networks ZiCo scores are therefore bit-identical to the networks that start supervised training.
 
 ## 2. Objectives (training-free)
 
 **f1 — complexity.** `f1(a) = Σ_θ 1[θ trainable] · numel(θ)` (minimise).
 
-**f2 — SynFlow** (Tanaka et al., NeurIPS 2020; zero-cost NAS proxy of Abdelfattah et al., ICLR 2021). The
-official procedure is used:
-
-1. initialise (seed); eval mode; bypass normalisation layers (zero-cost-NAS `bn=False`);
-2. replace every parameter by its absolute value;
-3. forward one all-ones input `1 ∈ R^{1×3×H×W}` in float64; `R = Σ output`;
-4. backpropagate; `S = Σ_{w ∈ Conv, ConvTranspose, Linear weights} |w · ∂R/∂w|`;
-5. restore the signs.
-
-`S` is exponential in depth (≈ 10^24 … 10^38), so the objective is defined on the log scale:
-`f2 = 1 / (1 + ln(1 + S)) ∈ (0, 1]`.
-
-**f3 — ZiCo** (Li et al., ICLR 2023). The official functions (`getgrad`, `caculate_zico`, `getzico` from
+**f2 — ZiCo** (Li et al., ICLR 2023). The official functions (`getgrad`, `caculate_zico`, `getzico` from
 github.com/SLDGroup/ZiCo) are used without any change to their logic:
 
 1. initialise (same seed); **train mode** (normalisation layers active);
@@ -111,7 +97,7 @@ github.com/SLDGroup/ZiCo) are used without any change to their logic:
 4. for every layer *l*, over the two batches, compute `std(g)` and `mean(|g|)` of each weight gradient. Then
    `ZiCo = Σ_l log( Σ_{weights with std > 0} mean|g| / std(g) )`.
 
-With two batches each ratio is ≥ 1, so ZiCo ≥ 0. The objective is `f3 = 1 / (1 + ZiCo) ∈ (0, 1]`.
+With two batches each ratio is ≥ 1, so ZiCo ≥ 0. The objective is `f2 = 1 / (1 + ZiCo) ∈ (0, 1]`.
 
 The two ZiCo batches are the first two batches of training epoch 0: 8 images each (IDRiD 4), shuffled and
 augmented exactly as in training. They are fixed for the whole search and identical for every architecture, as
@@ -119,19 +105,15 @@ in the official ZiCo search. ZiCo is the only objective that sees the dataset. I
 and their masks, and no weight is updated, so the search stays training-free. Validation and test images are
 never used by the search.
 
-All three objectives are positive and minimised. Pareto dominance is invariant to strictly monotone transforms,
-so the ranking equals that of "minimise parameters, maximise SynFlow, maximise ZiCo". No proxy is combined with
-another into a single score.
+Both objectives are positive and minimised. Pareto dominance is invariant to strictly monotone transforms, so
+the ranking equals that of "minimise parameters, maximise ZiCo". The two are not combined into a single score.
 
-**Do the objectives work together?** A training-free study of 65 architectures on BUSI
-(`evidence/objective_agreement/`, DESIGN_DECISIONS D14) measured how the objectives relate:
+**How the objectives relate** (study v1, 220 random architectures per dataset and seed; DESIGN_DECISIONS D14):
 
-* SynFlow and ZiCo agree (Kendall τ = +0.37; +0.41 after removing the effect of model size), so they are not
-  conflicting quality signals;
-* SynFlow trades off against the parameter count (τ = 0.46 with size), which is the intended
-  cost-versus-quality trade-off;
-* ZiCo is independent of model size (τ = −0.03), i.e. it adds information that size and SynFlow do not
-  carry.
+* ZiCo is almost independent of model size (Kendall τ −0.09 to −0.18), so the two objectives describe a genuine
+  size–quality trade-off;
+* SynFlow, the third objective of QENAS 2.x, agreed with ZiCo and mostly rewarded larger networks; removing it was
+  never significantly worse and significantly better on Kvasir-SEG, so QENAS 3.0 does not use it (D10).
 
 ## 3. NSGA-II
 
@@ -143,9 +125,10 @@ pymoo's `NSGA2` (non-dominated sorting, crowding distance, binary tournament mat
   binomial crossover with CR = 0.5 used by Mixed-GGNAS);
 * mutation: `ChoiceRandomMutation` (random resetting of categorical genes), per-gene probability 1/8;
 * duplicate elimination on;
-* **population 20**, generation 0 (random) + **10 evolutionary generations** (as in Mixed-GGNAS). With three
-  objectives, 51 % of a 10-individual population is non-dominated, so rank-based selection hardly acts; with 20
-  it is 33 % (D16).
+* **population 20**, generation 0 (random) + **10 evolutionary generations** (as in Mixed-GGNAS). With the two
+  objectives, about 22 % of a random 20-individual population is non-dominated, so rank-based selection acts
+  (with the three objectives of QENAS 2.x it was 40–51 %, and the whole final population ended non-dominated;
+  D16).
 
 Evaluations are cached. The cache key covers the chromosome, the architecture definition, the objective
 definitions and the SHA-256 of the exact ZiCo batches. After every generation the whole algorithm state is
@@ -156,17 +139,18 @@ Search progress is measured by the **hypervolume** of every generation's non-dom
 objective space min–max normalised over all evaluated architectures, with reference point 1.1 in each objective
 (figure `search_progress`).
 
-## 4. Pareto candidates
+## 4. Candidates
 
-The final non-dominated front is kept intact (no scalarisation, no TOPSIS). If it has at most *k* = 8 points, all
-of them are evaluated. Otherwise the subset is:
+Sixteen candidates are taken from the final population. No scalarisation, no TOPSIS:
 
-* the extreme point of each of the three objectives;
-* plus greedy farthest-point samples in the min–max-normalised objective space (k-centre coverage).
+* if the final non-dominated front has more than 16 points: the extreme point of each objective, plus greedy
+  farthest-point samples in the min–max-normalised objective space (k-centre coverage);
+* if it has at most 16 (the usual case): the whole front, filled up with the next individuals of the final
+  population in NSGA-II's own survival order (Pareto rank, then larger crowding distance).
 
-## 5. Learning-capability evaluation and selection
+## 5. Successive halving and learning-capability selection
 
-Each candidate is trained for *E* = 20 epochs under identical conditions:
+Every candidate run uses identical conditions:
 
 * same initialisation seed, same data order and augmentation stream (common random numbers);
 * AdamW (lr 1e-3, weight decay 5e-5) with a constant learning rate;
@@ -175,7 +159,21 @@ Each candidate is trained for *E* = 20 epochs under identical conditions:
 
 Every epoch records training/validation loss, Dice, IoU, mIoU, sensitivity and the validation HD95.
 
-Primary criterion: `ΔDice = Dice_val(E) − Dice_val(1)`. A candidate is eligible only if it passes all gates:
+**Criterion.** The mean validation Dice over the last 5 epochs a run has reached.
+
+**Successive halving** (Jamieson & Talwalkar 2016; reduction factor 2):
+
+| rung | candidates | trained to | promoted |
+|---|---:|---:|---|
+| 1 | 16 | 5 epochs | the best 8 by the criterion (epochs 1–5) |
+| 2 | 8 | 10 epochs | the best 4 by the criterion (epochs 6–10) |
+| 3 | 4 | 20 epochs | finalists |
+
+That is 160 candidate-epochs, the budget of 8 candidates × 20 epochs. A promoted run continues from its checkpoint;
+with a constant learning rate it is the same run as one trained without interruption. Ties in a promotion are
+broken by fewer parameters. A run with a non-finite loss is eliminated.
+
+**Selection among the 4 finalists.** A finalist is eligible only if it passes all gates on its 20-epoch run:
 
 | gate | condition | rationale |
 |---|---|---|
@@ -185,15 +183,9 @@ Primary criterion: `ΔDice = Dice_val(E) − Dice_val(1)`. A candidate is eligib
 | G4 | val Dice has a significant increasing trend over all epochs (Kendall τ > 0, p < 0.05) | genuine, stable learning (not an erratic curve or a lucky last epoch) |
 | G5 | `Dice_val(E)` > Dice of the trivial all-foreground predictor on the validation masks | the model has learned to segment |
 
-Among eligible candidates the largest ΔDice wins. Candidates within the measured epoch-to-epoch Dice noise of the
-leader (median |ΔDice_t| over the last 5 epochs) count as tied. Ties are broken by:
-
-1. higher final validation Dice;
-2. then larger ΔLoss;
-3. then fewer parameters.
-
-If no candidate passes all gates, gates are relaxed in the order G4 → G3 → G2 → G5, and only the gates that
-actually had to be relaxed are reported. G1 is never relaxed.
+Among eligible finalists the highest criterion (mean validation Dice of epochs 16–20) wins; ties → fewer
+parameters. If no finalist passes all gates, gates are relaxed in the order G4 → G3 → G2 → G5, and only the gates
+that actually had to be relaxed are reported. G1 is never relaxed.
 
 ## 6. Loss and loss weights
 
@@ -206,7 +198,10 @@ actually had to be relaxed are reported. G1 is never relaxed.
 
 * each value trains the selected architecture with the candidate protocol (20 epochs);
 * the criterion is the mean validation Dice over the last 5 epochs (ties → α closest to 0.5);
-* the α = 0.5 run is identical to the candidate run and is reused.
+* the α = 0.5 run is identical to the selected finalist's 20-epoch candidate run and is reused.
+
+Whether this search improves the test result, or only costs time, is measured in study v2 (`qenas_fixed_alpha`,
+DESIGN_DECISIONS D49).
 
 This is validation-set model selection; the test set is not involved.
 
@@ -215,16 +210,13 @@ This is validation-set model selection; the test set is not involved.
 * fresh initialisation (same seed);
 * AdamW (lr 1e-3, weight decay 5e-5);
 * poly schedule with one warm-up epoch (official Mixed-GGNAS schedule);
-* 100 epochs, the selected α/β;
+* 120 epochs, the selected α/β;
 * checkpoint every epoch, plus a best-validation-Dice checkpoint.
 
 Early stopping happens only on *overfitting*: no improvement for 20 epochs **and** a significantly rising
 validation loss together with a significantly falling training loss. Stagnation alone never stops training. The
-best checkpoint is restored and evaluated on train (no augmentation) and validation.
-
-**Test-time augmentation decision.** The best checkpoint is also evaluated on validation with horizontal-flip TTA:
-the foreground probabilities of the image and of its mirror (flipped back) are averaged. TTA is used for the test
-if and only if it increases the validation Dice.
+best checkpoint is restored and evaluated on train (no augmentation) and validation. No test-time augmentation is
+used (D27).
 
 ## 8. Test evaluation
 
@@ -232,7 +224,6 @@ The test split is loaded for the first time, and evaluated once, only after thes
 
 * the architecture;
 * α/β;
-* the TTA decision;
 * all hyper-parameters;
 * the end of final training.
 
@@ -267,7 +258,7 @@ truths.
 
 Also recorded:
 
-* the inference time per image (median of 50 forward passes, batch 1, including flip TTA if used);
+* the inference time per image (median of 50 forward passes, batch 1);
 * every test image's metrics (`test_per_image.csv`) and binary prediction (`test_predictions.npz`), for paired
   statistics and qualitative figures.
 
@@ -286,5 +277,6 @@ layouts and integrity checks.
 
 ## 11. Evaluation study
 
-The comparison with hand-designed networks, the ablations, random search, repeated seeds, external validation
-and the CVC split study are described in STUDY.md and run by `study.py`. They do not change QENAS.
+The comparison with U-Net, Attention U-Net and nnU-Net, the ablations, random search, repeated seeds and external
+validation are described in STUDY.md and run by `study.py`. They do not change QENAS. Study v1 (QENAS 2.1) is
+documented in `reports/QENAS_Study_v1.pdf`; study v2 tests QENAS 3.0.

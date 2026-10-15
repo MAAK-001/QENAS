@@ -8,7 +8,9 @@ Guarantees
 * NaN/Inf losses raise :class:`NumericalError` (never silently continue);
 * the best-validation-Dice weights are stored separately (``best.pt``) and can be
   restored with :func:`load_best_weights`;
-* progress (percentage, elapsed time, ETA) is logged during and after every epoch.
+* progress (percentage, elapsed time, ETA) is logged during and after every epoch;
+* ``fit(until=k)`` stops after epoch k with the complete resumable state, and a later ``fit`` continues the
+  same run (successive halving of the candidate runs).
 
 Training metrics are measured on the augmented mini-batches in train mode (standard
 practice); validation metrics in eval mode without augmentation. AMP (fp16 + loss scaling)
@@ -51,22 +53,14 @@ def use_amp(device: torch.device) -> bool:
 
 
 @torch.no_grad()
-def predict_logits(model: nn.Module, x: torch.Tensor, amp: bool = False, tta: bool = False) -> torch.Tensor:
-    """Logits of ``model`` for ``x``. With ``tta`` the foreground probabilities of the image and of its
-    horizontal mirror (prediction flipped back) are averaged and returned as logits, so loss, metrics and
-    the 0.5 threshold are applied to the averaged probability."""
+def predict_logits(model: nn.Module, x: torch.Tensor, amp: bool = False) -> torch.Tensor:
+    """Logits of ``model`` for ``x`` (no test-time augmentation; DESIGN_DECISIONS D27)."""
     with torch.autocast(device_type=x.device.type, dtype=torch.float16, enabled=amp):
-        logits = model(x)
-        if not tta:
-            return logits.float()
-        logits_m = model(x.flip(-1)).flip(-1)
-    p = 0.5 * (torch.sigmoid(logits.float()) + torch.sigmoid(logits_m.float()))
-    return torch.logit(p, eps=1e-6)
+        return model(x).float()
 
 
 @torch.no_grad()
-def evaluate(model: nn.Module, loader, loss_fn: BCESoftMIoULoss, device: torch.device,
-             tta: bool = False, keep: bool = False):
+def evaluate(model: nn.Module, loader, loss_fn: BCESoftMIoULoss, device: torch.device, keep: bool = False):
     """Loss, Dice, IoU, mIoU, sensitivity and HD95 of ``model`` on ``loader`` (eval mode, no augmentation).
     With ``keep`` returns ``(metrics, per_image_rows, binary_predictions)`` in loader order."""
     model.eval()
@@ -75,7 +69,7 @@ def evaluate(model: nn.Module, loader, loss_fn: BCESoftMIoULoss, device: torch.d
     for x, y in loader:
         x = x.to(device, non_blocking=True)
         y = y.to(device, non_blocking=True)
-        logits = predict_logits(model, x, amp, tta)
+        logits = predict_logits(model, x, amp)
         per_sample, _ = loss_fn.per_sample(logits, y)
         if not torch.isfinite(per_sample).all():
             raise NumericalError("non-finite loss during evaluation")
@@ -86,9 +80,9 @@ def evaluate(model: nn.Module, loader, loss_fn: BCESoftMIoULoss, device: torch.d
 
 
 @torch.no_grad()
-def inference_time_ms(model: nn.Module, input_shape, device: torch.device, tta: bool, repeats: int = 50,
+def inference_time_ms(model: nn.Module, input_shape, device: torch.device, repeats: int = 50,
                       warmup: int = 10) -> float:
-    """Median wall-clock time (ms) of one forward pass (with flip TTA if used) for a single image."""
+    """Median wall-clock time (ms) of one forward pass for a single image."""
     model.eval()
     x = torch.zeros([1] + list(input_shape), device=device)
     times = []
@@ -96,7 +90,7 @@ def inference_time_ms(model: nn.Module, input_shape, device: torch.device, tta: 
         if device.type == "cuda":
             torch.cuda.synchronize(device)
         t0 = time.perf_counter()
-        predict_logits(model, x, use_amp(device), tta)
+        predict_logits(model, x, use_amp(device))
         if device.type == "cuda":
             torch.cuda.synchronize(device)
         if i >= warmup:
@@ -233,13 +227,17 @@ class Trainer:
                          format_seconds(el / (b + 1) * (n_batches - b - 1)))
         return acc.compute()
 
-    def fit(self) -> Dict[str, Any]:
+    def fit(self, until: Optional[int] = None) -> Dict[str, Any]:
+        """Train to ``self.epochs`` (or only to epoch ``until``, keeping the run resumable)."""
         start = self._try_resume()
-        if self.completed:
-            log.info("%s%s already completed (%d epochs) — loaded from checkpoint", self._p(), self.tag, len(self.history))
+        stop_at = self.epochs if until is None else min(int(until), self.epochs)
+        if self.completed or start >= stop_at:
+            if self.completed:
+                log.info("%s%s already completed (%d epochs) — loaded from checkpoint", self._p(), self.tag,
+                         len(self.history))
             return self.result()
-        timer = ProgressTimer(self.epochs, done_before=start)
-        for epoch in range(start, self.epochs):
+        timer = ProgressTimer(stop_at, done_before=start)
+        for epoch in range(start, stop_at):
             t0 = time.time()
             tr = self._train_epoch(epoch)
             va = evaluate(self.model, self.val_loader, self.loss_fn, self.device)
@@ -282,10 +280,11 @@ class Trainer:
             if stop:
                 log.info("%sEarly stopping at epoch %d: %s", self._p(), epoch + 1, self.stop_reason)
                 break
-        self._compact_after_completion()
+        if self.completed:
+            self._compact_after_completion()
         return self.result()
 
     def result(self) -> Dict[str, Any]:
-        return {"tag": self.tag, "history": self.history, "best_val_dice": self.best_val_dice,
-                "best_epoch": self.best_epoch, "epochs_run": len(self.history),
+        return {"tag": self.tag, "history": list(self.history), "best_val_dice": self.best_val_dice,
+                "best_epoch": self.best_epoch, "epochs_run": len(self.history), "completed": self.completed,
                 "stopped_early": bool(self.stop_reason), "stop_reason": self.stop_reason}

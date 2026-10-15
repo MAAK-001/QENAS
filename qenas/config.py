@@ -63,7 +63,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "scale": 3,                        # fixed convolution scale of the manual blocks (DESIGN_DECISIONS D4)
         "num_classes": 1,                  # binary segmentation, one logit per pixel
     },
-    "search": {                            # training-free NSGA-II (objectives: params, SynFlow, ZiCo)
+    "search": {                            # training-free NSGA-II (objectives: params, ZiCo)
         "population_size": 20,
         "generations": 10,                 # evolutionary generations after the initial population (gen 0)
         "crossover_prob": 0.9,
@@ -71,10 +71,12 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "plot_every": 5,                   # intermediate Pareto figure every k generations
     },
     "pareto": {
-        "max_candidates": 8,               # evaluate all Pareto points if the front is smaller
+        "max_candidates": 16,              # candidates of the final population trained by successive halving
     },
-    "candidate_training": {                # learning-capability runs
-        "epochs": 20,
+    "candidate_training": {                # learning-capability runs (successive halving)
+        "epochs": 20,                      # length of a complete candidate run (the last rung)
+        "rungs": [5, 10, 20],              # epochs reached at each rung: 16 x 5 -> 8 x 10 -> 4 x 20 epochs
+        "keep_fraction": 0.5,              # share of a rung promoted to the next one (halving)
         "batch_size": 8,
         "lr": 1.0e-3,
         "weight_decay": 5.0e-5,
@@ -82,15 +84,15 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "loss_alpha": 0.5,                 # neutral BCE / soft-mIoU weighting before alpha is optimised
     },
     "selection": {
-        "significance": 0.05,              # one-sided Kendall trend tests
-        "noise_window": 5,                 # epochs used to estimate validation-Dice noise
+        "significance": 0.05,              # one-sided Kendall trend tests (gates G3, G4)
+        "criterion_window": 5,             # criterion: mean validation Dice over the last k epochs of a rung
     },
     "loss_weights": {                      # runs use the candidate protocol (same epochs, seed, data order)
         "alphas": [0.2, 0.4, 0.5, 0.6, 0.8],
         "criterion_window": 5,             # mean validation Dice over the last k epochs
     },
     "final_training": {
-        "epochs": 100,
+        "epochs": 120,
         "batch_size": 8,
         "lr": 1.0e-3,
         "weight_decay": 5.0e-5,
@@ -202,8 +204,14 @@ def validate_config(cfg: Dict[str, Any]) -> None:
             raise ValueError("loss_weights.alphas must lie in [0, 1] (beta = 1 - alpha)")
     if float(cfg["candidate_training"]["loss_alpha"]) not in [float(a) for a in cfg["loss_weights"]["alphas"]]:
         raise ValueError("candidate_training.loss_alpha must be one of loss_weights.alphas (its run is reused)")
-    if cfg["candidate_training"]["epochs"] < 2:
+    ct = cfg["candidate_training"]
+    rungs = [int(r) for r in ct["rungs"]]
+    if ct["epochs"] < 2:
         raise ValueError("candidate_training.epochs must be >= 2 to measure an improvement")
+    if not rungs or rungs != sorted(set(rungs)) or rungs[-1] != int(ct["epochs"]) or rungs[0] < 1:
+        raise ValueError("candidate_training.rungs must be strictly increasing and end at candidate_training.epochs")
+    if not 0.0 < float(ct["keep_fraction"]) < 1.0:
+        raise ValueError("candidate_training.keep_fraction must lie in (0, 1)")
 
 
 def _strip(cfg: Dict[str, Any], keys: Iterable[tuple]) -> Dict[str, Any]:

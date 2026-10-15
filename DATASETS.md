@@ -14,9 +14,9 @@ Every experiment also stores the full discovery report (`dataset_report.json`) a
 The split is fixed (`data.split_seed = 42`): every method and every run seed of the evaluation study uses exactly
 these splits.
 
-Use of the splits: the NSGA-II search sees only two training batches (ZiCo); candidate training, loss-weight
-selection, final training, early stopping, checkpoint selection and the TTA decision use train + validation; the
-test split is loaded once, by the final test stage.
+Use of the splits: the NSGA-II search sees only two training batches (ZiCo); candidate training (successive
+halving), selection, loss-weight selection, final training, early stopping and checkpoint selection use train +
+validation; the test split is loaded once, by the final test stage.
 
 ## BUSI — `Datasets/BUSI (Breast Ultrasound Image)/`
 

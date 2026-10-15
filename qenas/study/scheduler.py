@@ -41,7 +41,8 @@ def job_done(results: Path, job: Job) -> bool:
             return False
     except Exception:
         return False
-    return not job.external or (job_dir(results, job) / "external_CVC" / "external_metrics.json").exists()
+    ext = job_dir(results, job) / "external_CVC"
+    return not job.external or (ext / "external_metrics.json").exists() or (ext / "external_unavailable.json").exists()
 
 
 def measured_minutes(results: Path, jobs: Sequence[Job]) -> Dict[tuple, float]:

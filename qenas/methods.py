@@ -5,69 +5,71 @@ of the paper study (``study.py``), defined here and nowhere else, so that each o
 the documented way and shares all other code with it.
 
 kind
-    ``qenas``            the full pipeline (search -> Pareto subset -> candidates -> selection -> loss weights ->
-                         final training -> test), with the listed search objectives and selection rule;
-    ``qenas_selection``  re-uses the search, Pareto subset and 20-epoch candidate runs of the ``qenas`` experiment
-                         with the same dataset and seed, and only changes how the final architecture is chosen;
-    ``baseline``         a fixed hand-designed network trained with exactly the protocol QENAS uses for its
-                         selected architecture (loss-weight selection -> final training -> TTA decision -> test);
-    ``search_only``      a training-free search without any training (search-efficiency comparison).
+    ``qenas``          the full pipeline (search -> candidates -> successive halving -> selection -> loss weights
+                       -> final training -> test);
+    ``qenas_inherit``  re-uses the search, candidates and successive-halving runs of the ``qenas`` experiment with
+                       the same dataset and seed, and changes only the selection rule (``selection``) or the
+                       loss-weight rule (``loss_weights``);
+    ``baseline``       a fixed hand-designed network trained with exactly the protocol QENAS uses for its selected
+                       architecture (loss-weight selection -> final training -> test);
+    ``nnunet``         nnU-Net (Isensee et al., Nature Methods 2021) with its own self-configuring pipeline on the
+                       same split and the same images (qenas/study/nnunet.py);
+    ``search_only``    a training-free search without any training (search-efficiency comparison).
+
+loss_weights
+    ``grid``   alpha chosen on validation from ``loss_weights.alphas`` (the QENAS protocol);
+    ``fixed``  alpha = ``candidate_training.loss_alpha`` (0.5) without any search (loss-coefficient ablation).
 """
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
-ALL_OBJECTIVES = ("f1_params", "f2_synflow", "f3_zico")
+ALL_OBJECTIVES = ("f1_params", "f2_zico")
 
 METHODS: Dict[str, Dict[str, Any]] = {
     "qenas": {
-        "kind": "qenas", "objectives": ALL_OBJECTIVES, "selection": "learning_capability",
+        "kind": "qenas", "objectives": ALL_OBJECTIVES, "selection": "learning_capability", "loss_weights": "grid",
         "label": "QENAS",
-        "doc": "QENAS: NSGA-II on (params, SynFlow, ZiCo) + learning-capability selection",
+        "doc": "QENAS: NSGA-II on (params, ZiCo) + successive-halving learning-capability selection",
     },
-    "qenas_no_zico": {
-        "kind": "qenas", "objectives": ("f1_params", "f2_synflow"), "selection": "learning_capability",
-        "label": "QENAS w/o ZiCo",
-        "doc": "ablation: two objectives (params, SynFlow), i.e. without the data-aware third objective",
-    },
-    "qenas_no_synflow": {
-        "kind": "qenas", "objectives": ("f1_params", "f3_zico"), "selection": "learning_capability",
-        "label": "QENAS w/o SynFlow",
-        "doc": "ablation: two objectives (params, ZiCo), i.e. without SynFlow",
+    "qenas_fixed_alpha": {
+        "kind": "qenas_inherit", "parent": "qenas", "selection": "learning_capability", "loss_weights": "fixed",
+        "label": "QENAS, fixed α = 0.5",
+        "doc": "ablation: the QENAS architecture trained with the neutral loss weights alpha = beta = 0.5, without "
+               "the loss-coefficient search",
     },
     "qenas_random_pick": {
-        "kind": "qenas_selection", "parent": "qenas", "selection": "random",
-        "label": "QENAS, random Pareto candidate",
-        "doc": "ablation: a uniformly random one of QENAS' Pareto candidates instead of learning-capability selection",
+        "kind": "qenas_inherit", "parent": "qenas", "selection": "random", "loss_weights": "grid",
+        "label": "QENAS, random candidate",
+        "doc": "ablation: a uniformly random one of QENAS' 16 candidates instead of learning-capability selection",
     },
     "qenas_zico_pick": {
-        "kind": "qenas_selection", "parent": "qenas", "selection": "max_zico",
+        "kind": "qenas_inherit", "parent": "qenas", "selection": "max_zico", "loss_weights": "grid",
         "label": "QENAS, zero-shot pick (max ZiCo)",
-        "doc": "ablation / zero-shot NAS rule: the Pareto candidate with the highest ZiCo, chosen without training",
+        "doc": "ablation / zero-shot NAS rule: the candidate with the highest ZiCo, chosen without training",
     },
     "unet": {
-        "kind": "baseline", "network": "unet",
+        "kind": "baseline", "network": "unet", "loss_weights": "grid",
         "label": "U-Net",
         "doc": "baseline: U-Net (Ronneberger et al. 2015), 31.04 M parameters as in the Mixed-GGNAS tables",
     },
     "attention_unet": {
-        "kind": "baseline", "network": "attention_unet",
+        "kind": "baseline", "network": "attention_unet", "loss_weights": "grid",
         "label": "Attention U-Net",
         "doc": "baseline: Attention U-Net (Oktay et al. 2018), 8.73 M parameters as in the Mixed-GGNAS tables",
+    },
+    "nnunet": {
+        "kind": "nnunet",
+        "label": "nnU-Net",
+        "doc": "baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the "
+               "QENAS train/validation split",
     },
     "random_search": {
         "kind": "search_only", "objectives": ALL_OBJECTIVES, "sampler": "random",
         "label": "Random search",
         "doc": "search baseline: uniform random sampling with the evaluation budget of NSGA-II (training-free)",
     },
-}
-
-STAGES_BY_KIND = {
-    "qenas": ["split", "search", "pareto", "candidates", "selection", "loss_weights", "final", "test", "report"],
-    "qenas_selection": ["split", "inherit", "selection", "loss_weights", "final", "test", "report"],
-    "baseline": ["split", "loss_weights", "final", "test", "report"],
-    "search_only": ["split", "search"],
 }
 
 
@@ -77,5 +79,13 @@ def method_spec(name: str) -> Dict[str, Any]:
     return METHODS[name]
 
 
-def stages_for(name: str):
-    return STAGES_BY_KIND[method_spec(name)["kind"]]
+def stages_for(name: str) -> List[str]:
+    m = method_spec(name)
+    grid = ["loss_weights"] if m.get("loss_weights") == "grid" else []
+    return {
+        "qenas": ["split", "search", "pareto", "candidates", "selection"] + grid + ["final", "test", "report"],
+        "qenas_inherit": ["split", "inherit", "selection"] + grid + ["final", "test", "report"],
+        "baseline": ["split"] + grid + ["final", "test", "report"],
+        "nnunet": ["split", "nnunet_data", "nnunet_train", "nnunet_test", "report"],
+        "search_only": ["split", "search"],
+    }[m["kind"]]

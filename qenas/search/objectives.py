@@ -1,29 +1,9 @@
-r"""The three QENAS objectives. All are training-free: no weight is ever updated.
+r"""The two QENAS objectives. Both are training-free: no weight is ever updated.
 
 Objective 1 - model complexity
     f1(a) = number of trainable parameters of architecture a            (minimise)
 
-Objective 2 - SynFlow (Tanaka et al., NeurIPS 2020; zero-cost NAS proxy, Abdelfattah et al., ICLR 2021)
-
-    Official procedure (ganguli-lab/Synaptic-Flow ``Pruners/pruners.py::SynFlow.score``,
-    SamsungLabs zero-cost-nas ``measures/synflow.py``):
-      1. model in eval mode;
-      2. ``linearize``: replace every state-dict tensor by its absolute value;
-      3. forward a single all-ones input of the data shape [1, C, H, W] in float64;
-      4. R = sum(output); backpropagate;
-      5. per-weight score |theta * dR/dtheta| for the weights of Conv/Linear layers;
-      6. ``nonlinearize``: restore the signs.
-    S = sum of all per-weight scores. S >= 0, larger is better.
-
-    Normalisation layers are bypassed (zero-cost-nas ``bn=False``). Synaptic-Flow evaluates BatchNorm in
-    eval mode, which is the identity at initialisation, so both references compute the synaptic flow of
-    the normalisation-free network. QENAS bypasses GroupNorm too: it normalises with per-sample
-    statistics, cannot be linearised, and suppresses S of DARTS cells by ~30 orders of magnitude.
-    ``ConvTranspose2d`` weights are counted (the decoder up-samples with them).
-
-        f2 = 1 / (1 + ln(1 + S))   in (0, 1]                            (minimise)
-
-Objective 3 - ZiCo (Li et al., ICLR 2023; official code github.com/SLDGroup/ZiCo,
+Objective 2 - ZiCo (Li et al., ICLR 2023; official code github.com/SLDGroup/ZiCo,
 ``ZeroShotProxy/compute_zico.py``)
 
     The official functions ``getgrad``, ``caculate_zico`` and ``getzico`` are reproduced below without
@@ -44,14 +24,18 @@ Objective 3 - ZiCo (Li et al., ICLR 2023; official code github.com/SLDGroup/ZiCo
     With two batches every ratio mean|g| / std(g) = (|g1|+|g2|) / |g1-g2| >= 1, so each layer contributes
     log(sum) >= 0 and ZiCo >= 0.
 
-        f3 = 1 / (1 + ZiCo)   in (0, 1]                                 (minimise)
+        f2 = 1 / (1 + ZiCo)   in (0, 1]                                 (minimise)
 
     ZiCo uses the *training* split only (two augmented training batches). Validation and test images are
     never seen by the search.
 
-Every objective is strictly positive and strictly decreasing in the "goodness" of its criterion; Pareto
+Both objectives are strictly positive and strictly decreasing in the "goodness" of their criterion; Pareto
 dominance is invariant to strictly monotone transforms, so the ranking equals the ranking under
-"minimise parameters, maximise SynFlow, maximise ZiCo".
+"minimise parameters, maximise ZiCo".
+
+SynFlow, the third objective of QENAS 2.x, was removed in QENAS 3.0 (DESIGN_DECISIONS D10): in evaluation
+study v1 it agreed with ZiCo, rewarded larger networks, made the whole final population non-dominated, and
+removing it was never significantly worse and significantly better on Kvasir-SEG.
 """
 
 from __future__ import annotations
@@ -68,78 +52,14 @@ import torch.nn as nn
 from ..models.network import build_model, count_parameters
 from ..training.losses import BCESoftMIoULoss
 
-OBJECTIVE_VERSION = 2
-OBJECTIVE_NAMES = ("f1_params", "f2_synflow", "f3_zico")
-PRUNABLE_TYPES = (nn.Conv2d, nn.ConvTranspose2d, nn.Linear)
-NORM_TYPES = (nn.BatchNorm1d, nn.BatchNorm2d, nn.GroupNorm, nn.LayerNorm, nn.InstanceNorm2d)
+OBJECTIVE_VERSION = 3
+OBJECTIVE_NAMES = ("f1_params", "f2_zico")
 ZICO_BATCHES = 2          # official ZiCo --maxbatch default
 ZICO_LOSS_ALPHA = 0.5     # neutral BCE / soft-mIoU weighting = the candidate-training loss
 
 
 class ObjectiveError(RuntimeError):
     """Raised when an objective is NaN, Inf, out of range or otherwise invalid."""
-
-
-# ============================================================================================== SynFlow
-def bypass_normalization(model: nn.Module) -> int:
-    """Replace all normalisation layers by identities (zero-cost-nas ``bn=False``). Returns the count."""
-    n = 0
-    for name, child in list(model.named_children()):
-        if isinstance(child, NORM_TYPES):
-            setattr(model, name, nn.Identity())
-            n += 1
-        else:
-            n += bypass_normalization(child)
-    return n
-
-
-@torch.no_grad()
-def _linearize(model: nn.Module) -> Dict[str, torch.Tensor]:
-    signs = {}
-    for name, param in model.state_dict().items():
-        signs[name] = torch.sign(param)
-        param.abs_()
-    return signs
-
-
-@torch.no_grad()
-def _nonlinearize(model: nn.Module, signs: Dict[str, torch.Tensor]) -> None:
-    for name, param in model.state_dict().items():
-        param.mul_(signs[name])
-
-
-def synflow_score(model: nn.Module, input_shape: Sequence[int], device: torch.device) -> float:
-    """Raw SynFlow score S of an initialised model (official procedure, see module docstring)."""
-    model = model.to(device=device, dtype=torch.float64)
-    model.eval()
-    signs = _linearize(model)
-    model.zero_grad(set_to_none=True)
-    x = torch.ones([1] + list(input_shape), dtype=torch.float64, device=device)
-    torch.sum(model(x)).backward()
-    total = torch.zeros((), dtype=torch.float64, device=device)
-    n_layers = 0
-    for m in model.modules():
-        if isinstance(m, PRUNABLE_TYPES) and m.weight.grad is not None:
-            total += (m.weight.detach() * m.weight.grad).abs().sum().to(torch.float64)
-            n_layers += 1
-    _nonlinearize(model, signs)
-    model.zero_grad(set_to_none=True)
-    if n_layers == 0:
-        raise ObjectiveError("SynFlow: model has no prunable layers with gradients")
-    return float(total.item())
-
-
-def synflow_objective(raw: float) -> Tuple[float, float]:
-    """Map raw SynFlow S to (L = ln(1+S), f2 = 1/(1+L)). Validates the result."""
-    if raw is None or not math.isfinite(raw):
-        raise ObjectiveError(f"SynFlow is not finite (S={raw}); the float64 synaptic flow overflowed")
-    if raw < 0:
-        raise ObjectiveError(f"SynFlow is negative (S={raw}); impossible for a sum of absolute values")
-    log_s = math.log1p(raw)
-    f2 = 1.0 / (1.0 + log_s)
-    if not (math.isfinite(f2) and 0.0 < f2 <= 1.0):
-        raise ObjectiveError(f"Invalid SynFlow objective f2={f2} from S={raw}")
-    return log_s, f2
 
 
 # ============================================================================================== ZiCo
@@ -201,7 +121,7 @@ def getzico(network, trainloader, lossfunc, device: torch.device):
 
 
 def zico_objective(z: float) -> float:
-    """f3 = 1 / (1 + ZiCo). Validates the value (ZiCo >= 0 with two batches, see module docstring)."""
+    """f2 = 1 / (1 + ZiCo). Validates the value (ZiCo >= 0 with two batches, see module docstring)."""
     if z is None or not math.isfinite(z):
         raise ObjectiveError(f"ZiCo is not finite ({z})")
     if z <= -1.0:
@@ -230,35 +150,21 @@ def _seeded_model(chromosome: Sequence[int], cfg: Dict[str, Any], device: torch.
 
 def evaluate_architecture(chromosome: Sequence[int], cfg: Dict[str, Any], device: torch.device,
                           zico_batches: List[Tuple[torch.Tensor, torch.Tensor]]) -> Dict[str, Any]:
-    """Training-free evaluation of one architecture: parameters, SynFlow and ZiCo. No weight is updated."""
+    """Training-free evaluation of one architecture: parameters and ZiCo. No weight is updated."""
     t0 = time.time()
-    h, w = cfg["data"]["image_size"]
-    input_shape = [int(cfg["data"]["in_channels"]), int(h), int(w)]
     model = _seeded_model(chromosome, cfg, device)
-    params = count_parameters(model)   # counted on the real (normalised) architecture
+    params = count_parameters(model)
     if params <= 0:
         raise ObjectiveError(f"parameter count {params} is not positive for {list(chromosome)}")
-    bypass_normalization(model)        # throw-away copy used only for SynFlow
-    raw = synflow_score(model, input_shape, device)
-    log_s, f2 = synflow_objective(raw)
-    del model
-    t1 = time.time()
-    # ZiCo on a fresh copy with the identical initialisation (normalisation layers active, train mode).
-    model = _seeded_model(chromosome, cfg, device)
     z = float(getzico(model, zico_batches, BCESoftMIoULoss(alpha=ZICO_LOSS_ALPHA), device))
-    f3 = zico_objective(z)
+    f2 = zico_objective(z)
     del model
     return {
         "chromosome": [int(g) for g in chromosome],
         "params": params,
-        "synflow_raw": raw,
-        "synflow_log": log_s,
         "zico": z,
         "f1_params": float(params),
-        "f2_synflow": f2,
-        "f3_zico": f3,
-        "synflow_seconds": round(t1 - t0, 3),
-        "zico_seconds": round(time.time() - t1, 3),
+        "f2_zico": f2,
         "eval_seconds": round(time.time() - t0, 3),
     }
 
@@ -269,7 +175,6 @@ def objective_signature(cfg: Dict[str, Any], zico_digest: str) -> Dict[str, Any]
         "objective_version": OBJECTIVE_VERSION,
         "input_size": list(cfg["data"]["image_size"]),
         "init_seed": int(cfg["seed"]),
-        "synflow": "official procedure, float64, all-ones input, batch 1, normalisation bypassed",
         "zico": f"official getzico, train mode, {ZICO_BATCHES} training batches, BCE/soft-mIoU alpha={ZICO_LOSS_ALPHA}",
         "zico_batches_sha256": zico_digest,
         "torch_version": torch.__version__.split("+")[0],

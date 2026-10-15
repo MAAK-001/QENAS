@@ -49,7 +49,7 @@ class EvaluationCache:
             res = rec["result"]
             if rec.get("key") != k or [int(g) for g in res["chromosome"]] != [int(g) for g in chromosome]:
                 raise ValueError("cache record does not match its key")
-            for f in OBJECTIVE_NAMES + ("synflow_raw", "zico"):
+            for f in OBJECTIVE_NAMES + ("zico",):
                 v = float(res[f])
                 if not math.isfinite(v):
                     raise ValueError(f"non-finite cached value {f}={v}")

@@ -29,30 +29,42 @@ def test_leakage_detector():
 
 def _front(n=20, seed=0):
     rng = np.random.default_rng(seed)
-    return [{"chromosome": [i % 5] * 8, "f1_params": float(rng.integers(1, 100)), "f2_synflow": float(rng.random()),
-             "f3_zico": float(rng.random()), "params": i} for i in range(n)]
+    return [{"chromosome": [i % 5, i // 5] * 4, "f1_params": float(rng.integers(1, 100)), "f2_zico": float(rng.random()),
+             "params": i} for i in range(n)]
 
 
 def test_pareto_subset_keeps_every_objective_extreme_and_size():
     front = _front()
     sub = select_pareto_candidates(front, 6)
     assert len(sub) == 6
-    for k in ("f1_params", "f2_synflow", "f3_zico"):
+    for k in ("f1_params", "f2_zico"):
         assert min(r[k] for r in sub) == min(r[k] for r in front)
     assert any(r["selection_reason"].startswith("extreme") for r in sub)
     small = select_pareto_candidates(front[:4], 6)
-    assert len(small) == 4 and all(r["selection_reason"] == "entire front (|front| <= k)" for r in small)
-    for k in (1, 2):   # never more than k, even when there are more objective extremes than k
-        assert len(select_pareto_candidates(front, k)) == k
+    assert len(small) == 4 and all(r["selection_reason"] == "Pareto front" for r in small)
+    assert len(select_pareto_candidates(front, 1)) == 1   # never more than k, even with more extremes than k
 
 
-def test_pymoo_operators_produce_valid_integer_chromosomes_with_three_objectives():
+def test_small_front_is_filled_up_in_nsga2_survival_order():
+    front = _front(3)
+    pop = [dict(r, pareto_rank=0, crowding_distance="inf") for r in front]
+    rest = _front(8, seed=1)[3:]
+    pop += [dict(r, pareto_rank=1 + i // 3, crowding_distance=float(10 - i)) for i, r in enumerate(rest)]
+    sub = select_pareto_candidates(front, 6, population=pop)
+    assert len(sub) == 6
+    assert [r["selection_reason"] for r in sub[:3]] == ["Pareto front"] * 3
+    filled = [r["chromosome"] for r in sub[3:]]
+    assert filled == [r["chromosome"] for r in rest[:3]]                # rank 2 (largest crowding first)
+    assert all("pareto_rank" not in r for r in sub)
+
+
+def test_pymoo_operators_produce_valid_integer_chromosomes_with_two_objectives():
     from pymoo.core.evaluator import Evaluator
     from pymoo.problems.static import StaticProblem
     cfg = build_config("BUSI")
     alg = build_algorithm(cfg)
     prob = QENASProblem()
-    assert prob.n_obj == 3
+    assert prob.n_obj == 2
     alg.setup(prob, termination=("n_gen", 4), seed=1, verbose=False)
     rng = np.random.default_rng(0)
     while alg.has_next():
@@ -60,7 +72,7 @@ def test_pymoo_operators_produce_valid_integer_chromosomes_with_three_objectives
         X = pop.get("X")
         assert X.dtype.kind in "iu" and X.shape[1] == 8 and X.min() >= 0 and X.max() <= 4
         assert len({tuple(r) for r in X.tolist()}) == len(X)   # duplicates eliminated
-        Evaluator().eval(StaticProblem(prob, F=rng.random((len(X), 3)) + 0.1), pop)
+        Evaluator().eval(StaticProblem(prob, F=rng.random((len(X), 2)) + 0.1), pop)
         alg.tell(infills=pop)
 
 

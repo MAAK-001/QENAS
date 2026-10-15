@@ -5,7 +5,7 @@ Uses pymoo's official ask-and-tell interface:
     algorithm.setup(problem, termination, seed)
     while algorithm.has_next():
         pop = algorithm.ask()                                # initial sampling / mating + mutation
-        F   = <evaluate params, SynFlow and ZiCo, with cache>  # no weight is updated
+        F   = <evaluate params and ZiCo, with cache>         # no weight is updated
         Evaluator().eval(StaticProblem(problem, F=F), pop)
         algorithm.tell(infills=pop)                          # rank-and-crowding survival
         <record generation, checkpoint>
@@ -45,7 +45,7 @@ from .problem import QENASProblem, build_algorithm
 
 log = get_logger()
 
-RECORD_KEYS = ("chromosome", "blocks", "params", "synflow_raw", "synflow_log", "zico") + OBJECTIVE_NAMES
+RECORD_KEYS = ("chromosome", "blocks", "params", "zico") + OBJECTIVE_NAMES
 
 
 class NSGA2Search:
@@ -53,7 +53,7 @@ class NSGA2Search:
                  zico_batches: List[Tuple[torch.Tensor, torch.Tensor]],
                  objectives: Sequence[str] = OBJECTIVE_NAMES):
         self.cfg = cfg
-        self.objectives = tuple(objectives)   # optimised objectives; all three are always evaluated and recorded
+        self.objectives = tuple(objectives)   # optimised objectives
         self.exp_dir = Path(exp_dir)
         self.device = device
         self.fingerprint = fingerprint
@@ -133,9 +133,9 @@ class NSGA2Search:
             if not np.all(np.isfinite(F[i])) or np.any(F[i] <= 0):
                 raise ObjectiveError(f"Invalid objective vector {F[i]} for {ch}")
             timer.step()
-            log.info("  Generation %d/%d | Evaluating %d/%d | %s %s | params %.3fM | ln(1+SynFlow) %.2f | "
-                     "ZiCo %.2f | %s | %s", generation, self.n_generations, i + 1, n, chromosome_to_str(ch),
-                     rec["blocks"], rec["params"] / 1e6, rec["synflow_log"], rec["zico"],
+            log.info("  Generation %d/%d | Evaluating %d/%d | %s %s | params %.3fM | ZiCo %.2f | %s | %s",
+                     generation, self.n_generations, i + 1, n, chromosome_to_str(ch), rec["blocks"],
+                     rec["params"] / 1e6, rec["zico"],
                      "cached" if cached else f"{rec['eval_seconds']:.1f}s", timer.summary())
         return F
 
@@ -163,15 +163,14 @@ class NSGA2Search:
             "new_evaluations": n_evaluated,
             "pareto_size": len(front),
             "best_params": int(min(r["params"] for r in rows)),
-            "best_log_synflow": float(max(r["synflow_log"] for r in rows)),
             "best_zico": float(max(r["zico"] for r in rows)),
             "unique_evaluated_total": len(self.archive),
             "seconds": round(gen_seconds, 2),
         })
         g = self.generation_table[-1]
         log.info("Generation %d/%d done | population %d | Pareto front size %d | best params %.3fM | "
-                 "best ln(1+SynFlow) %.2f | best ZiCo %.2f | time %s", generation, self.n_generations, len(rows),
-                 len(front), g["best_params"] / 1e6, g["best_log_synflow"], g["best_zico"], format_seconds(gen_seconds))
+                 "best ZiCo %.2f | time %s", generation, self.n_generations, len(rows), len(front),
+                 g["best_params"] / 1e6, g["best_zico"], format_seconds(gen_seconds))
 
     def _hypervolumes(self) -> None:
         A = np.array([[r[o] for o in self.objectives] for r in self.archive.values()], dtype=float)
@@ -231,7 +230,7 @@ class NSGA2Search:
         d = self.exp_dir
         archive_rows = sorted(self.archive.values(), key=lambda r: (r["first_generation"], r["params"]))
         save_csv(d / "search_results.csv", archive_rows,
-                 ["first_generation", *RECORD_KEYS, "synflow_seconds", "zico_seconds", "eval_seconds"])
+                 ["first_generation", *RECORD_KEYS, "eval_seconds"])
         save_json(d / "search_results.json", archive_rows)
         save_csv(d / "search_population_history.csv", self.population_history)
         save_json(d / "search_population_history.json", self.population_history)
@@ -269,7 +268,7 @@ class RandomSearch(NSGA2Search):
         d = self.exp_dir
         archive_rows = sorted(self.archive.values(), key=lambda r: r["params"])
         save_csv(d / "search_results.csv", archive_rows,
-                 ["first_generation", *RECORD_KEYS, "synflow_seconds", "zico_seconds", "eval_seconds"])
+                 ["first_generation", *RECORD_KEYS, "eval_seconds"])
         save_json(d / "search_results.json", archive_rows)
         save_csv(d / "pareto_front.csv", front, ["front_index", *RECORD_KEYS])
         save_json(d / "pareto_front.json", front)

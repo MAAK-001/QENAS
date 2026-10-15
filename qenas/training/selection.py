@@ -1,43 +1,35 @@
-r"""Learning-capability selection of one architecture from the evaluated Pareto candidates.
+r"""Learning-capability selection: successive halving and the final choice of one architecture.
 
-Primary criterion (as specified):     ΔDice = Dice_val(epoch E) - Dice_val(epoch 1)
-Secondary quantities:                 ΔLoss = Loss_val(epoch 1) - Loss_val(epoch E),
-                                      final validation Dice, stability, overfitting.
+Successive halving (Jamieson & Talwalkar, AISTATS 2016; the rung schedule of Hyperband / ASHA)
+    All candidates are trained to the first rung (5 epochs); the best half by the criterion continues to the next
+    rung (10 epochs); the best half of those is trained to the full candidate length (20 epochs). With 16
+    candidates: 16 x 5 + 8 x 5 + 4 x 10 = 160 epochs, the budget of 8 candidates x 20 epochs. Candidate runs use a
+    constant learning rate, the same initialisation seed and the same per-epoch data order, so a run continued
+    from one rung to the next is the run that would have been trained without interruption. A run that diverges
+    (non-finite loss) is eliminated at its rung (gate G1).
 
-No weighted score is used. Instead a candidate must first pass five *eligibility gates*,
-each a falsifiable statement about pathological behaviour, and only then is ΔDice
-compared. Thresholds are either standard statistical significance levels or derived
-from the data itself:
+Criterion (every rung and the final choice)
+    mean validation Dice over the last ``window`` (5) epochs reached - the end-of-run validation quality, averaged
+    over epochs to reduce single-epoch noise. It replaces QENAS 2.x' ΔDice = Dice(E) - Dice(1), which rewards a
+    poor start as much as a good end: in evaluation study v1 ΔDice chose the candidate with the best end-of-run
+    Dice in 1 of 12 runs (DESIGN_DECISIONS D21). Ties are broken by fewer parameters.
 
-G1 finite      — training completed without NaN/Inf (diverged runs are disqualified).
-G2 generalises — ΔLoss > 0: the validation loss actually decreased. A Dice gain with a
-                 rising validation loss indicates the gain does not generalise.
-G3 no overfit  — NOT [validation loss has a significant increasing trend over the second
-                 half of training while training loss has a significant decreasing trend]
-                 (one-sided Kendall tau tests, p < ``significance``). This is the textbook
-                 overfitting signature.
-G4 genuine, stable learning — the validation Dice curve has a significant increasing
-                 monotone trend over all epochs (Kendall tau > 0, p < ``significance``).
-                 A large ΔDice produced by an erratic/oscillating curve or a lucky final
-                 epoch fails this test.
-G5 competence  — final validation Dice exceeds the Dice of the trivial predictor that
-                 labels every pixel foreground (computed on the validation masks). An
-                 architecture that cannot beat this floor has not learned to segment.
+Eligibility gates of the final choice (unchanged from QENAS 2.x; computed on the full candidate run)
+    G1 finite      - training completed without NaN/Inf.
+    G2 generalises - ΔLoss = Loss_val(1) - Loss_val(E) > 0.
+    G3 no overfit  - NOT [validation loss significantly increasing and training loss significantly decreasing over
+                     the second half] (one-sided Kendall tau tests, p < ``significance``).
+    G4 genuine learning - the validation Dice has a significant increasing trend over all epochs.
+    G5 competence  - final validation Dice above the Dice of the all-foreground predictor on the validation masks.
 
-Among eligible candidates the largest ΔDice wins. Because single-epoch Dice values are
-noisy, candidates whose ΔDice is within the *measured noise* of the leader are treated
-as tied: noise_i = median |Dice_t - Dice_{t-1}| over candidate i's last
-``noise_window`` epochs; candidate i is tied with leader l if
-ΔDice_l - ΔDice_i <= max(noise_l, noise_i). Ties are broken by (1) higher final
-validation Dice, (2) larger ΔLoss, (3) fewer parameters (the complexity objective).
-
-If no candidate passes every gate, gates are relaxed in a fixed, recorded order
-(G4, then G3, then G2, then G5); G1 is never relaxed.
+    If no finalist passes every gate, gates are relaxed in a fixed, recorded order (G4, G3, G2, G5); G1 is never
+    relaxed, and only the gates that actually blocked every finalist are reported as relaxed.
 """
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+import math
+from typing import Any, Dict, List, Sequence
 
 import numpy as np
 
@@ -47,29 +39,44 @@ GATE_RELAX_ORDER = ["G4_learning_trend", "G3_no_overfitting", "G2_val_loss_decre
 ALL_GATES = ["G1_finite"] + ["G2_val_loss_decreased", "G3_no_overfitting", "G4_learning_trend", "G5_beats_trivial"]
 
 
+def criterion(history: List[Dict[str, Any]], window: int) -> float:
+    """Mean validation Dice over the last ``window`` epochs of ``history``."""
+    return float(np.mean([h["val_dice"] for h in history[-window:]]))
+
+
+def rung_sizes(n: int, n_rungs: int, keep_fraction: float) -> List[int]:
+    """Number of candidates trained at each rung: n, ceil(n * keep), ceil(n * keep^2), ..."""
+    sizes = [n]
+    for _ in range(n_rungs - 1):
+        sizes.append(max(1, math.ceil(sizes[-1] * keep_fraction)))
+    return sizes
+
+
+def promote(scored: Sequence[Dict[str, Any]], n_keep: int) -> List[int]:
+    """Ids of the ``n_keep`` best candidates by criterion (ties: fewer parameters, then id)."""
+    order = sorted(scored, key=lambda c: (-c["score"], c["params"], c["candidate_id"]))
+    return [c["candidate_id"] for c in order[:n_keep]]
+
+
 def analyse_candidate(history: List[Dict[str, Any]], trivial_dice: float, significance: float,
-                      noise_window: int) -> Dict[str, Any]:
+                      window: int) -> Dict[str, Any]:
     vd = [h["val_dice"] for h in history]
     vl = [h["val_loss"] for h in history]
-    tl = [h["train_loss"] for h in history]
     n = len(history)
     half = history[n // 2:]
     tau_v, p_v = trend_test([h["val_loss"] for h in half], "greater")
     tau_t, p_t = trend_test([h["train_loss"] for h in half], "less")
     tau_d, p_d = trend_test(vd, "greater")
-    diffs = np.abs(np.diff(vd[-(noise_window + 1):])) if n > 1 else np.array([0.0])
-    noise = float(np.median(diffs)) if diffs.size else 0.0
     out = {
+        "criterion": criterion(history, window), "epochs_trained": n,
         "epoch1_val_dice": vd[0], "final_val_dice": vd[-1], "delta_dice": vd[-1] - vd[0],
         "epoch1_val_loss": vl[0], "final_val_loss": vl[-1], "delta_loss": vl[0] - vl[-1],
-        "epoch1_val_iou": history[0]["val_iou"], "final_val_iou": history[-1]["val_iou"],
-        "best_val_dice": max(vd), "min_val_loss": min(vl),
-        "final_train_dice": history[-1]["train_dice"], "final_train_loss": tl[-1],
+        "final_val_iou": history[-1]["val_iou"], "best_val_dice": max(vd),
+        "final_train_dice": history[-1]["train_dice"],
         "generalisation_gap_dice": history[-1]["train_dice"] - vd[-1],
         "dice_trend_tau": tau_d, "dice_trend_p": p_d,
         "val_loss_trend_tau_2nd_half": tau_v, "val_loss_trend_p_2nd_half": p_v,
         "train_loss_trend_tau_2nd_half": tau_t, "train_loss_trend_p_2nd_half": p_t,
-        "dice_noise": noise,
     }
     overfit = (p_v < significance) and (p_t < significance)
     out["gates"] = {
@@ -82,29 +89,32 @@ def analyse_candidate(history: List[Dict[str, Any]], trivial_dice: float, signif
     return out
 
 
-def select_by_learning_capability(candidates: List[Dict[str, Any]], trivial_dice: float,
-                                  significance: float, noise_window: int) -> Dict[str, Any]:
-    """``candidates``: dicts with the candidate id, chromosome, objectives and ``history`` (or diverged=True)."""
+def select_by_learning_capability(candidates: List[Dict[str, Any]], trivial_dice: float, significance: float,
+                                  window: int, full_epochs: int) -> Dict[str, Any]:
+    """``candidates``: every candidate of the successive halving (id, chromosome, objectives, ``history`` up to the
+    rung it reached, ``diverged``). The finalists are the candidates that completed ``full_epochs``."""
     analysed = []
     for c in candidates:
-        rec = {k: c[k] for k in ("candidate_id", "chromosome", "blocks", "params", "synflow_log", "zico",
-                                 "f2_synflow", "f3_zico")}
+        rec = {k: c[k] for k in ("candidate_id", "chromosome", "blocks", "params", "zico", "f2_zico")}
+        rec["rung_scores"] = c.get("rung_scores", {})
         if c.get("diverged"):
-            rec.update({"diverged": True, "divergence": c.get("divergence", ""),
+            rec.update({"diverged": True, "divergence": c.get("divergence", ""), "finalist": False,
                         "gates": {g: (False if g == "G1_finite" else None) for g in ALL_GATES}})
         else:
-            rec.update(analyse_candidate(c["history"], trivial_dice, significance, noise_window))
+            rec.update(analyse_candidate(c["history"], trivial_dice, significance, window))
             rec["diverged"] = False
+            rec["finalist"] = len(c["history"]) >= full_epochs
         analysed.append(rec)
 
-    relaxed: List[str] = []
-    finite = [a for a in analysed if not a["diverged"]]
-    if not finite:
-        raise RuntimeError("All Pareto candidates diverged (non-finite loss); no architecture can be selected.")
+    finalists = [a for a in analysed if a["finalist"]]
+    if not finalists:
+        raise RuntimeError("No candidate completed the full candidate run (all diverged); no architecture can be "
+                           "selected.")
 
     def eligible(active: List[str]) -> List[Dict[str, Any]]:
-        return [a for a in finite if all(a["gates"][g] for g in active)]
+        return [a for a in finalists if all(a["gates"][g] for g in active)]
 
+    relaxed: List[str] = []
     active = [g for g in ALL_GATES if g != "G1_finite"]
     pool = eligible(active)
     for g in GATE_RELAX_ORDER:
@@ -113,43 +123,31 @@ def select_by_learning_capability(candidates: List[Dict[str, Any]], trivial_dice
         active.remove(g)
         relaxed.append(g)
         pool = eligible(active)
-    # Re-instate every relaxed gate that is not actually needed (most important first), so that
-    # only the gates that truly blocked all candidates are reported as relaxed.
+    # Re-instate every relaxed gate that is not actually needed (most important first), so that only the gates
+    # that truly blocked all finalists are reported as relaxed.
     for g in reversed(list(relaxed)):
         trial = active + [g]
         if eligible(trial):
             active = trial
             relaxed.remove(g)
-    pool = eligible(active) if active else finite
-    if not pool:
-        pool = finite
+    pool = eligible(active) or finalists
 
-    leader = max(pool, key=lambda a: a["delta_dice"])
-    tied = [a for a in pool
-            if leader["delta_dice"] - a["delta_dice"] <= max(leader["dice_noise"], a["dice_noise"])]
-    winner = sorted(tied, key=lambda a: (-a["final_val_dice"], -a["delta_loss"], a["params"]))[0]
-
+    winner = sorted(pool, key=lambda a: (-a["criterion"], a["params"], a["candidate_id"]))[0]
     pool_ids = {a["candidate_id"] for a in pool}
-    tied_ids = {a["candidate_id"] for a in tied}
     for a in analysed:
         a["eligible"] = a["candidate_id"] in pool_ids
-        a["tied_with_leader"] = a["candidate_id"] in tied_ids
         a["selected"] = a["candidate_id"] == winner["candidate_id"]
-    ranking = sorted([a for a in analysed if a["eligible"]], key=lambda a: -a["delta_dice"]) + \
-        sorted([a for a in analysed if not a["eligible"]], key=lambda a: -(a.get("delta_dice") or -1e9))
+    ranking = sorted(finalists, key=lambda a: (not a["eligible"], -a["criterion"], a["params"]))
     for r, a in enumerate(ranking, 1):
         a["capability_rank"] = r
+    for a in analysed:
+        a.setdefault("capability_rank", None)
 
-    if len(tied) > 1:
-        why = (f"largest ΔDice tier (within measured Dice noise of the leader, {len(tied)} tied); "
-               f"tie broken by final validation Dice")
-    else:
-        why = "largest validation ΔDice among eligible candidates"
-    reason = (f"Candidate {winner['candidate_id']} selected: {why}. "
-              f"ΔDice={winner['delta_dice']:.4f}, final val Dice={winner['final_val_dice']:.4f}, "
-              f"ΔLoss={winner['delta_loss']:.4f}, Dice trend tau={winner['dice_trend_tau']:.2f} "
-              f"(p={winner['dice_trend_p']:.2g}).")
+    reason = (f"Candidate {winner['candidate_id']} selected: highest mean validation Dice over the last {window} of "
+              f"{full_epochs} epochs among the {len(pool)} eligible of {len(finalists)} successive-halving finalists "
+              f"({winner['criterion']:.4f}; ΔLoss {winner['delta_loss']:.4f}, Dice trend tau "
+              f"{winner['dice_trend_tau']:.2f}, p={winner['dice_trend_p']:.2g}).")
     if relaxed:
-        reason += f" No candidate passed all gates; relaxed: {', '.join(relaxed)}."
+        reason += f" No finalist passed all gates; relaxed: {', '.join(relaxed)}."
     return {"selected_id": winner["candidate_id"], "reason": reason, "relaxed_gates": relaxed,
             "active_gates": ["G1_finite"] + active, "trivial_val_dice": trivial_dice, "analysis": analysed}

@@ -1,5 +1,6 @@
-"""End-to-end test of the evaluation study on tiny synthetic Kvasir-SEG and CVC-ClinicDB datasets (official folder
-layouts). The protocol is shrunk only in size; every study condition runs the code path of study.py."""
+"""End-to-end test of evaluation study v2 on tiny synthetic Kvasir-SEG and CVC-ClinicDB datasets (official folder
+layouts). The protocol is shrunk only in size; every study condition runs the code path of study.py (nnU-Net:
+tests/test_nnunet.py, which needs the nnunetv2 package)."""
 
 import csv
 import json
@@ -21,9 +22,9 @@ from qenas.study.plan import Job, plan
 from qenas.study.scheduler import job_done, run_study
 
 SMALL = {"device": "cpu", "data.image_size": [64, 64], "model.base_channels": 16,
-         "search.population_size": 4, "search.generations": 1, "search.plot_every": 1, "pareto.max_candidates": 2,
-         "candidate_training.epochs": 3, "candidate_training.batch_size": 4,
-         "loss_weights.alphas": [0.5, 0.8], "loss_weights.criterion_window": 2, "selection.noise_window": 2,
+         "search.population_size": 4, "search.generations": 1, "search.plot_every": 1, "pareto.max_candidates": 4,
+         "candidate_training.epochs": 3, "candidate_training.rungs": [1, 2, 3], "candidate_training.batch_size": 4,
+         "loss_weights.alphas": [0.5, 0.8], "loss_weights.criterion_window": 2, "selection.criterion_window": 2,
          "final_training.epochs": 3, "final_training.batch_size": 4,
          "final_training.early_stopping": {"patience": 2, "min_epochs": 2, "significance": 0.05}}
 
@@ -67,6 +68,9 @@ def _make_cvc(root, n=20, seed=1):
         w.writerows(rows)
 
 
+CONDITIONS = ("qenas", "qenas_fixed_alpha", "qenas_random_pick", "qenas_zico_pick", "attention_unet", "random_search")
+
+
 @pytest.fixture(scope="module")
 def study(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("study")
@@ -78,10 +82,9 @@ def study(tmp_path_factory):
     def cfg(ds, method, split_unit="dataset"):
         return study_config(ds, method, 42, overrides=base, split_unit=split_unit)
 
-    for m in ("qenas", "qenas_random_pick", "qenas_zico_pick", "qenas_no_zico", "attention_unet", "random_search"):
+    for m in CONDITIONS:
         assert run_experiment(cfg("KVASIR", m)) == 0, m
     external_validation(cfg("KVASIR", "qenas"), torch.device("cpu"))
-    assert run_experiment(cfg("CVC", "qenas", "image")) == 0
     return tmp, cfg
 
 
@@ -94,8 +97,10 @@ def test_every_condition_completes_with_its_own_stages(study):
     assert list(_state(cfg("KVASIR", "attention_unet"))["stages"]) == ["split", "loss_weights", "final", "test", "report"]
     assert list(_state(cfg("KVASIR", "qenas_random_pick"))["stages"]) == \
         ["split", "inherit", "selection", "loss_weights", "final", "test", "report"]
+    assert list(_state(cfg("KVASIR", "qenas_fixed_alpha"))["stages"]) == \
+        ["split", "inherit", "selection", "final", "test", "report"]
     assert list(_state(cfg("KVASIR", "random_search"))["stages"]) == ["split", "search"]
-    for m in ("qenas", "qenas_random_pick", "qenas_zico_pick", "qenas_no_zico", "attention_unet", "random_search"):
+    for m in CONDITIONS:
         assert _state(cfg("KVASIR", m))["status"] == "completed"
         assert _state(cfg("KVASIR", m))["total_seconds"] > 0          # start-to-end timer
 
@@ -103,7 +108,7 @@ def test_every_condition_completes_with_its_own_stages(study):
 def test_all_conditions_use_the_identical_split(study):
     _, cfg = study
     splits = [json.loads((experiment_dir(cfg("KVASIR", m)) / "split.json").read_text())["splits"]
-              for m in ("qenas", "attention_unet", "random_search", "qenas_no_zico")]
+              for m in ("qenas", "attention_unet", "random_search", "qenas_fixed_alpha")]
     assert all(s == splits[0] for s in splits)
     assert [len(splits[0][k]) for k in ("test",)] == [8]              # the official val.txt images
 
@@ -121,10 +126,24 @@ def test_selection_ablations_reuse_the_qenas_candidates(study):
     assert sel["selected_id"] == max(pool, key=lambda a: a["zico"])["candidate_id"]
 
 
-def test_objective_ablation_optimises_two_objectives(study):
+def test_loss_coefficient_ablation_trains_the_qenas_architecture_with_alpha_half(study):
     _, cfg = study
-    d = experiment_dir(cfg("KVASIR", "qenas_no_zico"))
-    assert json.loads((d / "search_summary.json").read_text())["objectives"] == ["f1_params", "f2_synflow"]
+    q = json.loads((experiment_dir(cfg("KVASIR", "qenas")) / "final_metrics.json").read_text())
+    f = json.loads((experiment_dir(cfg("KVASIR", "qenas_fixed_alpha")) / "final_metrics.json").read_text())
+    assert f["architecture"] == q["architecture"] and f["alpha"] == 0.5
+    assert not (experiment_dir(cfg("KVASIR", "qenas_fixed_alpha")) / "loss_weights.json").exists()
+
+
+def test_random_pick_seed_depends_on_the_dataset():
+    from qenas.utils.seed import derive_seed
+    assert derive_seed(42, "random-candidate-BUSI") != derive_seed(42, "random-candidate-KVASIR")
+
+
+def test_search_optimises_params_and_zico(study):
+    _, cfg = study
+    for m in ("qenas", "random_search"):
+        d = experiment_dir(cfg("KVASIR", m))
+        assert json.loads((d / "search_summary.json").read_text())["objectives"] == ["f1_params", "f2_zico"]
 
 
 def test_baseline_is_the_published_attention_unet(study):
@@ -134,24 +153,21 @@ def test_baseline_is_the_published_attention_unet(study):
     assert abs(final["params_m"] - 8.73) < 0.01
 
 
-def test_external_validation_and_leakage_condition(study):
+def test_external_validation(study):
     _, cfg = study
     ext = json.loads((experiment_dir(cfg("KVASIR", "qenas")) / "external_CVC" / "external_metrics.json").read_text())
     assert ext["n_images"] == 20 and 0 <= ext["metrics"]["dice"] <= 1
-    d = experiment_dir(cfg("CVC", "qenas", "image"))
-    assert d.parent.parent.name == "CVC_frame_split"
-    groups = {s["group"] for s in json.loads((d / "split.json").read_text())["splits"]["test"]}
-    assert all(g.startswith("frame_") for g in groups)
 
 
 def test_analysis_writes_the_paper_tables(study):
     tmp, _ = study
-    analyse(tmp / "results", data_root=str(tmp / "Datasets"))
+    analyse(tmp / "results", data_root=str(tmp / "Datasets"), v1_results=tmp / "results")
     a = tmp / "results" / "analysis"
-    for name in ("T3_ablations", "T5_search_vs_random", "T6_objective_agreement", "T9_proxies_vs_quality",
-                 "T14_external_validation", "T16_cvc_leakage"):
+    for name in ("T1_main_results", "T3_loss_coefficients", "T4_significance_loss_coefficients",
+                 "T5_selection_ablations", "T7_search_vs_random", "T8_successive_halving", "T9_proxies_vs_quality",
+                 "T10_training", "T11_time", "T12_external_validation", "T14_v1_vs_v2"):
         assert (a / f"{name}.md").exists(), name
-    assert (a / "README.md").exists()
+    assert (a / "README.md").exists() and (a / "figures" / "ablation_loss_coefficients.png").exists()
 
 
 def test_scheduler_respects_dependencies_and_time_budget(tmp_path):
@@ -178,6 +194,30 @@ def test_scheduler_respects_dependencies_and_time_budget(tmp_path):
 
 def test_full_plan_is_consistent():
     jobs = plan()
-    ids = {j.id for j in jobs}
-    assert len(jobs) == 78 and all(d in ids for j in jobs for d in j.deps)
-    assert sum(j.external for j in jobs) == 9
+    ids = [j.id for j in jobs]
+    assert len(jobs) == 84 and all(d in ids for j in jobs for d in j.deps)
+    assert sum(j.external for j in jobs) == 12
+    assert {j.seed for j in jobs} == {45, 46, 47}                     # new seeds: v1 used 42, 43, 44
+    for j in jobs:                                                    # dependants come after their parent
+        assert all(ids.index(d) < ids.index(j.id) for d in j.deps)
+
+
+def test_nnunet_repeats_training_when_its_work_folder_is_lost(tmp_path):
+    from qenas.experiment import Experiment
+    from qenas.study.nnunet import NNUNetPipeline
+    cfg = study_config("KVASIR", "nnunet", 45, overrides={**SMALL, "paths.results": str(tmp_path)})
+    exp = Experiment.open(cfg, config_fingerprint(cfg))
+    for s in ("split", "nnunet_data", "nnunet_train"):
+        exp.mark_done(s)
+    NNUNetPipeline(cfg, exp, torch.device("cpu")).run(stop_after="split")   # new session: work folder missing
+    assert list(exp.state["stages"]) == ["split"]
+
+
+def test_unavailable_external_validation_does_not_block_the_job(tmp_path):
+    job = Job("KVASIR", "unet", 45)
+    d = tmp_path / job.id
+    (d / "external_CVC").mkdir(parents=True)
+    (d / "state.json").write_text(json.dumps({"status": "completed"}))
+    assert not job_done(tmp_path, job)
+    (d / "external_CVC" / "external_unavailable.json").write_text("{}")
+    assert job_done(tmp_path, job)

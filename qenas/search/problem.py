@@ -30,8 +30,7 @@ from .objectives import OBJECTIVE_NAMES
 
 
 class QENASProblem(Problem):
-    """All objectives minimised. QENAS: f1 = #parameters, f2 = 1/(1 + ln(1 + SynFlow)), f3 = 1/(1 + ZiCo);
-    the study's objective ablations pass two of them."""
+    """Both objectives minimised: f1 = #parameters, f2 = 1/(1 + ZiCo)."""
 
     def __init__(self, n_obj: int = len(OBJECTIVE_NAMES)) -> None:
         super().__init__(

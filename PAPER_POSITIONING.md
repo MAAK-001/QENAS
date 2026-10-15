@@ -14,36 +14,44 @@ Every entry was checked against its paper; "–" means the paper does not report
 | **ZiCo-BC** (Bhardwaj et al., ICCVW 2023) | semantic segmentation of natural images (Cityscapes) | HRNet / FFNet backbones and heads | NSGA-II with hardware latency, training-free | ZiCo (bias-corrected) computed with the training loss, latency | the proxy/latency front |
 | **Mixed-GGNAS** (Hu et al., ESWA 2025) | medical image segmentation (CVC-ClinicDB, BUSI, CAMUS, IDRiD) | mixed: 4 manual blocks + DARTS block, U-shape (+ ViT) | GA with supervised training of individuals + DARTS; ≈ 26 h search on IDRiD | validation accuracy after training | the GA, after training |
 
-## What QENAS adds
+## What QENAS adds (QENAS 3.0)
 
 1. **A data- and label-aware zero-cost objective for medical segmentation.** The training-free medical NAS methods
    (MedNAS, AEG-cTFNAS) and the TF-MOENAS line use proxies that never see a label: SynFlow is data-free;
-   jacob_cov and NTK/linear regions use images but no masks. QENAS adds ZiCo, computed with the *segmentation
-   loss on real training images and their masks* (official ZiCo code, unchanged), next to parameters and
-   SynFlow. Its contribution is measured by the ablation `qenas_no_zico` (STUDY.md, RQ2).
+   jacob_cov and NTK/linear regions use images but no masks. QENAS optimises the parameter count against ZiCo,
+   computed with the *segmentation loss on real training images and their masks* (official ZiCo code, unchanged).
+   Study v1 measured that adding the data-free SynFlow (the objective of MedNAS / AEG-cTFNAS / E-TF-MOENAS) on top
+   does not help: removing it was never significantly worse and significantly better on Kvasir-SEG (+3.10 pp), and
+   ZiCo beat SynFlow as the second objective (DESIGN_DECISIONS D10).
 2. **Training-free search in the mixed manual + DARTS search space** of Mixed-GGNAS, which so far was searched only
    with supervised training (≈ 26 h per dataset). QENAS uses the same blocks and genotypes, so the comparison
-   isolates the search strategy.
-3. **Learning-capability selection.** Zero-shot NAS methods return the proxy front or its best member. QENAS
-   instead trains a representative subset of the front for 20 epochs and chooses by validation ΔDice with
-   falsifiable pathology gates. This is a safeguard against proxy failure, which the study measures
-   (T9: proxy vs trained quality; ablations `qenas_random_pick` and `qenas_zico_pick`, the zero-shot rule).
+   isolates the search strategy. The search takes 5–10 min on a Tesla T4; a complete QENAS run 33–106 min (v1).
+3. **Supervised selection by successive halving.** Zero-shot NAS methods return the proxy front or its best member.
+   Study v1 showed that inside the search elite no proxy predicts trained quality, so QENAS trains 16 candidates of
+   the final population with successive halving (16 × 5 → 8 × 10 → 4 × 20 epochs) and selects by end-of-run
+   validation Dice with falsifiable pathology gates. Study v2 tests this against a random candidate and the
+   zero-shot rule (max ZiCo).
 4. **A leakage-controlled evaluation**, beyond what the compared papers report:
    * splits by leakage unit (CVC-ClinicDB by colonoscopy sequence), identical for all methods and seeds;
    * test sets touched once;
    * paired statistics on the same images;
+   * nnU-Net on the identical split as the strong reference (study v2);
    * external validation (Kvasir-SEG → CVC-ClinicDB);
-   * a measurement of how much the common random frame split inflates CVC-ClinicDB scores (RQ5).
+   * a measurement of how much the common random frame split inflates CVC-ClinicDB scores (v1: +20 to +28 pp).
 
 ## Honest limits for the paper
 
-* Three-objective, training-free NSGA-II itself is not new (E-TF-MOENAS, MedNAS). The novelty is the
+* Multi-objective, training-free NSGA-II itself is not new (E-TF-MOENAS, MedNAS). The novelty is the
   *combination* above, and it must be argued with the ablations, not assumed.
+* In study v1 QENAS 2.1 beat U-Net and Attention U-Net clearly on BUSI, CVC-ClinicDB and IDRiD but not on
+  Kvasir-SEG; v2 shows whether QENAS 3.0 changes that, and how it compares with nnU-Net.
 * Mixed-GGNAS could not be re-run on our splits: its released code has no searched architectures, weights or
   training instructions, and its search costs ≈ 26 h per dataset. Its published numbers come from its own splits
   and are reported as such.
 * AEG-cTFNAS (ACDC, EndoVis 2018) and MedNAS (classification) were evaluated on other datasets. A numerical
   comparison would require re-running them on these datasets.
+* nnU-Net is trained for 100 instead of 1000 epochs (compute), with at least the GPU time of the whole QENAS
+  pipeline.
 
 ## Sources
 
@@ -58,4 +66,8 @@ Every entry was checked against its paper; "–" means the paper does not report
 * Bhardwaj, K. et al.: ZiCo-BC: A Bias Corrected Zero-Shot NAS for Vision Tasks. ICCV Workshops 2023.
 * Li, G. et al.: ZiCo: Zero-shot NAS via Inverse Coefficient of Variation on Gradients. ICLR 2023.
 * Hu, M. et al.: Mixed-GGNAS. Expert Systems with Applications 289 (2025) 128338.
+* Isensee, F. et al.: nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation.
+  Nature Methods 18 (2021) 203–211.
+* Jamieson, K., Talwalkar, A.: Non-stochastic best arm identification and hyperparameter optimization (successive
+  halving). AISTATS 2016.
 * Jha, D. et al.: Kvasir-SEG: A Segmented Polyp Dataset. MMM 2020.

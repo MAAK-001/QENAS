@@ -11,7 +11,7 @@ stride-2 down-sampling / transposed up-sampling operations, channel weighting (S
 
 QENAS modifications (behaviour-preserving):
 * ``ZeroOp`` allocates its output with ``x.new_zeros`` (the original allocates a
-  float32 CPU tensor, which breaks float64 SynFlow evaluation and GPU placement).
+  float32 CPU tensor, which breaks GPU placement and float64 evaluation).
 * Code is restructured into small classes; numerics are unchanged.
 """
 

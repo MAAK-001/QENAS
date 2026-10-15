@@ -22,7 +22,7 @@ from qenas.runner import run_experiment
 
 
 def parse_args(argv=None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="QENAS: training-free NSGA-II (parameters, SynFlow, ZiCo) + "
+    p = argparse.ArgumentParser(description="QENAS: training-free NSGA-II (parameters, ZiCo) + successive-halving "
                                             "learning-capability selection for medical image segmentation")
     p.add_argument("--dataset", required=True, type=str.upper, choices=SUPPORTED_DATASETS)
     p.add_argument("--data-root", default=None, help="folder containing BUSI*/CVC*/IDRID*/Kvasir* (default: ../Datasets)")

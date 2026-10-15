@@ -20,7 +20,7 @@ Mixed-GGNAS transition, or a DARTS down/up cell:
   skip -> BN -> spatial-channel attention; concat -> 1x1 conv -> block
 * DARTS positions: NAS-Unet cells (see ``darts_cell.py``)
 
-The *same* class and constructor arguments are used for SynFlow evaluation,
+The *same* class and constructor arguments are used for the ZiCo evaluation,
 candidate training and final training — there is no search/train mismatch.
 """
 
