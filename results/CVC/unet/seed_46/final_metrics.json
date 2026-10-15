@@ -1,0 +1,53 @@
+{
+  "dataset": "CVC",
+  "split_unit": "dataset",
+  "method": "unet",
+  "method_label": "U-Net",
+  "seed": 46,
+  "architecture": {
+    "type": "baseline",
+    "network": "unet"
+  },
+  "architecture_label": "U-Net",
+  "blocks": null,
+  "total_params": 31037633,
+  "params_m": 31.037633,
+  "flops_batch_size": 8,
+  "gflops_mixed_ggnas": 437.902114816,
+  "gflops_per_image": 54.737764352,
+  "inference_ms_per_image": 10.660505002306309,
+  "inference_device": "cuda",
+  "zico": null,
+  "alpha": 0.4,
+  "beta": 0.6,
+  "best_epoch": 22,
+  "epochs_run": 47,
+  "train": {
+    "dice": 0.5963833096544477,
+    "iou": 0.46845225095941984,
+    "miou": 0.6995489762666174,
+    "loss": 0.2774993528765214,
+    "hd95": 67.46689950414934,
+    "sensitivity": 0.6919925927706991,
+    "hd95_empty_pred": 1
+  },
+  "validation": {
+    "dice": 0.53483833750301,
+    "iou": 0.4026321991409259,
+    "miou": 0.6669436486874422,
+    "loss": 0.3078103774848084,
+    "hd95": 58.562781233921946,
+    "sensitivity": 0.4645847977279532,
+    "hd95_empty_pred": 2
+  },
+  "test": {
+    "dice": 0.34339136588955005,
+    "iou": 0.24308340150056343,
+    "miou": 0.5776311549579508,
+    "loss": 0.3673869092479225,
+    "hd95": 102.8508720279366,
+    "sensitivity": 0.40795842693907197,
+    "hd95_empty_pred": 2
+  },
+  "n_test": 121
+}

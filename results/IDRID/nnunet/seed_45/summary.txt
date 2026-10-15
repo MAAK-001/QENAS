@@ -1,0 +1,22 @@
+================ nnU-Net RESULT ================
+
+Dataset: IDRID
+Method: nnU-Net — baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split
+Seed: 45
+
+Training: 100 epochs x 250 iterations, batch size 3, patch [320, 512]
+Validation Dice (final checkpoint): 0.9540
+
+Final test (n = 27, evaluated once, no TTA):
+Dice (DSC):        95.91 %
+mIoU (class mean): 96.10 %
+Params:            33.472 M
+FLOPs:             167.27 G per batch of 4 (41.82 G per image)
+HD95:              9.26 px
+Sensitivity:       96.32 %
+IoU (foreground):  92.33 %
+Inference:         16.10 ms per image on cuda
+Dice with nnU-Net mirroring TTA: 96.16 %
+
+================================================
+QENAS time on IDRID (nnunet, seed 45): 01:12:57 from start to end (all stages) | this session: 01:13:03

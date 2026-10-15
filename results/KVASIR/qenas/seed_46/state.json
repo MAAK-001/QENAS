@@ -1,0 +1,92 @@
+{
+  "fingerprint": "46a2b707f109bed2",
+  "created": "2026-10-16T12:19:53",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-16T12:20:12",
+      "train": 704,
+      "val": 176,
+      "test": 120,
+      "seconds": 17.8
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-16T12:24:27",
+      "unique_evaluations": 218,
+      "final_front_size": 13,
+      "cache_hits": 0,
+      "cache_misses": 218,
+      "objectives": [
+        "f1_params",
+        "f2_zico"
+      ],
+      "hypervolume_generation_0": 0.5891830378553551,
+      "hypervolume_final": 1.1094171387398062,
+      "seconds": 254.5
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-16T12:24:27",
+      "front_size": 13,
+      "n_candidates": 16,
+      "from_front": 13,
+      "seconds": 0.5
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-16T13:36:36",
+      "n_candidates": 16,
+      "rung_sizes": [
+        16,
+        8,
+        4
+      ],
+      "n_diverged": 0,
+      "seconds": 4328.9
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-16T13:36:39",
+      "selected_candidate": 12,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.5
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-16T14:02:03",
+      "alpha": 0.5,
+      "beta": 0.5,
+      "seconds": 1524.1
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-16T14:39:18",
+      "best_epoch": 93,
+      "best_val_dice": 0.8890839958131326,
+      "seconds": 2235.7
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-16T14:39:27",
+      "test_dice": 0.8577621215226989,
+      "test_miou": 0.866902096350518,
+      "test_hd95": 27.139402002324353,
+      "seconds": 8.2
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-16T14:39:31",
+      "seconds": 4.6
+    }
+  },
+  "test_evaluated": true,
+  "method": "qenas",
+  "dataset": "KVASIR",
+  "seed": 46,
+  "updated": "2026-10-16T14:39:31",
+  "test_evaluated_at": "2026-10-16T14:39:22",
+  "total_seconds": 8376.8
+}

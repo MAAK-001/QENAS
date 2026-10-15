@@ -1,0 +1,48 @@
+2026-10-16 21:23:39 | INFO    | QENAS | dataset BUSI | method nnunet | seed 46 | experiment /kaggle/working/QENAS_results/results/BUSI/nnunet/seed_46 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint 586257c409b867c5
+2026-10-16 21:23:39 | INFO    | Method nnunet (baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split) | stages: split -> nnunet_data -> nnunet_train -> nnunet_test -> report
+2026-10-16 21:23:39 | INFO    | ####################################################################################################
+2026-10-16 21:23:39 | INFO    | STAGE: SPLIT
+2026-10-16 21:23:50 | WARNING | BUSI exact duplicate ['benign/benign (433)', 'malignant/malignant (145)'] -> excluded all copies (conflicting masks/labels)
+2026-10-16 21:23:56 | INFO    | Dataset structure: class folders; masks '<stem>_mask[_k].png' (union of all masks per image)
+2026-10-16 21:23:56 | INFO    | 
+BUSI
+Train: 413
+Validation: 103
+Test: 129
+2026-10-16 21:23:56 | INFO    | Stage 'split' finished in 00:00:16
+2026-10-16 21:23:56 | INFO    | ####################################################################################################
+2026-10-16 21:23:56 | INFO    | STAGE: NNUNET_DATA
+2026-10-16 21:23:57 | INFO    |   preprocessing BUSI/train: 82/413 | Progress:  19.9% | Elapsed: 00:00:01 | ETA: 00:00:04
+2026-10-16 21:23:58 | INFO    |   preprocessing BUSI/train: 164/413 | Progress:  39.7% | Elapsed: 00:00:02 | ETA: 00:00:03
+2026-10-16 21:23:59 | INFO    |   preprocessing BUSI/train: 246/413 | Progress:  59.6% | Elapsed: 00:00:03 | ETA: 00:00:02
+2026-10-16 21:24:00 | INFO    |   preprocessing BUSI/train: 328/413 | Progress:  79.4% | Elapsed: 00:00:04 | ETA: 00:00:01
+2026-10-16 21:24:01 | INFO    |   preprocessing BUSI/train: 410/413 | Progress:  99.3% | Elapsed: 00:00:05 | ETA: 00:00:00
+2026-10-16 21:24:01 | INFO    |   preprocessing BUSI/train: 413/413 | Progress: 100.0% | Elapsed: 00:00:05 | ETA: 00:00:00
+2026-10-16 21:24:08 | INFO    |   preprocessing BUSI/val: 20/103 | Progress:  19.4% | Elapsed: 00:00:00 | ETA: 00:00:01
+2026-10-16 21:24:09 | INFO    |   preprocessing BUSI/val: 40/103 | Progress:  38.8% | Elapsed: 00:00:00 | ETA: 00:00:01
+2026-10-16 21:24:09 | INFO    |   preprocessing BUSI/val: 60/103 | Progress:  58.3% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-16 21:24:09 | INFO    |   preprocessing BUSI/val: 80/103 | Progress:  77.7% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-16 21:24:09 | INFO    |   preprocessing BUSI/val: 100/103 | Progress:  97.1% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-16 21:24:09 | INFO    |   preprocessing BUSI/val: 103/103 | Progress: 100.0% | Elapsed: 00:00:01 | ETA: 00:00:00
+2026-10-16 21:24:12 | INFO    | Data ready: train 413, validation 103 (test held out) | normalisation mean [0.3298, 0.3298, 0.3297] std [0.2205, 0.2205, 0.2205]
+2026-10-16 21:24:23 | INFO    | nnU-Net raw dataset Dataset901_BUSI: 413 training + 103 validation cases (256x256 PNG)
+2026-10-16 21:24:23 | INFO    | Stage 'nnunet_data' finished in 00:00:27
+2026-10-16 21:24:23 | INFO    | ####################################################################################################
+2026-10-16 21:24:23 | INFO    | STAGE: NNUNET_TRAIN
+2026-10-17 00:26:19 | INFO    | nnU-Net training finished in 181.0 min (100 epochs x 250 iterations, batch size 26, patch [256, 256])
+2026-10-17 00:26:19 | INFO    | Stage 'nnunet_train' finished in 03:01:56
+2026-10-17 00:26:19 | INFO    | ####################################################################################################
+2026-10-17 00:26:19 | INFO    | STAGE: NNUNET_TEST
+2026-10-17 00:26:44 | INFO    |   preprocessing BUSI/test: 25/129 | Progress:  19.4% | Elapsed: 00:00:00 | ETA: 00:00:02
+2026-10-17 00:26:44 | INFO    |   preprocessing BUSI/test: 50/129 | Progress:  38.8% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-17 00:26:45 | INFO    |   preprocessing BUSI/test: 75/129 | Progress:  58.1% | Elapsed: 00:00:01 | ETA: 00:00:01
+2026-10-17 00:26:45 | INFO    |   preprocessing BUSI/test: 100/129 | Progress:  77.5% | Elapsed: 00:00:02 | ETA: 00:00:01
+2026-10-17 00:26:45 | INFO    |   preprocessing BUSI/test: 125/129 | Progress:  96.9% | Elapsed: 00:00:02 | ETA: 00:00:00
+2026-10-17 00:26:45 | INFO    |   preprocessing BUSI/test: 129/129 | Progress: 100.0% | Elapsed: 00:00:02 | ETA: 00:00:00
+2026-10-17 00:26:48 | INFO    | Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA (+ nnU-Net's mirroring TTA reported separately)
+2026-10-17 00:27:57 | INFO    | TEST | nnU-Net | Dice (DSC) 0.7827 | mIoU 0.8253 | HD95 32.84 px | Sensitivity 0.8144 | Params 33.472 M | 13.37 ms/image | with mirroring TTA: Dice 0.7887
+2026-10-17 00:27:57 | INFO    | Stage 'nnunet_test' finished in 00:01:38
+2026-10-17 00:27:57 | INFO    | ####################################################################################################
+2026-10-17 00:27:57 | INFO    | STAGE: REPORT
+2026-10-17 00:27:57 | INFO    | Stage 'report' finished in 00:00:00
+2026-10-17 00:27:57 | INFO    | QENAS time on BUSI (nnunet, seed 46): 03:04:18 from start to end (all stages) | this session: 03:04:19

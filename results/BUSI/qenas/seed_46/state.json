@@ -1,0 +1,92 @@
+{
+  "fingerprint": "f88be39e623f3389",
+  "created": "2026-10-16T10:48:49",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-16T10:49:14",
+      "train": 413,
+      "val": 103,
+      "test": 129,
+      "seconds": 23.7
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-16T10:54:20",
+      "unique_evaluations": 219,
+      "final_front_size": 9,
+      "cache_hits": 0,
+      "cache_misses": 219,
+      "objectives": [
+        "f1_params",
+        "f2_zico"
+      ],
+      "hypervolume_generation_0": 0.7265223171047008,
+      "hypervolume_final": 1.176046651134256,
+      "seconds": 306.4
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-16T10:54:21",
+      "front_size": 9,
+      "n_candidates": 16,
+      "from_front": 9,
+      "seconds": 0.5
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-16T11:25:11",
+      "n_candidates": 16,
+      "rung_sizes": [
+        16,
+        8,
+        4
+      ],
+      "n_diverged": 0,
+      "seconds": 1850.2
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-16T11:25:13",
+      "selected_candidate": 10,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.6
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-16T11:37:50",
+      "alpha": 0.5,
+      "beta": 0.5,
+      "seconds": 756.6
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-16T11:51:12",
+      "best_epoch": 35,
+      "best_val_dice": 0.7948747795359339,
+      "seconds": 801.8
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-16T11:51:20",
+      "test_dice": 0.7899356683642412,
+      "test_miou": 0.8270705583836668,
+      "test_hd95": 29.96110681654796,
+      "seconds": 8.0
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-16T11:51:24",
+      "seconds": 3.8
+    }
+  },
+  "test_evaluated": true,
+  "method": "qenas",
+  "dataset": "BUSI",
+  "seed": 46,
+  "updated": "2026-10-16T11:51:24",
+  "test_evaluated_at": "2026-10-16T11:51:19",
+  "total_seconds": 3753.6
+}

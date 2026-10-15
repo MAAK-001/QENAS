@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: BUSI
+Method: QENAS — QENAS: NSGA-II on (params, ZiCo) + successive-halving learning-capability selection
+Seed: 47
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 219
+Hypervolume: 0.7588 (generation 0) -> 1.1421 (final)
+Final Pareto front size: 14
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [4, 0, 1, 0, 4, 4, 4, 2]
+Block sequence: ['DARTS', 'Residual', 'Dense', 'Residual', 'DARTS', 'DARTS', 'DARTS', 'Inception']
+ZiCo: 768.579
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.5990, 10 ep 0.6890, 20 ep 0.7464
+Selection: Candidate 2 selected: highest mean validation Dice over the last 5 of 20 epochs among the 4 eligible of 4 successive-halving finalists (0.7464; ΔLoss 0.1653, Dice trend tau 0.74, p=2.5e-07).
+
+Loss coefficients:
+alpha (BCE): 0.200   beta (soft-mIoU): 0.800
+
+Final training:
+Epochs run: 120 (best epoch 79)
+Best validation Dice: 0.8018   mIoU: 0.8376   HD95: 28.81 px
+
+Final test (n = 129, evaluated once):
+Dice (DSC):        80.32 %
+mIoU (class mean): 83.02 %
+Params:            1.018 M
+FLOPs:             22.47 G per batch of 8 (Mixed-GGNAS convention; 2.81 G per image)
+HD95:              27.19 px
+Sensitivity:       80.78 %
+IoU (foreground):  71.10 %
+Inference:         20.40 ms per image on cuda
+Test loss:         0.1832
+
+================================================
+QENAS time on BUSI (qenas, seed 47): 01:49:23 from start to end (all stages) | this session: 01:49:24

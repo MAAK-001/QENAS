@@ -1,0 +1,32 @@
+2026-10-16 01:44:24 | INFO    | QENAS | dataset CVC | method nnunet | seed 45 | experiment /kaggle/working/QENAS_results/results/CVC/nnunet/seed_45 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint a4cfb7a513537302
+2026-10-16 01:44:24 | INFO    | Method nnunet (baseline: nnU-Net v2 (2d configuration, default plans, nnUNetTrainer_100epochs), fold 0 = the QENAS train/validation split) | stages: split -> nnunet_data -> nnunet_train -> nnunet_test -> report
+2026-10-16 01:44:24 | INFO    | ####################################################################################################
+2026-10-16 01:44:24 | INFO    | STAGE: SPLIT
+2026-10-16 01:44:33 | INFO    | Dataset structure: PNG/Original/<frame>.png paired with PNG/Ground Truth/<frame>.png; metadata.csv frame->sequence
+2026-10-16 01:44:33 | INFO    | 
+CVC
+Train: 395
+Validation: 96
+Test: 121
+2026-10-16 01:44:33 | INFO    | Stage 'split' finished in 00:00:09
+2026-10-16 01:44:33 | INFO    | ####################################################################################################
+2026-10-16 01:44:33 | INFO    | STAGE: NNUNET_DATA
+2026-10-16 01:44:35 | INFO    | Loaded cached preprocessed CVC/train (395 samples) from CVC_train_256x256_28e4d3d112a43439ae1918b0.npz
+2026-10-16 01:44:35 | INFO    | Loaded cached preprocessed CVC/val (96 samples) from CVC_val_256x256_f455a3e452c5a0cef9e4f163.npz
+2026-10-16 01:44:36 | INFO    | Data ready: train 395, validation 96 (test held out) | normalisation mean [0.4059, 0.2754, 0.1878] std [0.3025, 0.211, 0.1451]
+2026-10-16 01:44:51 | INFO    | nnU-Net raw dataset Dataset902_CVC: 395 training + 96 validation cases (256x256 PNG)
+2026-10-16 01:44:51 | INFO    | Stage 'nnunet_data' finished in 00:00:17
+2026-10-16 01:44:51 | INFO    | ####################################################################################################
+2026-10-16 01:44:51 | INFO    | STAGE: NNUNET_TRAIN
+2026-10-16 04:31:01 | INFO    | nnU-Net training finished in 165.1 min (100 epochs x 250 iterations, batch size 25, patch [256, 256])
+2026-10-16 04:31:01 | INFO    | Stage 'nnunet_train' finished in 02:46:11
+2026-10-16 04:31:01 | INFO    | ####################################################################################################
+2026-10-16 04:31:01 | INFO    | STAGE: NNUNET_TEST
+2026-10-16 04:31:22 | INFO    | Loaded cached preprocessed CVC/test (121 samples) from CVC_test_256x256_d13b36b8ac32c74b28ca387e.npz
+2026-10-16 04:31:22 | INFO    | Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA (+ nnU-Net's mirroring TTA reported separately)
+2026-10-16 04:32:18 | INFO    | TEST | nnU-Net | Dice (DSC) 0.7559 | mIoU 0.8090 | HD95 41.16 px | Sensitivity 0.7940 | Params 33.472 M | 12.19 ms/image | with mirroring TTA: Dice 0.7721
+2026-10-16 04:32:18 | INFO    | Stage 'nnunet_test' finished in 00:01:17
+2026-10-16 04:32:18 | INFO    | ####################################################################################################
+2026-10-16 04:32:18 | INFO    | STAGE: REPORT
+2026-10-16 04:32:18 | INFO    | Stage 'report' finished in 00:00:00
+2026-10-16 04:32:18 | INFO    | QENAS time on CVC (nnunet, seed 45): 02:47:54 from start to end (all stages) | this session: 02:47:56

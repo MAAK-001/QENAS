@@ -1,0 +1,28 @@
+================ QENAS RESULT ================
+
+Dataset: BUSI
+Method: U-Net — baseline: U-Net (Ronneberger et al. 2015), 31.04 M parameters as in the Mixed-GGNAS tables
+Seed: 45
+
+Architecture: U-Net (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.400   beta (soft-mIoU): 0.600
+
+Final training:
+Epochs run: 120 (best epoch 94)
+Best validation Dice: 0.7420   mIoU: 0.8017   HD95: 45.90 px
+
+Final test (n = 129, evaluated once):
+Dice (DSC):        71.89 %
+mIoU (class mean): 78.69 %
+Params:            31.038 M
+FLOPs:             437.90 G per batch of 8 (Mixed-GGNAS convention; 54.74 G per image)
+HD95:              42.72 px  (1 empty predictions scored as the image diagonal)
+Sensitivity:       73.30 %
+IoU (foreground):  63.03 %
+Inference:         10.83 ms per image on cuda
+Test loss:         0.2316
+
+================================================
+QENAS time on BUSI (unet, seed 45): 01:03:24 from start to end (all stages) | this session: 01:03:26

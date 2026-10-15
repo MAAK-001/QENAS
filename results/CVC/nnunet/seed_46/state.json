@@ -1,0 +1,53 @@
+{
+  "fingerprint": "b7f564bdaadba5af",
+  "created": "2026-10-16T22:00:12",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-16T22:00:21",
+      "train": 395,
+      "val": 96,
+      "test": 121,
+      "seconds": 7.9
+    },
+    "nnunet_data": {
+      "status": "done",
+      "finished": "2026-10-16T22:00:46",
+      "train": 395,
+      "val": 96,
+      "seconds": 24.9
+    },
+    "nnunet_train": {
+      "status": "done",
+      "finished": "2026-10-17T00:41:51",
+      "num_epochs": 100,
+      "iterations_per_epoch": 250,
+      "batch_size": 25,
+      "patch_size": [
+        256,
+        256
+      ],
+      "seconds": 9665.2
+    },
+    "nnunet_test": {
+      "status": "done",
+      "finished": "2026-10-17T00:43:20",
+      "test_dice": 0.7805005142723944,
+      "test_dice_mirroring_tta": 0.7841827498074053,
+      "seconds": 88.7
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-17T00:43:20",
+      "seconds": 0.0
+    }
+  },
+  "test_evaluated": true,
+  "method": "nnunet",
+  "dataset": "CVC",
+  "seed": 46,
+  "updated": "2026-10-17T00:43:20",
+  "test_evaluated_at": "2026-10-17T00:43:14",
+  "total_seconds": 9786.7
+}

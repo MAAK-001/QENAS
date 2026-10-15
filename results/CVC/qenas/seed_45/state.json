@@ -1,0 +1,92 @@
+{
+  "fingerprint": "eb9ab64acc3166f1",
+  "created": "2026-10-15T18:40:38",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-15T18:41:02",
+      "train": 395,
+      "val": 96,
+      "test": 121,
+      "seconds": 17.4
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-15T18:45:16",
+      "unique_evaluations": 216,
+      "final_front_size": 15,
+      "cache_hits": 0,
+      "cache_misses": 216,
+      "objectives": [
+        "f1_params",
+        "f2_zico"
+      ],
+      "hypervolume_generation_0": 0.8472806192993936,
+      "hypervolume_final": 1.1217462921893182,
+      "seconds": 254.3
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-15T18:45:16",
+      "front_size": 15,
+      "n_candidates": 16,
+      "from_front": 15,
+      "seconds": 0.4
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-15T19:16:09",
+      "n_candidates": 16,
+      "rung_sizes": [
+        16,
+        8,
+        4
+      ],
+      "n_diverged": 0,
+      "seconds": 1852.6
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-15T19:16:12",
+      "selected_candidate": 3,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.4
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-15T19:28:35",
+      "alpha": 0.2,
+      "beta": 0.8,
+      "seconds": 743.8
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-15T19:47:12",
+      "best_epoch": 33,
+      "best_val_dice": 0.7582233346842892,
+      "seconds": 1116.7
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-15T19:47:21",
+      "test_dice": 0.6727858841333532,
+      "test_miou": 0.7590032921980074,
+      "test_hd95": 59.56392264582843,
+      "seconds": 9.0
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-15T19:47:26",
+      "seconds": 5.0
+    }
+  },
+  "test_evaluated": true,
+  "method": "qenas",
+  "dataset": "CVC",
+  "seed": 45,
+  "updated": "2026-10-15T19:47:26",
+  "test_evaluated_at": "2026-10-15T19:47:20",
+  "total_seconds": 4001.6
+}
