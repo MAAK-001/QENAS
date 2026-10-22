@@ -1,0 +1,123 @@
+{
+  "chromosome": [
+    0,
+    2,
+    3,
+    0,
+    2,
+    1,
+    0,
+    3
+  ],
+  "blocks": [
+    "Residual",
+    "Inception",
+    "ConvNeXt",
+    "Residual",
+    "Inception",
+    "Dense",
+    "Residual",
+    "ConvNeXt"
+  ],
+  "base_channels": 32,
+  "scale": 3,
+  "darts_genotype": "darts_cell_cvc",
+  "input": "3x256x256",
+  "stem_params": 928,
+  "head_params": 33,
+  "positions": [
+    {
+      "position": "enc1",
+      "gene": 0,
+      "block": "Residual",
+      "in_channels": 32,
+      "out_channels": 64,
+      "in_resolution": "256x256",
+      "out_resolution": "128x128",
+      "kernel_scale": "2x[3x3 gconv] + identity",
+      "params": 6144
+    },
+    {
+      "position": "enc2",
+      "gene": 2,
+      "block": "Inception",
+      "in_channels": 64,
+      "out_channels": 128,
+      "in_resolution": "128x128",
+      "out_resolution": "64x64",
+      "kernel_scale": "3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1",
+      "params": 96000
+    },
+    {
+      "position": "enc3",
+      "gene": 3,
+      "block": "ConvNeXt",
+      "in_channels": 128,
+      "out_channels": 256,
+      "in_resolution": "64x64",
+      "out_resolution": "32x32",
+      "kernel_scale": "dw 5x5 -> 4x MLP -> residual -> 1x1",
+      "params": 617984
+    },
+    {
+      "position": "enc4",
+      "gene": 0,
+      "block": "Residual",
+      "in_channels": 256,
+      "out_channels": 512,
+      "in_resolution": "32x32",
+      "out_resolution": "16x16",
+      "kernel_scale": "2x[3x3 gconv] + identity",
+      "params": 371712
+    },
+    {
+      "position": "dec1",
+      "gene": 2,
+      "block": "Inception",
+      "in_channels": 512,
+      "out_channels": 256,
+      "in_resolution": "16x16",
+      "out_resolution": "32x32",
+      "kernel_scale": "3x3 gconv -> strips 1x3+3x1/1x5+5x1/1x7+7x1 -> 1x1",
+      "params": 1051200
+    },
+    {
+      "position": "dec2",
+      "gene": 1,
+      "block": "Dense",
+      "in_channels": 256,
+      "out_channels": 128,
+      "in_resolution": "32x32",
+      "out_resolution": "64x64",
+      "kernel_scale": "3 dense layers (3x3 gconv, growth 32) + 1x1",
+      "params": 211744
+    },
+    {
+      "position": "dec3",
+      "gene": 0,
+      "block": "Residual",
+      "in_channels": 128,
+      "out_channels": 64,
+      "in_resolution": "64x64",
+      "out_resolution": "128x128",
+      "kernel_scale": "2x[3x3 gconv] + identity",
+      "params": 48528
+    },
+    {
+      "position": "dec4",
+      "gene": 3,
+      "block": "ConvNeXt",
+      "in_channels": 64,
+      "out_channels": 32,
+      "in_resolution": "128x128",
+      "out_resolution": "256x256",
+      "kernel_scale": "dw 5x5 -> 4x MLP -> residual -> 1x1",
+      "params": 21448
+    }
+  ],
+  "total_params": 2425721,
+  "params_m": 2.425721,
+  "flops_batch_size": 8,
+  "gflops_mixed_ggnas": 42.467155712,
+  "gflops_per_image": 5.308394464
+}

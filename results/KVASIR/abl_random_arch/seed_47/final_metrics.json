@@ -1,0 +1,70 @@
+{
+  "dataset": "KVASIR",
+  "method": "abl_random_arch",
+  "method_label": "Random architecture (no search, no ZiCo)",
+  "seed": 47,
+  "architecture": {
+    "type": "qenas",
+    "chromosome": [
+      0,
+      3,
+      1,
+      3,
+      3,
+      2,
+      3,
+      1
+    ]
+  },
+  "architecture_label": "[0, 3, 1, 3, 3, 2, 3, 1]",
+  "blocks": [
+    "Residual",
+    "ConvNeXt",
+    "Dense",
+    "ConvNeXt",
+    "ConvNeXt",
+    "Inception",
+    "ConvNeXt",
+    "Dense"
+  ],
+  "total_params": 4399257,
+  "params_m": 4.399257,
+  "flops_batch_size": 8,
+  "gflops_mixed_ggnas": 51.761209088,
+  "gflops_per_image": 6.470151136,
+  "inference_ms_per_image": 13.273840999318054,
+  "inference_device": "cuda",
+  "zico": null,
+  "alpha": 0.2,
+  "beta": 0.8,
+  "best_epoch": 93,
+  "epochs_run": 120,
+  "train": {
+    "dice": 0.9368262384932808,
+    "iou": 0.8904148764221668,
+    "miou": 0.9329789865888917,
+    "loss": 0.07188028513866646,
+    "hd95": 14.41191126249779,
+    "sensitivity": 0.9355318084337904,
+    "hd95_empty_pred": 2
+  },
+  "validation": {
+    "dice": 0.8837403447181313,
+    "iou": 0.8152510539207853,
+    "miou": 0.8847565256920124,
+    "loss": 0.13262629676186902,
+    "hd95": 26.38243415335614,
+    "sensitivity": 0.9099234133123268,
+    "hd95_empty_pred": 0
+  },
+  "test": {
+    "dice": 0.83236798771385,
+    "iou": 0.7489658742788746,
+    "miou": 0.844108772867752,
+    "loss": 0.18569746714395782,
+    "hd95": 36.450978329868434,
+    "sensitivity": 0.8528833790100072,
+    "hd95_empty_pred": 0
+  },
+  "n_test": 120
+}

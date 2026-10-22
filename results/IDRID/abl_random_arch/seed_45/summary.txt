@@ -1,0 +1,28 @@
+================ QENAS RESULT ================
+
+Dataset: IDRID
+Method: Random architecture (no search, no ZiCo) — ablation: one architecture drawn uniformly from the 5^8 search space, then the QENAS loss-weight selection and final training
+Seed: 45
+
+Architecture: [3, 0, 4, 1, 0, 3, 3, 2] — ['ConvNeXt', 'Residual', 'DARTS', 'Dense', 'Residual', 'ConvNeXt', 'ConvNeXt', 'Inception'] (uniformly random architecture (rng seed derived from seed 45 and dataset IDRID); no search)
+
+Loss coefficients:
+alpha (BCE): 0.400   beta (soft-mIoU): 0.600
+
+Final training:
+Epochs run: 102 (best epoch 55) — overfitting: val Dice not improved for 47 epochs (best epoch 55); val loss increasing (Kendall tau=0.27, p=0.0492) while train loss decreasing (tau=-0.65, p=8.58e-06) over the last 20 epochs
+Best validation Dice: 0.9624   mIoU: 0.9633   HD95: 3.67 px
+
+Final test (n = 27, evaluated once):
+Dice (DSC):        95.80 %
+mIoU (class mean): 96.01 %
+Params:            1.919 M
+FLOPs:             56.79 G per batch of 4 (Mixed-GGNAS convention; 14.20 G per image)
+HD95:              3.22 px
+Sensitivity:       94.96 %
+IoU (foreground):  92.16 %
+Inference:         20.15 ms per image on cuda
+Test loss:         0.0273
+
+================================================
+QENAS time on IDRID (abl_random_arch, seed 45): 00:27:47 from start to end (all stages) | this session: 00:27:52

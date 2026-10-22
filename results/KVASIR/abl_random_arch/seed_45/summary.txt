@@ -1,0 +1,28 @@
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: Random architecture (no search, no ZiCo) — ablation: one architecture drawn uniformly from the 5^8 search space, then the QENAS loss-weight selection and final training
+Seed: 45
+
+Architecture: [0, 2, 3, 0, 2, 1, 0, 3] — ['Residual', 'Inception', 'ConvNeXt', 'Residual', 'Inception', 'Dense', 'Residual', 'ConvNeXt'] (uniformly random architecture (rng seed derived from seed 45 and dataset KVASIR); no search)
+
+Loss coefficients:
+alpha (BCE): 0.400   beta (soft-mIoU): 0.600
+
+Final training:
+Epochs run: 120 (best epoch 104)
+Best validation Dice: 0.8807   mIoU: 0.8849   HD95: 27.90 px
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        84.19 %
+mIoU (class mean): 85.40 %
+Params:            2.426 M
+FLOPs:             42.47 G per batch of 8 (Mixed-GGNAS convention; 5.31 G per image)
+HD95:              30.24 px
+Sensitivity:       85.91 %
+IoU (foreground):  76.53 %
+Inference:         11.62 ms per image on cuda
+Test loss:         0.1917
+
+================================================
+QENAS time on KVASIR (abl_random_arch, seed 45): 01:25:47 from start to end (all stages) | this session: 01:25:48

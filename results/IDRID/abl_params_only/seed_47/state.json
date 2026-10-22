@@ -1,0 +1,91 @@
+{
+  "fingerprint": "285dfebf44be03d2",
+  "created": "2026-10-22T23:28:46",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-22T23:29:12",
+      "train": 43,
+      "val": 11,
+      "test": 27,
+      "seconds": 24.4
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-22T23:34:45",
+      "unique_evaluations": 218,
+      "final_front_size": 1,
+      "cache_hits": 0,
+      "cache_misses": 218,
+      "objectives": [
+        "f1_params"
+      ],
+      "hypervolume_generation_0": 1.0187652456227159,
+      "hypervolume_final": 1.1,
+      "seconds": 332.7
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-22T23:34:45",
+      "front_size": 1,
+      "n_candidates": 16,
+      "from_front": 1,
+      "seconds": 0.4
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-22T23:40:55",
+      "n_candidates": 16,
+      "rung_sizes": [
+        16,
+        8,
+        4
+      ],
+      "n_diverged": 0,
+      "seconds": 369.9
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-22T23:40:58",
+      "selected_candidate": 4,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.3
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-22T23:43:52",
+      "alpha": 0.5,
+      "beta": 0.5,
+      "seconds": 174.0
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-22T23:48:13",
+      "best_epoch": 101,
+      "best_val_dice": 0.9616034465510775,
+      "seconds": 261.1
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-22T23:48:16",
+      "test_dice": 0.9628341020201807,
+      "test_miou": 0.964100686463302,
+      "test_hd95": 2.7939901599052543,
+      "seconds": 2.8
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-22T23:48:19",
+      "seconds": 3.9
+    }
+  },
+  "test_evaluated": true,
+  "method": "abl_params_only",
+  "dataset": "IDRID",
+  "seed": 47,
+  "updated": "2026-10-22T23:48:19",
+  "test_evaluated_at": "2026-10-22T23:48:14",
+  "total_seconds": 1171.5
+}

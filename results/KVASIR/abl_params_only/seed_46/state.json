@@ -1,0 +1,91 @@
+{
+  "fingerprint": "19a666f01b4183e2",
+  "created": "2026-10-22T21:59:31",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-22T21:59:44",
+      "train": 704,
+      "val": 176,
+      "test": 120,
+      "seconds": 12.1
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-22T22:03:30",
+      "unique_evaluations": 220,
+      "final_front_size": 1,
+      "cache_hits": 0,
+      "cache_misses": 220,
+      "objectives": [
+        "f1_params"
+      ],
+      "hypervolume_generation_0": 0.8770201965887339,
+      "hypervolume_final": 1.1,
+      "seconds": 225.5
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-22T22:03:30",
+      "front_size": 1,
+      "n_candidates": 16,
+      "from_front": 1,
+      "seconds": 0.4
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-22T22:44:05",
+      "n_candidates": 16,
+      "rung_sizes": [
+        16,
+        8,
+        4
+      ],
+      "n_diverged": 0,
+      "seconds": 2434.8
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-22T22:44:07",
+      "selected_candidate": 9,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.2
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-22T23:01:51",
+      "alpha": 0.2,
+      "beta": 0.8,
+      "seconds": 1063.6
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-22T23:28:27",
+      "best_epoch": 109,
+      "best_val_dice": 0.89317486343805,
+      "seconds": 1596.3
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-22T23:28:33",
+      "test_dice": 0.8566823917371854,
+      "test_miou": 0.8614019167845668,
+      "test_hd95": 30.602367736694948,
+      "seconds": 5.4
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-22T23:28:36",
+      "seconds": 3.1
+    }
+  },
+  "test_evaluated": true,
+  "method": "abl_params_only",
+  "dataset": "KVASIR",
+  "seed": 46,
+  "updated": "2026-10-22T23:28:36",
+  "test_evaluated_at": "2026-10-22T23:28:29",
+  "total_seconds": 5343.4
+}

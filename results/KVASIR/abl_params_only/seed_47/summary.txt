@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: QENAS, parameters only (no ZiCo) — ablation: NSGA-II minimises the number of parameters only (ZiCo is recorded but not optimised); the rest of QENAS is unchanged
+Seed: 47
+
+Search (training-free NSGA-II; optimised objectives: f1_params):
+Population: 20   Generations: 10
+Unique architectures evaluated: 220
+Hypervolume: 1.0096 (generation 0) -> 1.1000 (final)
+Final Pareto front size: 1
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [0, 4, 4, 4, 4, 4, 1, 0]
+Block sequence: ['Residual', 'DARTS', 'DARTS', 'DARTS', 'DARTS', 'DARTS', 'Dense', 'Residual']
+ZiCo: 574.045
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.5819, 10 ep 0.7166, 20 ep 0.8028
+Selection: Candidate 8 selected: highest mean validation Dice over the last 5 of 20 epochs among the 4 eligible of 4 successive-halving finalists (0.8028; ΔLoss 0.1906, Dice trend tau 0.86, p=1.1e-10).
+
+Loss coefficients:
+alpha (BCE): 0.500   beta (soft-mIoU): 0.500
+
+Final training:
+Epochs run: 120 (best epoch 112)
+Best validation Dice: 0.8885   mIoU: 0.8871   HD95: 27.95 px
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        84.88 %
+mIoU (class mean): 85.65 %
+Params:            0.594 M
+FLOPs:             20.14 G per batch of 8 (Mixed-GGNAS convention; 2.52 G per image)
+HD95:              35.60 px
+Sensitivity:       87.78 %
+IoU (foreground):  76.91 %
+Inference:         13.85 ms per image on cuda
+Test loss:         0.1644
+
+================================================
+QENAS time on KVASIR (abl_params_only, seed 47): 01:32:17 from start to end (all stages) | this session: 01:32:19

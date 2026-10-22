@@ -1,0 +1,70 @@
+{
+  "layout": "images/<id>.jpg paired with masks/<id>.jpg (JPEG masks, binarised); official train.txt / val.txt",
+  "directory": "/kaggle/input/datasets/maak01/e-nas-datasets/Datasets/Kvasir-SEG",
+  "tree": [
+    "Kvasir-SEG/  [1 .md, 1 .pdf, 2 .txt]",
+    "  annotated_images/  [1000 .jpg]",
+    "  bbox/  [1000 .csv]",
+    "  images/  [1000 .jpg]",
+    "  masks/  [1000 .jpg]"
+  ],
+  "extensions": {
+    ".pdf": 1,
+    ".md": 1,
+    ".txt": 2,
+    ".jpg": 3000,
+    ".csv": 1000
+  },
+  "official_split": "880 train.txt / 120 val.txt (val.txt = test split; validation carved from train.txt)",
+  "exact_duplicates": "none (pixel hash)",
+  "patient_metadata": "none available -> image-level validation split (documented limitation)",
+  "validation": {
+    "n_samples": 1000,
+    "image_modes": {
+      "RGB": 1000
+    },
+    "n_distinct_image_sizes": 333,
+    "most_common_image_sizes": [
+      [
+        [
+          622,
+          530
+        ],
+        78
+      ],
+      [
+        [
+          626,
+          547
+        ],
+        66
+      ],
+      [
+        [
+          626,
+          546
+        ],
+        61
+      ],
+      [
+        [
+          622,
+          529
+        ],
+        56
+      ],
+      [
+        [
+          622,
+          528
+        ],
+        53
+      ]
+    ],
+    "mask_intermediate_pixel_fraction_max": 0.021195665619356274,
+    "mask_intermediate_pixel_fraction_mean": 0.007668202236812073,
+    "foreground_fraction_mean": 0.15390989411452588,
+    "n_empty_masks": 0,
+    "warnings": []
+  }
+}
