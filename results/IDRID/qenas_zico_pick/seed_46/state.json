@@ -1,0 +1,63 @@
+{
+  "fingerprint": "4f2f99a7a5c4e92e",
+  "created": "2026-10-22T20:23:44",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-22T20:24:14",
+      "train": 43,
+      "val": 11,
+      "test": 27,
+      "seconds": 28.6
+    },
+    "inherit": {
+      "status": "done",
+      "finished": "2026-10-22T20:24:15",
+      "inherited_from": "/kaggle/working/QENAS_results/results/IDRID/qenas/seed_46",
+      "seconds": 0.0
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-22T20:24:18",
+      "selected_candidate": 9,
+      "rule": "max_zico",
+      "relaxed_gates": [],
+      "seconds": 3.6
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-22T20:31:49",
+      "alpha": 0.6,
+      "beta": 0.4,
+      "seconds": 451.0
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-22T20:40:45",
+      "best_epoch": 73,
+      "best_val_dice": 0.9616790116966172,
+      "seconds": 536.3
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-22T20:40:51",
+      "test_dice": 0.9571495656003969,
+      "test_miou": 0.9590316464578267,
+      "test_hd95": 3.7738465725110655,
+      "seconds": 5.1
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-22T20:40:57",
+      "seconds": 6.9
+    }
+  },
+  "test_evaluated": true,
+  "method": "qenas_zico_pick",
+  "dataset": "IDRID",
+  "seed": 46,
+  "updated": "2026-10-22T20:40:58",
+  "test_evaluated_at": "2026-10-22T20:40:47",
+  "total_seconds": 1031.5
+}

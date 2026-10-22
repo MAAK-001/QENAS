@@ -1,0 +1,93 @@
+{
+  "fingerprint": "b6a6245e2df26621",
+  "created": "2026-10-22T19:46:59",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-22T19:49:36",
+      "train": 704,
+      "val": 176,
+      "test": 120,
+      "seconds": 155.1
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-22T19:54:16",
+      "unique_evaluations": 220,
+      "final_front_size": 9,
+      "cache_hits": 0,
+      "cache_misses": 220,
+      "objectives": [
+        "f1_params",
+        "f2_zico"
+      ],
+      "sampler": "random",
+      "hypervolume_generation_0": 1.1279947457259352,
+      "hypervolume_final": 1.1279947457259352,
+      "seconds": 280.1
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-22T19:54:17",
+      "front_size": 9,
+      "n_candidates": 16,
+      "from_front": 9,
+      "seconds": 0.5
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-22T20:51:33",
+      "n_candidates": 16,
+      "rung_sizes": [
+        16,
+        8,
+        4
+      ],
+      "n_diverged": 0,
+      "seconds": 3436.7
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-22T20:51:36",
+      "selected_candidate": 14,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.8
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-22T21:12:14",
+      "alpha": 0.4,
+      "beta": 0.6,
+      "seconds": 1237.4
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-22T21:43:38",
+      "best_epoch": 101,
+      "best_val_dice": 0.8882998675127866,
+      "seconds": 1884.5
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-22T21:43:46",
+      "test_dice": 0.8365307881297942,
+      "test_miou": 0.8522742854623819,
+      "test_hd95": 28.820907512055303,
+      "seconds": 8.0
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-22T21:43:51",
+      "seconds": 4.6
+    }
+  },
+  "test_evaluated": true,
+  "method": "abl_random_population",
+  "dataset": "KVASIR",
+  "seed": 45,
+  "updated": "2026-10-22T21:43:51",
+  "test_evaluated_at": "2026-10-22T21:43:43",
+  "total_seconds": 7009.7
+}
