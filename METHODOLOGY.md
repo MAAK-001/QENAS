@@ -279,4 +279,4 @@ layouts and integrity checks.
 
 The comparison with U-Net, Attention U-Net and nnU-Net, the ablations, random search, repeated seeds and external
 validation are described in STUDY.md and run by `study.py`. They do not change QENAS. Study v1 (QENAS 2.1) is
-documented in `reports/QENAS_Study_v1.pdf`; study v2 tests QENAS 3.0.
+documented in `Old Results/QENAS_Study_v1.pdf`; study v2 tests QENAS 3.0.

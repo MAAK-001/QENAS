@@ -10,7 +10,8 @@ Works on partial results (every table states how many seeds it contains). Statis
   random search with the same number of evaluations), both normalised by the union of their archives (reference
   point 1.1); NSGA-II's curve is the best-so-far set after every generation.
 
-With ``v1_results`` (the results of study v1, branch ``kaggle-study``) the v1 -> v2 comparison (T14) is added.
+With ``old_results`` (the preliminary study v1 of QENAS 2.1, folder ``Old Results/study_v1``) the v1 -> v2 comparison
+(T14) is added.
 Every output file is listed with the research question it answers in results/analysis/README.md.
 """
 
@@ -549,7 +550,7 @@ def _write(out: Path, name: str, rows: List[Dict], title: str, fmt_: str = "{:.4
     save_json(out / f"{name}.json", rows)
 
 
-def analyse(results: Path, data_root: Optional[str] = None, v1_results: Optional[Path] = None) -> Dict[str, Any]:
+def analyse(results: Path, data_root: Optional[str] = None, old_results: Optional[Path] = None) -> Dict[str, Any]:
     st = Store(results)
     out = Path(results) / "analysis"
     (out / "figures").mkdir(parents=True, exist_ok=True)
@@ -583,8 +584,8 @@ def analyse(results: Path, data_root: Optional[str] = None, v1_results: Optional
     _write(out, "T13_significance_external", ext_sig, "RQ5 — Paired comparison on the 612 CVC-ClinicDB frames", "{:.4g}")
     _write(out, "T15_nnunet_tta", nnunet_tta_table(st), "nnU-Net with and without its default mirroring TTA "
            "(supplementary; all main tables use no TTA)")
-    if v1_results is not None and Path(v1_results).exists():
-        v1 = Store(Path(v1_results))
+    if old_results is not None and Path(old_results).exists():
+        v1 = Store(Path(old_results))
         rows, sig = v1_v2_tables(st, v1)
         _write(out, "T14_v1_vs_v2", rows, "Study v1 (QENAS 2.1, seeds 42–44) vs study v2 (QENAS 3.0 and the v2 "
                "protocol, seeds 45–47) on the identical test images", "{:.2f}")
@@ -595,7 +596,7 @@ def analyse(results: Path, data_root: Optional[str] = None, v1_results: Optional
     n = len(st.exps)
     index = ["# QENAS evaluation study v2 — analysis", "",
              f"Completed experiments: {n}. Regenerate with `python study.py analyse` (add `--data-root` for the "
-             "qualitative figures and `--v1-results` for the v1 → v2 comparison).", "",
+             "qualitative figures; the v1 → v2 comparison reads `Old Results/study_v1`).", "",
              "| file | question |", "|---|---|",
              "| T1_main_results | RQ1: QENAS vs U-Net, Attention U-Net, nnU-Net on identical splits (+ published Mixed-GGNAS) |",
              "| T2_significance_main | RQ1: paired Wilcoxon tests on the same test images, Holm-corrected |",
@@ -606,7 +607,7 @@ def analyse(results: Path, data_root: Optional[str] = None, v1_results: Optional
              "| T9_proxies_vs_quality | objectives vs early trained validation Dice |",
              "| T10, T11 | training behaviour, compute time |",
              "| T12, T13 | RQ5: external validation Kvasir-SEG → CVC-ClinicDB |",
-             "| T14 | study v1 vs v2 (needs `--v1-results`) |",
+             "| T14 | preliminary study v1 vs study v2 (from `Old Results/study_v1`) |",
              "| T15_nnunet_tta | nnU-Net with its default mirroring TTA (supplementary) |",
              "", "Figures: " + ", ".join(f"`figures/{m}`" for m in made), ""]
     (out / "README.md").write_text("\n".join(index), encoding="utf-8")

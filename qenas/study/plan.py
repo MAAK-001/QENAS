@@ -20,7 +20,7 @@ Jobs are ordered seed-major (each seed completes a full set of tables) and, insi
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 STUDY_VERSION = 2
 SEEDS = (45, 46, 47)
@@ -43,8 +43,21 @@ _EST = {
     "nnunet": {"BUSI": 150, "CVC": 150, "IDRID": 120, "KVASIR": 150},
     "random_search": {"BUSI": 10, "CVC": 10, "IDRID": 12, "KVASIR": 10},
     "qenas_random_pick": {"BUSI": 55, "KVASIR": 70},
-    "qenas_zico_pick": {"BUSI": 55, "KVASIR": 70},
+    "qenas_zico_pick": {"BUSI": 55, "IDRID": 15, "KVASIR": 70},
+    "abl_random_population": {"IDRID": 40, "KVASIR": 150},
+    "abl_params_only": {"IDRID": 40, "KVASIR": 150},
+    "abl_random_arch": {"IDRID": 15, "KVASIR": 65},
 }
+
+# ---------------------------------------------------------------------------------------- component ablation study
+# Six conditions x IDRiD, Kvasir-SEG x seeds 45-47 (36 experiments). Full QENAS, the fixed-alpha variant and the
+# Kvasir-SEG max-ZiCo pick are the study-v2 experiments (copied into the results branch); the rest are new. The new
+# experiments are split between two Kaggle accounts (workers A and B) of roughly equal GPU time.
+ABLATION_DATASETS = ("IDRID", "KVASIR")
+ABLATION_METHODS = ("qenas", "abl_random_population", "abl_params_only", "abl_random_arch", "qenas_zico_pick",
+                    "qenas_fixed_alpha")
+ABLATION_WORKERS = {"A": ("abl_random_population", "qenas_zico_pick"),
+                    "B": ("abl_params_only", "abl_random_arch")}
 
 
 @dataclass(frozen=True)
@@ -52,17 +65,15 @@ class Job:
     dataset: str
     method: str
     seed: int
-    split_unit: str = "dataset"
     deps: Tuple[str, ...] = field(default=())
 
     @property
     def id(self) -> str:
-        ds = f"{self.dataset}_frame_split" if self.split_unit == "image" else self.dataset
-        return f"{ds}/{self.method}/seed_{self.seed}"
+        return f"{self.dataset}/{self.method}/seed_{self.seed}"
 
     @property
     def external(self) -> bool:
-        return self.dataset == "KVASIR" and self.split_unit == "dataset" and self.method in EXTERNAL_METHODS
+        return self.dataset == "KVASIR" and self.method in EXTERNAL_METHODS
 
     def estimate_minutes(self) -> float:
         return float(_EST.get(self.method, {}).get(self.dataset, 120))
@@ -81,6 +92,30 @@ def plan() -> List[Job]:
     ids = [j.id for j in jobs]
     assert len(ids) == len(set(ids)), "duplicate job ids"
     return jobs
+
+
+def ablation_plan(worker: Optional[str] = None) -> List[Job]:
+    """The component ablation study; ``worker`` 'A' or 'B' keeps only that Kaggle account's conditions."""
+    jobs: List[Job] = []
+    for s in SEEDS:
+        for d in ABLATION_DATASETS:
+            for m in ABLATION_METHODS:
+                inherit = m in DEPENDS_ON_QENAS
+                jobs.append(Job(d, m, s, deps=(Job(d, "qenas", s).id,) if inherit else ()))
+    if worker is not None:
+        keep = ABLATION_WORKERS[worker.upper()]
+        jobs = [j for j in jobs if j.method in keep]
+    return jobs
+
+
+def select_plan(name: str = "v2", worker: Optional[str] = None) -> List[Job]:
+    if name == "v2":
+        if worker is not None:
+            raise ValueError("--worker applies to the ablation plan only")
+        return plan()
+    if name == "ablation":
+        return ablation_plan(worker)
+    raise ValueError(f"unknown plan {name!r} (v2 or ablation)")
 
 
 def summary() -> Dict[str, int]:

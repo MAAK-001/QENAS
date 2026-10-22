@@ -68,7 +68,8 @@ def _make_cvc(root, n=20, seed=1):
         w.writerows(rows)
 
 
-CONDITIONS = ("qenas", "qenas_fixed_alpha", "qenas_random_pick", "qenas_zico_pick", "attention_unet", "random_search")
+CONDITIONS = ("qenas", "qenas_fixed_alpha", "qenas_random_pick", "qenas_zico_pick", "attention_unet", "random_search",
+              "abl_random_population", "abl_params_only", "abl_random_arch")
 
 
 @pytest.fixture(scope="module")
@@ -79,8 +80,8 @@ def study(tmp_path_factory):
     base = {**SMALL, "data.root": str(tmp / "Datasets"), "paths.results": str(tmp / "results"),
             "paths.cache": str(tmp / "cache")}
 
-    def cfg(ds, method, split_unit="dataset"):
-        return study_config(ds, method, 42, overrides=base, split_unit=split_unit)
+    def cfg(ds, method):
+        return study_config(ds, method, 42, overrides=base)
 
     for m in CONDITIONS:
         assert run_experiment(cfg("KVASIR", m)) == 0, m
@@ -161,7 +162,7 @@ def test_external_validation(study):
 
 def test_analysis_writes_the_paper_tables(study):
     tmp, _ = study
-    analyse(tmp / "results", data_root=str(tmp / "Datasets"), v1_results=tmp / "results")
+    analyse(tmp / "results", data_root=str(tmp / "Datasets"), old_results=tmp / "results")
     a = tmp / "results" / "analysis"
     for name in ("T1_main_results", "T3_loss_coefficients", "T4_significance_loss_coefficients",
                  "T5_selection_ablations", "T7_search_vs_random", "T8_successive_halving", "T9_proxies_vs_quality",
@@ -190,6 +191,36 @@ def test_scheduler_respects_dependencies_and_time_budget(tmp_path):
     run_study(late, [None], budget_hours=0.01, jobs=[Job("KVASIR", "qenas", 43)], command=fake, poll_seconds=0.1,
               log=lambda *_: None)
     assert not job_done(late, Job("KVASIR", "qenas", 43))
+
+
+def test_ablation_conditions(study):
+    _, cfg = study
+    qenas_stages = ["split", "search", "pareto", "candidates", "selection", "loss_weights", "final", "test", "report"]
+    for m in ("abl_random_population", "abl_params_only"):
+        assert list(_state(cfg("KVASIR", m))["stages"]) == qenas_stages
+    assert list(_state(cfg("KVASIR", "abl_random_arch"))["stages"]) == \
+        ["split", "loss_weights", "final", "test", "report"]
+    # random population: no evolution, one generation-0 population of all sampled architectures
+    d = experiment_dir(cfg("KVASIR", "abl_random_population"))
+    hist = json.loads((d / "search_population_history.json").read_text())
+    assert {r["generation"] for r in hist} == {0} and len(hist) == SMALL["search.population_size"] * 2
+    assert json.loads((d / "search_summary.json").read_text())["sampler"] == "random"
+    # parameters only: the front is ranked by parameters alone
+    d = experiment_dir(cfg("KVASIR", "abl_params_only"))
+    assert json.loads((d / "search_summary.json").read_text())["objectives"] == ["f1_params"]
+    # random architecture: deterministic in seed and dataset, trained with the QENAS protocol
+    f = json.loads((experiment_dir(cfg("KVASIR", "abl_random_arch")) / "final_metrics.json").read_text())
+    assert f["architecture"]["type"] == "qenas" and len(f["architecture"]["chromosome"]) == 8
+
+
+def test_ablation_plan_split_between_two_workers():
+    from qenas.study.plan import ablation_plan
+    jobs = ablation_plan()
+    assert len(jobs) == 36 and {j.dataset for j in jobs} == {"IDRID", "KVASIR"}
+    a, b = ablation_plan("A"), ablation_plan("B")
+    assert not {j.id for j in a} & {j.id for j in b}
+    new = {"abl_random_population", "abl_params_only", "abl_random_arch"}
+    assert {j.id for j in jobs if j.method in new} <= {j.id for j in a + b}
 
 
 def test_full_plan_is_consistent():

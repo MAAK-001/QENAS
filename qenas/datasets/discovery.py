@@ -352,11 +352,9 @@ def discover_cvc(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
     missing_files = sorted(set(seq_of) - set(imgs))
     if missing_meta or missing_files:
         raise DatasetError(f"CVC: frames without metadata {missing_meta[:10]}; metadata without files {missing_files[:10]}")
-    # Leakage unit: the colonoscopy sequence. Only the CVC leakage study of study.py (data.split_unit = "image")
-    # splits frames individually, to measure how much a random frame split inflates the scores (D35).
-    by_frame = cfg["data"]["split_unit"] == "image"
+    # Leakage unit: the colonoscopy sequence (consecutive frames are near-duplicates; D35).
     samples = [Sample(sample_id=f"frame_{fid}", image=imgs[fid], masks=[gts[fid]],
-                      group=f"frame_{fid}" if by_frame else f"seq_{seq_of[fid]}",
+                      group=f"seq_{seq_of[fid]}",
                       stratum="", meta={"frame_id": int(fid), "sequence_id": int(seq_of[fid])})
                for fid in sorted(imgs, key=lambda x: int(x))]
     seq_sizes = Counter(f"seq_{s.meta['sequence_id']}" for s in samples)
@@ -369,8 +367,7 @@ def discover_cvc(data_root: Path, cfg: Dict[str, Any]) -> DiscoveryResult:
         "frames_per_sequence": dict(sorted(seq_sizes.items(), key=lambda kv: int(kv[0].split("_")[1]))),
         "tif_copies": "ignored (not decodable by Pillow; PNG copies are lossless and identical in content)",
         "official_split": None,
-        "leakage_unit": ("frame (CVC leakage study: frames of one sequence can be in different splits)" if by_frame
-                         else "sequence (all frames of one colonoscopy sequence stay in one split)"),
+        "leakage_unit": "sequence (all frames of one colonoscopy sequence stay in one split)",
     }
     report["validation"] = _validate_pairs(samples, threshold, allow_empty=False)
     return DiscoveryResult("CVC", str(root), samples, False, report)

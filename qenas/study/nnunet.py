@@ -241,8 +241,7 @@ class NNUNetPipeline(Pipeline):
               "train_metrics_best_checkpoint": None, "val_metrics_best_checkpoint": val_m}
         save_json(self.path("final_validation.json"), fv)
         final = {
-            "dataset": self.cfg["data"]["dataset"], "split_unit": self.cfg["data"]["split_unit"],
-            "method": self.method_name, "method_label": self.method["label"], "seed": self.seed,
+            "dataset": self.cfg["data"]["dataset"], "method": self.method_name, "method_label": self.method["label"], "seed": self.seed,
             "architecture": {"type": "nnunet", "configuration": CONFIGURATION, "trainer": TRAINER, "plans": PLANS,
                              "nnunetv2": NNUNET_VERSION},
             "architecture_label": f"nnU-Net {CONFIGURATION} ({TRAINER})", "blocks": None,

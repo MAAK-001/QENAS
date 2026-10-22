@@ -6,8 +6,9 @@ applied throughout: a choice is adopted when it is proved by a reference impleme
 measurement in this project. A merely plausible change is not adopted.
 
 **Evidence of this project.** Evaluation study v1 (QENAS 2.1, 78 experiments, seeds 42–44; code: git tag
-`study-v1`; results: GitHub branch `kaggle-study`, local copy `results_v1/`; report `reports/QENAS_Study_v1.pdf`)
-is cited as "v1 Tn" (table n of `results_v1/analysis/`). Evaluation study v2 (QENAS 3.0, seeds 45–47; STUDY.md)
+`study-v1`; results: GitHub branch `kaggle-study`, local copy `Old Results/study_v1/`; report
+`Old Results/QENAS_Study_v1.pdf`)
+is cited as "v1 Tn" (table n of `Old Results/study_v1/analysis/`). Evaluation study v2 (QENAS 3.0, seeds 45–47; STUDY.md)
 tests every decision changed here.
 
 **Sources consulted:**
@@ -504,7 +505,8 @@ tests every decision changed here.
 * **Evidence (v1 T16, 3 seeds each):** with a random frame split (392 / 98 / 122) the test Dice rises from 69.76 %
   to 90.05 % for QENAS (+20.29 pp) and from 48.28 % to 76.69 % for U-Net (+28.41 pp). The random split measures
   mostly the leakage, so it is **not adopted**; frame-split results may only be reported as a labelled comparison
-  with the Mixed-GGNAS protocol. This question is answered and not repeated in study v2 (D48).
+  with the Mixed-GGNAS protocol. (The frame-split switch existed only for that v1 study and is no longer in the
+  code.) This question is answered and not repeated in study v2 (D48).
 * PNG copies are used (the TIFs are not decodable by Pillow and contain the same images). The PNG masks have
   anti-aliasing artefacts, so they are binarised at > 127.
 
@@ -564,7 +566,7 @@ tests every decision changed here.
 ### D41 — Result folders
 * Every experiment is identified by (dataset, method, seed) and lives in `results/<DATASET>/<method>/seed_<s>/`.
   Re-running the same command resumes or reports that directory; a changed configuration is refused.
-* Study v1 results: GitHub branch `kaggle-study` (local copy `results_v1/`); study v2 results: branch
+* Study v1 results: GitHub branch `kaggle-study` (local copy `Old Results/study_v1/`); study v2 results: branch
   `kaggle-study-v2`. Result folders are not committed to `main`.
 
 ### D42 — Kvasir-SEG: official split

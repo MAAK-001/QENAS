@@ -5,7 +5,7 @@ not changed by the study. Every comparison condition is defined in `qenas/method
 QENAS, and is run by `study.py`.
 
 **Study v1** (QENAS 2.1, seeds 42–44, 78 experiments) is complete: code at git tag `study-v1`, results on the
-GitHub branch `kaggle-study` (local copy `results_v1/`), report `reports/QENAS_Study_v1.pdf`. Its findings led to
+GitHub branch `kaggle-study` (local copy `Old Results/study_v1/`), report `Old Results/QENAS_Study_v1.pdf`. Its findings led to
 QENAS 3.0 (DESIGN_DECISIONS, table at the end). **Study v2 is productive, not complete:** it runs only what changed,
 what was never tested, or what needs more evidence, with **new seeds 45, 46, 47**, so the changes are not judged
 on the runs that motivated them. The split is unchanged, so v1 and v2 are tested on the same images.
@@ -110,10 +110,11 @@ The progress of every job:
 python study.py status
 ```
 
-All paper tables and figures, written to `results/analysis/` (with `--v1-results` also the v1 → v2 comparison):
+All paper tables and figures, written to `results/analysis/` (including the v1 → v2 comparison, read from
+`Old Results/study_v1`):
 
 ```bash
-python study.py analyse --data-root ../Datasets --v1-results results_v1
+python study.py analyse --data-root ../Datasets
 ```
 
 On Kaggle (two T4 GPUs, 12 h sessions), use the notebook cell in README.md §6. Each session continues where the

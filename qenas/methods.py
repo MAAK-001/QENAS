@@ -14,7 +14,12 @@ kind
                        architecture (loss-weight selection -> final training -> test);
     ``nnunet``         nnU-Net (Isensee et al., Nature Methods 2021) with its own self-configuring pipeline on the
                        same split and the same images (qenas/study/nnunet.py);
-    ``search_only``    a training-free search without any training (search-efficiency comparison).
+    ``search_only``    a training-free search without any training (search-efficiency comparison);
+    ``random_arch``    one architecture drawn uniformly from the search space (no search, no ZiCo), trained with the
+                       QENAS protocol (loss-weight selection -> final training -> test).
+
+sampler (kind ``qenas`` / ``search_only``)
+    ``nsga2`` (default) the evolutionary search; ``random`` uniform random sampling with NSGA-II's evaluation budget.
 
 loss_weights
     ``grid``   alpha chosen on validation from ``loss_weights.alphas`` (the QENAS protocol);
@@ -70,6 +75,27 @@ METHODS: Dict[str, Dict[str, Any]] = {
         "label": "Random search",
         "doc": "search baseline: uniform random sampling with the evaluation budget of NSGA-II (training-free)",
     },
+    # ---- component ablation study (IDRiD, Kvasir-SEG; plan.ablation_plan)
+    "abl_random_population": {
+        "kind": "qenas", "objectives": ALL_OBJECTIVES, "sampler": "random", "selection": "learning_capability",
+        "loss_weights": "grid",
+        "label": "QENAS, random-search population (no NSGA-II)",
+        "doc": "ablation: the 220 architectures are sampled uniformly (NSGA-II's budget) instead of evolved; the 16 "
+               "candidates are their non-dominated front in (params, ZiCo), filled up by rank and crowding; the rest "
+               "of QENAS is unchanged",
+    },
+    "abl_params_only": {
+        "kind": "qenas", "objectives": ("f1_params",), "selection": "learning_capability", "loss_weights": "grid",
+        "label": "QENAS, parameters only (no ZiCo)",
+        "doc": "ablation: NSGA-II minimises the number of parameters only (ZiCo is recorded but not optimised); the "
+               "rest of QENAS is unchanged",
+    },
+    "abl_random_arch": {
+        "kind": "random_arch", "loss_weights": "grid",
+        "label": "Random architecture (no search, no ZiCo)",
+        "doc": "ablation: one architecture drawn uniformly from the 5^8 search space, then the QENAS loss-weight "
+               "selection and final training",
+    },
 }
 
 
@@ -86,6 +112,7 @@ def stages_for(name: str) -> List[str]:
         "qenas": ["split", "search", "pareto", "candidates", "selection"] + grid + ["final", "test", "report"],
         "qenas_inherit": ["split", "inherit", "selection"] + grid + ["final", "test", "report"],
         "baseline": ["split"] + grid + ["final", "test", "report"],
+        "random_arch": ["split"] + grid + ["final", "test", "report"],
         "nnunet": ["split", "nnunet_data", "nnunet_train", "nnunet_test", "report"],
         "search_only": ["split", "search"],
     }[m["kind"]]

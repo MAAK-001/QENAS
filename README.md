@@ -41,7 +41,7 @@ QENAS is **one pipeline with one protocol** (`main.py`). The **evaluation study*
 | [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) | every decision, with reasons and evidence (incl. the v1 results behind every 3.0 change) |
 | [PAPER_POSITIONING.md](PAPER_POSITIONING.md) | related work and what QENAS adds |
 | [DATASETS.md](DATASETS.md) | dataset structure and splits |
-| `reports/QENAS_Study_v1.pdf` | the complete report of study v1 (local file; PDFs are not pushed) |
+| `Old Results/` | everything of the preliminary study v1 (QENAS 2.1): results, report `QENAS_Study_v1.pdf` (local, not pushed) |
 
 ---
 
@@ -67,11 +67,10 @@ GGNAS/
     │   ├── study/         study plan, GPU scheduler, nnU-Net baseline, external validation, analysis
     │   ├── visualization/ figures
     │   └── utils/         atomic I/O, checkpoints, seeding, environment, logging/ETA
-    ├── reports/       build_study_v1_pdf.py (the v1 report)
     ├── scripts/inspect_datasets.py   dataset inspection (no model, no training)
     ├── tests/         unit tests + end-to-end tests of QENAS and of the whole study (pytest)
-    ├── results/       created by runs (not on main; results are on the branches kaggle-study / kaggle-study-v2)
-    ├── results_v1/    local copy of the study v1 results (not on main)
+    ├── results/       the final results: study v2 of QENAS 3.0 (not on main; GitHub branch kaggle-study-v2)
+    ├── Old Results/   the preliminary study v1 (QENAS 2.1): results and report (not on main)
     └── cache/         zero-cost evaluation cache, preprocessed-image cache (created by runs)
 ```
 
@@ -191,10 +190,33 @@ python study.py status
 ```
 
 Write all paper tables, statistical tests and figures to `results/analysis/` (`--data-root` enables the
-qualitative figures, `--v1-results` the comparison with study v1):
+qualitative figures; the comparison with study v1 is read from `Old Results/study_v1`):
 
 ```bash
-python study.py analyse --data-root ../Datasets --v1-results results_v1
+python study.py analyse --data-root ../Datasets
+```
+
+All paper tables (one per metric, with published results of other methods), statistics, ablations, cost analysis
+and paper figures, written to `results/paper/` (needs the datasets for the extra metrics):
+
+```bash
+python scripts/paper_analysis.py
+```
+
+Publication figures (600 dpi, Times New Roman, one font size, no titles; the file name is the title), written to
+`results/figures/` (comparisons, QENAS stages, qualitative masks, review) and `results/figures/3 Architecture/`:
+
+```bash
+python scripts/paper_figures.py
+python scripts/paper_diagrams.py
+python scripts/paper_architecture.py
+```
+
+Publication tables (one Word file, `results/tables/QENAS Tables.docx`; the renderer needs the npm package `docx`):
+
+```bash
+python scripts/paper_tables.py
+node scripts/render_tables_docx.js
 ```
 
 Regenerate every experiment's figures from its saved results (PNG files are not stored on GitHub):
@@ -212,7 +234,7 @@ python study.py archive QENAS_results.zip
 Rebuild the report of study v1 (needs `pip install reportlab`):
 
 ```bash
-python reports/build_study_v1_pdf.py . reports/QENAS_Study_v1.pdf cache/report_figures
+python "Old Results/build_study_v1_pdf.py" . "Old Results/QENAS_Study_v1.pdf" cache/report_figures
 ```
 
 On Kaggle, use the cell of §6, which runs the plan on both T4 GPUs and saves everything to GitHub.
@@ -230,7 +252,7 @@ On Kaggle, use the cell of §6, which runs the plan on both T4 GPUs and saves ev
 ### Every session
 
 Paste the cell (it replaces the v1 cell), then **Save Version → Save & Run All (Commit)**. Repeat with the same
-cell until `[study] … 84/84 jobs done` appears in the log.
+cell until `[study] … 84/84 jobs done` appears in the log (study v2 is complete: 84/84).
 
 * Each session takes the latest code from `main`.
 * It continues the results of the branch `kaggle-study-v2`: finished experiments are skipped and unfinished ones
@@ -244,7 +266,7 @@ import os, subprocess, threading, time
 # ---------------- settings ----------------
 REPO_PATH   = "github.com/MAAK-001/QENAS.git"
 CODE_BRANCH = "main"               # code: always the latest main
-RUN_BRANCH  = "kaggle-study-v2"    # results of study v2 only; main and kaggle-study (v1) are never touched
+RUN_BRANCH  = "kaggle-study-v2"    # results only; main is never touched
 GPUS        = ["0", "1"]           # Kaggle "GPU T4 x2"
 SESSION_H   = 11.0                 # no job is started that would not finish within this time of the session
 SYNC_EVERY  = 30 * 60              # push results every 30 minutes
@@ -258,25 +280,34 @@ from kaggle_secrets import UserSecretsClient
 token = UserSecretsClient().get_secret("GITHUB_TOKEN").strip()
 url = f"https://x-access-token:{token}@{REPO_PATH}"
 
-def sh(cmd, cwd=None, check=True):
-    r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+def say(text):                                   # visible at once in the Kaggle log
+    print(time.strftime("%Y-%m-%d %H:%M:%S ") + text, flush=True)
+
+def sh(cmd, cwd=None, check=True, timeout=None):
+    try:
+        r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired as e:
+        out = ((e.stdout or b"") + (e.stderr or b"")).decode(errors="replace").replace(token, "***")
+        raise RuntimeError(f"{' '.join(cmd[:4])} did not finish within {timeout} s. Last output:\n{out[-2000:]}")
     if check and r.returncode != 0:
-        raise RuntimeError(f"{' '.join(cmd[:3])} failed: {r.stderr.replace(token, '***')[-600:]}")
+        raise RuntimeError(f"{' '.join(cmd[:4])} failed:\n{(r.stdout + r.stderr).replace(token, '***')[-2000:]}")
     return r
 
-def log(text):
-    line = time.strftime("%Y-%m-%d %H:%M:%S ") + text
-    print(line, flush=True)
-    os.makedirs(RES, exist_ok=True)
+def log(text):                                   # also written to the results branch
+    say(text)
     with open(f"{RES}/kaggle_notebook.log", "a") as f:
-        f.write(line + "\n")
+        f.write(time.strftime("%Y-%m-%d %H:%M:%S ") + text + "\n")
 
-# 1) Code (latest main) and results (branch kaggle-study-v2, created on the first session)
+# 1) Code and results. A NEW results branch is created only if it really does not exist on GitHub.
+say("1/5 downloading code")
 if not os.path.exists(CODE):
-    sh(["git", "clone", "--depth", "1", "--branch", CODE_BRANCH, url, CODE])
+    sh(["git", "clone", "--depth", "1", "--branch", CODE_BRANCH, url, CODE], timeout=600)
+say("1/5 downloading results")
 if not os.path.exists(f"{RES}/.git"):
-    r = sh(["git", "clone", "--depth", "1", "--single-branch", "--branch", RUN_BRANCH, url, RES], check=False)
-    if r.returncode != 0:                          # branch not there yet: new, empty results branch
+    heads = sh(["git", "ls-remote", "--heads", url, RUN_BRANCH], timeout=300).stdout
+    if RUN_BRANCH in heads:
+        sh(["git", "clone", "--depth", "1", "--single-branch", "--branch", RUN_BRANCH, url, RES], timeout=1800)
+    else:
         os.makedirs(RES, exist_ok=True)
         sh(["git", "init", "-q"], RES)
         sh(["git", "checkout", "-q", "-b", RUN_BRANCH], RES)
@@ -287,14 +318,16 @@ with open(f"{RES}/.git/info/exclude", "w") as f:   # never pushed: images, check
     f.write("*.png\n*.pdf\n*.prev\nresults/*/unet/*/checkpoints/\nresults/*/attention_unet/*/checkpoints/\n"
             "results/*/*/*/checkpoints/candidates/\nresults/*/nnunet/*/nnunet_work/\n")
 
-# 2) Packages: pymoo, and nnU-Net for the baseline. nnunetv2 excludes torch 2.9.*, which may be preinstalled; its
-#    2D networks do not need that exclusion, so it is installed without dependencies (DESIGN_DECISIONS D46).
+# 2) Packages (each step limited to 20 min; on failure the pip output is shown). nnunetv2 excludes torch 2.9.*,
+#    which may be preinstalled; its 2D networks do not need that exclusion, so it is installed without dependencies.
+say("2/5 installing packages")
 torch_before = sh(["python", "-c", "import torch; print(torch.__version__)"]).stdout.strip()
-sh(["pip", "install", "-q", "pymoo>=0.6.2,<0.7"])
-sh(["pip", "install", "-q", "--no-deps", "nnunetv2==2.8.1"])
-sh(["pip", "install", "-q", "acvl-utils==0.2.6", "dynamic-network-architectures==0.4.4", "batchgeneratorsv2==0.3.5",
-    "batchgenerators==0.25.3", "blosc2>=3.3.2", "SimpleITK>=2.2.1", "nibabel", "imagecodecs", "yacs", "einops",
-    "graphviz", "tifffile", "seaborn"])
+pip = ["pip", "install", "--progress-bar", "off", "--default-timeout", "60"]
+sh(pip + ["pymoo>=0.6.2,<0.7"], timeout=1200)
+sh(pip + ["--no-deps", "nnunetv2==2.8.1"], timeout=1200)
+sh(pip + ["acvl-utils==0.2.6", "dynamic-network-architectures==0.4.4", "batchgeneratorsv2==0.3.5",
+          "batchgenerators==0.25.3", "blosc2>=3.3.2", "SimpleITK>=2.2.1", "nibabel", "imagecodecs", "yacs", "einops",
+          "graphviz", "tifffile", "seaborn"], timeout=1200)
 torch_after = sh(["python", "-c", "import torch, nnunetv2, pymoo; print(torch.__version__)"]).stdout.strip()
 if torch_after != torch_before:
     raise RuntimeError(f"the package installation changed torch ({torch_before} -> {torch_after}); stopping")
@@ -314,10 +347,15 @@ def push(note=""):
         first = sh(["git", "log", "-1", "--format=%s"], RES, check=False).stdout.strip() != "Study results"
         sh(["git", "commit", "-q", "--allow-empty", "-m", "Study results"] + ([] if first else ["--amend"]), RES,
            check=False)
-        r = sh(["git", "push", "-q", "-f", "origin", RUN_BRANCH], RES, check=False)
-        log(f"{note} " + ("results pushed" if r.returncode == 0 else "PUSH FAILED: " + r.stderr.replace(token, "***")[-300:]))
-        return r.returncode == 0
+        try:
+            r = sh(["git", "push", "-q", "-f", "origin", RUN_BRANCH], RES, check=False, timeout=900)
+            ok, err = r.returncode == 0, r.stderr
+        except RuntimeError as e:
+            ok, err = False, str(e)
+        log(f"{note} " + ("results pushed" if ok else "PUSH FAILED: " + err.replace(token, "***")[-300:]))
+        return ok
 
+say("3/5 push check")
 if not push("[start check]"):
     raise RuntimeError("Pushing to GitHub does not work - check the GITHUB_TOKEN secret")
 stop = threading.Event()
@@ -330,7 +368,7 @@ threading.Thread(target=periodic, daemon=True).start()
 data_root = sh(["python", "-c", "from qenas.datasets.discovery import locate_data_root; "
                 "print(locate_data_root('/nonexistent', 'BUSI'))"], CODE).stdout.strip()
 hours = SESSION_H - (time.time() - T0) / 3600
-log(f"data root {data_root} | study budget {hours:.2f} h")
+log(f"4/5 data root {data_root} | study budget {hours:.2f} h")
 proc = subprocess.run(["python", "study.py", "run", "--gpus", *GPUS, "--hours", f"{hours:.2f}",
                        "--results", f"{RES}/results", "--data-root", data_root], cwd=CODE)
 log(f"study session finished (exit {proc.returncode})")
@@ -342,7 +380,28 @@ stop.set()
 push("[session end]")
 subprocess.run(["python", "study.py", "archive", f"{WORK}/QENAS_study_v2_results.zip", "--results", f"{RES}/results"],
                cwd=CODE)
-log("Done. Results: GitHub branch kaggle-study-v2, and Output: QENAS_study_v2_results.zip")
+log("5/5 Done. Results: GitHub branch kaggle-study-v2, and Output: QENAS_study_v2_results.zip")
+```
+
+### Component ablation study (IDRiD, Kvasir-SEG) on two Kaggle accounts
+
+Six conditions × 2 datasets × seeds 45–47 = 36 experiments (`study.py status --plan ablation`): full QENAS,
+random-search population (no NSGA-II), parameters only (no ZiCo), random architecture (no search, no ZiCo),
+max-ZiCo pick (no successive halving), fixed α = 0.5. The 15 experiments of study v2 are on the results branch
+`kaggle-ablation`; the 21 new ones are split between account A and account B.
+
+Setup on **both** accounts: the Kaggle secret `GITHUB_TOKEN` (same token), GPU T4 x2, Internet on, and the
+datasets input with `IDRID…` and `Kvasir-SEG`. Paste `kaggle_ablation_cell.py` into a notebook cell with
+`WORKER = "A"` on the first account and `WORKER = "B"` on the second, then Save Version → Save & Run All
+(Commit). Repeat a session until the log shows `0 left`. Each account pushes to its own branch
+(`kaggle-ablation-a` / `-b`); the account that finishes last writes all 36 experiments to `kaggle-ablation`.
+
+```bash
+git fetch origin kaggle-ablation
+```
+
+```bash
+git archive origin/kaggle-ablation results | tar -x
 ```
 
 ### Getting the results onto your PC
@@ -353,20 +412,20 @@ Fetch the results branch of study v2:
 git fetch origin kaggle-study-v2
 ```
 
-Extract its `results/` folder into `results_v2/` (nothing is staged on `main`):
+Extract its `results/` folder into `results/` (nothing is staged on `main`):
 
 ```bash
-mkdir results_v2 && git archive origin/kaggle-study-v2 results | tar -x -C results_v2 --strip-components=1
+git archive origin/kaggle-study-v2 results | tar -x
 ```
 
 Regenerate the figures, and the paper tables including the comparison with study v1:
 
 ```bash
-python study.py figures --results results_v2
+python study.py figures
 ```
 
 ```bash
-python study.py analyse --results results_v2 --data-root ../Datasets --v1-results results_v1
+python study.py analyse --data-root ../Datasets
 ```
 
 The Kaggle version's Output also contains `QENAS_study_v2_results.zip` with all figures.

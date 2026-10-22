@@ -187,7 +187,7 @@ class Pipeline:
 
         save_json(self.path("split.json"), {
             "dataset": disc.dataset, "split_seed": int(self.cfg["data"]["split_seed"]),
-            "split_unit": self.cfg["data"]["split_unit"], "summary": summ, "data_root": root,
+            "summary": summ, "data_root": root,
             "paths": "relative to data_root (re-based onto --data-root when resumed elsewhere)",
             "splits": {k: [portable(s) for s in v] for k, v in splits.items()},
         })
@@ -201,7 +201,7 @@ class Pipeline:
     def stage_search(self) -> Dict[str, Any]:
         s = self.cfg["search"]
         bs = int(self.cfg["candidate_training"]["batch_size"])
-        random_search = self.method["kind"] == "search_only"
+        random_search = self.method.get("sampler") == "random"
         log.info("Training-free %s | search space 5^8 = %s | population %d | generations %d | "
                  "crossover p=%.2f | mutation p_var=%.3f | optimised objectives: %s",
                  "random search" if random_search else "NSGA-II", f"{SEARCH_SPACE_SIZE:,}", s["population_size"],
@@ -213,9 +213,11 @@ class Pipeline:
                  ZICO_LOSS_ALPHA)
         if random_search:
             res = RandomSearch(self.cfg, self.exp.dir, self.device, self.fp, zb, self.objectives).run()
+            hv = res["generation_table"][0]["hypervolume"]
             info = {"unique_evaluations": len(res["archive"]), "final_front_size": len(res["pareto_front"]),
                     "cache_hits": res["cache_hits"], "cache_misses": res["cache_misses"],
-                    "objectives": list(self.objectives), "zico_batches_sha256": digest}
+                    "objectives": list(self.objectives), "sampler": "random",
+                    "hypervolume_generation_0": hv, "hypervolume_final": hv, "zico_batches_sha256": digest}
             save_json(self.path("search_summary.json"), info)
             return {k: v for k, v in info.items() if k != "zico_batches_sha256"}
         search = NSGA2Search(self.cfg, self.exp.dir, self.device, self.fp, zb, self.objectives)
@@ -455,6 +457,15 @@ class Pipeline:
         if self.method["kind"] == "baseline":
             return {"arch": {"type": "baseline", "network": self.method["network"]}, "label": self.method["label"],
                     "history": None, "diverged": False}
+        if self.method["kind"] == "random_arch":
+            # One architecture drawn uniformly from the 5^8 search space; deterministic in (seed, dataset).
+            from .models.chromosome import CHROMOSOME_LENGTH, N_BLOCK_TYPES
+            ds = self.cfg["data"]["dataset"]
+            rng = np.random.default_rng(derive_seed(self.seed, f"random-architecture-{ds}"))
+            ch = [int(g) for g in rng.integers(0, N_BLOCK_TYPES, CHROMOSOME_LENGTH)]
+            return {"arch": {"type": "qenas", "chromosome": ch}, "label": chromosome_to_str(ch), "history": None,
+                    "diverged": False, "chromosome": ch,
+                    "reason": f"uniformly random architecture (rng seed derived from seed {self.seed} and dataset {ds})"}
         sel = load_json(self.path("selection.json"))
         results = load_json(self.path("candidate_results.json"))
         rec = next(r for r in results if r["candidate_id"] == sel["selected_id"])
@@ -585,8 +596,7 @@ class Pipeline:
         latency = inference_time_ms(model, [cin, h, w], self.device)
         cost = cost_summary(model, [h, w], cin, int(fcfg["batch_size"]))
         final = {
-            "dataset": self.cfg["data"]["dataset"], "split_unit": self.cfg["data"]["split_unit"],
-            "method": self.method_name, "method_label": self.method["label"], "seed": self.seed,
+            "dataset": self.cfg["data"]["dataset"], "method": self.method_name, "method_label": self.method["label"], "seed": self.seed,
             "architecture": best["arch"], "architecture_label": best["label"],
             "blocks": decode(best["arch"]["chromosome"]) if best["arch"]["type"] == "qenas" else None,
             **cost, "inference_ms_per_image": latency, "inference_device": str(self.device),
@@ -623,7 +633,7 @@ class Pipeline:
                     f"of {bs}")
         save_json(self.path("model_summary.json"), summ)
         self.path("model_summary.txt").write_text(text + "\n\n" + repr(model) + "\n", encoding="utf-8")
-        searched = self.method["kind"] != "baseline"
+        searched = self.method["kind"] not in ("baseline", "random_arch")
         if searched:
             gens = load_json(self.path("nsga2_generations.json"))
             save_markdown_table(self.path("nsga2_generations.md"), [
@@ -679,13 +689,13 @@ def research_summary(cfg: Dict[str, Any], method: Dict[str, Any], best: Dict[str
     v = fv["val_metrics_best_checkpoint"]
     t = final["test"]
     lines = ["================ QENAS RESULT ================", "",
-             f"Dataset: {cfg['data']['dataset']}" + (" (frame-level split: CVC leakage study)"
-                                                     if cfg["data"]["split_unit"] == "image" else ""),
+             f"Dataset: {cfg['data']['dataset']}",
              f"Method: {method['label']} — {method['doc']}", f"Seed: {cfg['seed']}", ""]
     if search is not None:
         a = best["analysis"]
         lines += [
-            f"Search (training-free NSGA-II; optimised objectives: {', '.join(search['objectives'])}):",
+            f"Search (training-free {'random sampling' if search.get('sampler') == 'random' else 'NSGA-II'}; "
+            f"optimised objectives: {', '.join(search['objectives'])}):",
             f"Population: {cfg['search']['population_size']}   Generations: {cfg['search']['generations']}",
             f"Unique architectures evaluated: {search['unique_evaluations']}",
             f"Hypervolume: {search['hypervolume_generation_0']:.4f} (generation 0) -> {search['hypervolume_final']:.4f} (final)",
@@ -699,6 +709,9 @@ def research_summary(cfg: Dict[str, Any], method: Dict[str, Any], best: Dict[str
             "Candidate scores (mean val Dice of the last epochs): " +
             ", ".join(f"{e} ep {s:.4f}" for e, s in sorted(a["rung_scores"].items(), key=lambda kv: int(kv[0]))),
             f"Selection: {best['reason']}", ""]
+    elif method["kind"] == "random_arch":
+        lines += [f"Architecture: {best['label']} — {decode(best['arch']['chromosome'])} ({best['reason']}; no "
+                  f"search)", ""]
     else:
         lines += [f"Architecture: {best['label']} (fixed baseline, no search)", ""]
     lines += [
@@ -725,10 +738,9 @@ def research_summary(cfg: Dict[str, Any], method: Dict[str, Any], best: Dict[str
     return "\n".join(lines)
 
 
-def study_config(dataset: str, method: str, seed: int, overrides: Optional[Dict[str, Any]] = None,
-                 split_unit: str = "dataset") -> Dict[str, Any]:
+def study_config(dataset: str, method: str, seed: int, overrides: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Configuration of one study experiment (used by study.py and its tests)."""
     from .config import build_config
-    ov = {"method": method, "seed": seed, "data.split_unit": split_unit}
+    ov = {"method": method, "seed": seed}
     ov.update(overrides or {})
     return build_config(dataset, overrides=ov)

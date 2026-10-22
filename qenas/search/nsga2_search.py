@@ -259,18 +259,48 @@ class RandomSearch(NSGA2Search):
         timer = ProgressTimer(budget)
         log.info("Random search | %d distinct random architectures (budget of NSGA-II: %d x %d)", budget,
                  self.pop_size, self.n_generations + 1)
+        t0 = time.time()
         F = self._evaluate_population(np.array(chosen), 0, timer)
-        nd = NonDominatedSorting().do(F, only_non_dominated_front=True)
+        # All sampled architectures form one "population" (generation 0): non-dominated rank and crowding distance
+        # per front, as in NSGA-II's survival, so the candidate stage can take the front and fill it up by rank.
+        rank = np.zeros(len(chosen), dtype=int)
+        crowd = np.zeros(len(chosen), dtype=float)
+        for r, idx in enumerate(NonDominatedSorting().do(F)):
+            rank[idx] = r
+            crowd[idx] = crowding_distance(F[idx])
+        for i, ch in enumerate(chosen):
+            rec = self.archive[chromosome_key(ch)]
+            self.population_history.append({
+                "generation": 0, **{k: rec[k] for k in RECORD_KEYS}, "pareto_rank": int(rank[i]),
+                "crowding_distance": float(crowd[i]) if np.isfinite(crowd[i]) else "inf",
+                "nondominated": bool(rank[i] == 0)})
+        self.generation_table = [{
+            "generation": 0, "population": len(chosen), "new_evaluations": len(chosen),
+            "pareto_size": int((rank == 0).sum()), "best_params": int(min(r["params"] for r in self.archive.values())),
+            "best_zico": float(max(r["zico"] for r in self.archive.values())),
+            "unique_evaluated_total": len(self.archive), "seconds": round(time.time() - t0, 2)}]
+        nd = np.where(rank == 0)[0]
         front = [{k: self.archive[chromosome_key(chosen[i])][k] for k in RECORD_KEYS}
                  for i in sorted(nd, key=lambda j: tuple(F[j]))]
         for r, row in enumerate(front, 1):
             row["front_index"] = r
-        d = self.exp_dir
-        archive_rows = sorted(self.archive.values(), key=lambda r: r["params"])
-        save_csv(d / "search_results.csv", archive_rows,
-                 ["first_generation", *RECORD_KEYS, "eval_seconds"])
-        save_json(d / "search_results.json", archive_rows)
-        save_csv(d / "pareto_front.csv", front, ["front_index", *RECORD_KEYS])
-        save_json(d / "pareto_front.json", front)
-        return {"pareto_front": front, "archive": archive_rows, "cache_hits": self.cache.hits,
-                "cache_misses": self.cache.misses}
+        self._hypervolumes()
+        self.write_outputs(front)
+        return {"pareto_front": front, "archive": list(self.archive.values()),
+                "population_history": self.population_history, "generation_table": self.generation_table,
+                "cache_hits": self.cache.hits, "cache_misses": self.cache.misses}
+
+
+def crowding_distance(F: np.ndarray) -> np.ndarray:
+    """NSGA-II crowding distance of the points of one front (boundary points: infinity)."""
+    n, m = F.shape
+    if n <= 2:
+        return np.full(n, np.inf)
+    d = np.zeros(n)
+    for j in range(m):
+        order = np.argsort(F[:, j], kind="stable")
+        span = F[order[-1], j] - F[order[0], j]
+        d[order[0]] = d[order[-1]] = np.inf
+        if span > 0:
+            d[order[1:-1]] += (F[order[2:], j] - F[order[:-2], j]) / span
+    return d

@@ -2,7 +2,7 @@
 
 An experiment is identified by (dataset, method, seed) and lives in a fixed directory::
 
-    results/<DATASET>/<method>/seed_<seed>/          (CVC leakage study: results/CVC_frame_split/...)
+    results/<DATASET>/<method>/seed_<seed>/
         state.json            stage completion, fingerprint, test-evaluation flag
         config.json           fully resolved configuration (+ fingerprint)
         environment.json      Python / PyTorch / CUDA / device information
@@ -32,8 +32,7 @@ class ResumeConflict(RuntimeError):
 
 
 def dataset_dirname(cfg: Dict[str, Any]) -> str:
-    ds = cfg["data"]["dataset"]
-    return f"{ds}_frame_split" if cfg["data"]["split_unit"] == "image" else ds
+    return cfg["data"]["dataset"]
 
 
 def experiment_dir(cfg: Dict[str, Any]) -> Path:
