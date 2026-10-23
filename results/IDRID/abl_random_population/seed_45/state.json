@@ -1,0 +1,93 @@
+{
+  "fingerprint": "96c0f6374a65ab42",
+  "created": "2026-10-22T19:27:00",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-10-22T19:27:58",
+      "train": 43,
+      "val": 11,
+      "test": 27,
+      "seconds": 50.5
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-10-22T19:35:43",
+      "unique_evaluations": 220,
+      "final_front_size": 10,
+      "cache_hits": 0,
+      "cache_misses": 220,
+      "objectives": [
+        "f1_params",
+        "f2_zico"
+      ],
+      "sampler": "random",
+      "hypervolume_generation_0": 1.1460199523266181,
+      "hypervolume_final": 1.1460199523266181,
+      "seconds": 465.4
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-10-22T19:35:44",
+      "front_size": 10,
+      "n_candidates": 16,
+      "from_front": 10,
+      "seconds": 0.5
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-10-22T19:45:05",
+      "n_candidates": 16,
+      "rung_sizes": [
+        16,
+        8,
+        4
+      ],
+      "n_diverged": 0,
+      "seconds": 561.8
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-10-22T19:45:08",
+      "selected_candidate": 8,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.9
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-10-22T19:49:22",
+      "alpha": 0.6,
+      "beta": 0.4,
+      "seconds": 253.9
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-10-22T19:55:50",
+      "best_epoch": 52,
+      "best_val_dice": 0.956346437409959,
+      "seconds": 387.6
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-10-22T19:55:55",
+      "test_dice": 0.9602608002557773,
+      "test_miou": 0.9614319887099827,
+      "test_hd95": 3.0435023987245082,
+      "seconds": 4.9
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-10-22T19:56:02",
+      "seconds": 7.5
+    }
+  },
+  "test_evaluated": true,
+  "method": "abl_random_population",
+  "dataset": "IDRID",
+  "seed": 45,
+  "updated": "2026-10-22T19:56:02",
+  "test_evaluated_at": "2026-10-22T19:55:51",
+  "total_seconds": 1735.0
+}

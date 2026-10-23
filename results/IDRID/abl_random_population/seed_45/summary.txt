@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: IDRID
+Method: QENAS, random-search population (no NSGA-II) — ablation: the 220 architectures are sampled uniformly (NSGA-II's budget) instead of evolved; the 16 candidates are their non-dominated front in (params, ZiCo), filled up by rank and crowding; the rest of QENAS is unchanged
+Seed: 45
+
+Search (training-free random sampling; optimised objectives: f1_params, f2_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 220
+Hypervolume: 1.1460 (generation 0) -> 1.1460 (final)
+Final Pareto front size: 10
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [4, 1, 2, 4, 4, 4, 4, 1]
+Block sequence: ['DARTS', 'Dense', 'Inception', 'DARTS', 'DARTS', 'DARTS', 'DARTS', 'Dense']
+ZiCo: 855.062
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.7588, 10 ep 0.9088, 20 ep 0.9328
+Selection: Candidate 8 selected: highest mean validation Dice over the last 5 of 20 epochs among the 4 eligible of 4 successive-halving finalists (0.9328; ΔLoss 0.4809, Dice trend tau 0.55, p=0.00024).
+
+Loss coefficients:
+alpha (BCE): 0.600   beta (soft-mIoU): 0.400
+
+Final training:
+Epochs run: 120 (best epoch 52)
+Best validation Dice: 0.9563   mIoU: 0.9576   HD95: 5.53 px
+
+Final test (n = 27, evaluated once):
+Dice (DSC):        96.03 %
+mIoU (class mean): 96.14 %
+Params:            1.710 M
+FLOPs:             29.86 G per batch of 4 (Mixed-GGNAS convention; 7.46 G per image)
+HD95:              3.04 px
+Sensitivity:       96.44 %
+IoU (foreground):  92.43 %
+Inference:         37.17 ms per image on cuda
+Test loss:         0.0195
+
+================================================
+QENAS time on IDRID (abl_random_population, seed 45): 00:28:55 from start to end (all stages) | this session: 00:29:02

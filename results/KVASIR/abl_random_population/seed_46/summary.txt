@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: QENAS, random-search population (no NSGA-II) — ablation: the 220 architectures are sampled uniformly (NSGA-II's budget) instead of evolved; the 16 candidates are their non-dominated front in (params, ZiCo), filled up by rank and crowding; the rest of QENAS is unchanged
+Seed: 46
+
+Search (training-free random sampling; optimised objectives: f1_params, f2_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 220
+Hypervolume: 1.1173 (generation 0) -> 1.1173 (final)
+Final Pareto front size: 8
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [2, 0, 2, 4, 4, 0, 3, 3]
+Block sequence: ['Inception', 'Residual', 'Inception', 'DARTS', 'DARTS', 'Residual', 'ConvNeXt', 'ConvNeXt']
+ZiCo: 675.469
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.6223, 10 ep 0.7653, 20 ep 0.8316
+Selection: Candidate 15 selected: highest mean validation Dice over the last 5 of 20 epochs among the 4 eligible of 4 successive-halving finalists (0.8316; ΔLoss 0.2108, Dice trend tau 0.85, p=2.5e-10).
+
+Loss coefficients:
+alpha (BCE): 0.500   beta (soft-mIoU): 0.500
+
+Final training:
+Epochs run: 113 (best epoch 93) — overfitting: val Dice not improved for 20 epochs (best epoch 93); val loss increasing (Kendall tau=0.29, p=0.037) while train loss decreasing (tau=-0.79, p=1.61e-08) over the last 20 epochs
+Best validation Dice: 0.8970   mIoU: 0.8957   HD95: 24.03 px
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        84.48 %
+mIoU (class mean): 85.02 %
+Params:            1.125 M
+FLOPs:             37.27 G per batch of 8 (Mixed-GGNAS convention; 4.66 G per image)
+HD95:              31.83 px
+Sensitivity:       86.89 %
+IoU (foreground):  76.56 %
+Inference:         18.92 ms per image on cuda
+Test loss:         0.1905
+
+================================================
+QENAS time on KVASIR (abl_random_population, seed 46): 01:53:26 from start to end (all stages) | this session: 01:53:28

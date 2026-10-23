@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: IDRID
+Method: QENAS, zero-shot pick (max ZiCo) — ablation / zero-shot NAS rule: the candidate with the highest ZiCo, chosen without training
+Seed: 46
+
+Search (training-free NSGA-II; optimised objectives: f1_params, f2_zico):
+Population: 20   Generations: 10
+Unique architectures evaluated: 219
+Hypervolume: 0.5938 (generation 0) -> 1.1407 (final)
+Final Pareto front size: 9
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [4, 4, 4, 4, 2, 2, 4, 2]
+Block sequence: ['DARTS', 'DARTS', 'DARTS', 'DARTS', 'Inception', 'Inception', 'DARTS', 'Inception']
+ZiCo: 1027.486
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.4272
+Selection: Candidate 9 selected: highest ZiCo among the candidates (zero-shot rule, no training used). Learning-capability selection would have chosen candidate 2.
+
+Loss coefficients:
+alpha (BCE): 0.600   beta (soft-mIoU): 0.400
+
+Final training:
+Epochs run: 120 (best epoch 73) — overfitting: val Dice not improved for 47 epochs (best epoch 73); val loss increasing (Kendall tau=0.33, p=0.0234) while train loss decreasing (tau=-0.39, p=0.0082) over the last 20 epochs
+Best validation Dice: 0.9617   mIoU: 0.9626   HD95: 3.41 px
+
+Final test (n = 27, evaluated once):
+Dice (DSC):        95.71 %
+mIoU (class mean): 95.90 %
+Params:            2.638 M
+FLOPs:             45.67 G per batch of 4 (Mixed-GGNAS convention; 11.42 G per image)
+HD95:              3.77 px
+Sensitivity:       95.64 %
+IoU (foreground):  91.95 %
+Inference:         31.89 ms per image on cuda
+Test loss:         0.0207
+
+================================================
+QENAS time on IDRID (qenas_zico_pick, seed 46): 00:17:12 from start to end (all stages) | this session: 00:17:13
