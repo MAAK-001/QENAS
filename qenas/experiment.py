@@ -31,6 +31,14 @@ class ResumeConflict(RuntimeError):
     pass
 
 
+class SessionPause(RuntimeError):
+    """A long stage stopped cleanly at the session deadline after saving its resumable state (nnU-Net 1000 epochs);
+    the same command continues it in the next session. ``run_experiment`` returns ``PAUSED_EXIT_CODE``."""
+
+
+PAUSED_EXIT_CODE = 75
+
+
 def dataset_dirname(cfg: Dict[str, Any]) -> str:
     return cfg["data"]["dataset"]
 

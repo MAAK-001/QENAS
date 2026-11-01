@@ -81,6 +81,18 @@ class Pipeline:
     def objectives(self):
         return self.method["objectives"]
 
+    @property
+    def supervised_fitness(self) -> bool:
+        """Supervised NSGA-II (journal revision): f2 = 1 - S1 instead of the training-free ZiCo objective."""
+        return self.method.get("fitness") == "supervised"
+
+    @property
+    def plot_y(self) -> Dict[str, str]:
+        """Second axis of the search figures: the optimised quality objective."""
+        if self.supervised_fitness:
+            return {"ykey": "s1_dice", "ylabel": "S1 = mean validation Dice, epochs 1-5   (higher is better)"}
+        return {}
+
     def init_model(self, arch: Dict[str, Any]) -> torch.nn.Module:
         """Seeded initialisation; for QENAS architectures identical to the zero-cost evaluation (the scored
         network is the trained network)."""
@@ -144,7 +156,8 @@ class Pipeline:
                 log.info("STAGE: %s", stage.upper())
                 t0 = time.time()
                 info = getattr(self, f"stage_{stage}")() or {}
-                info["seconds"] = round(time.time() - t0, 1)
+                # a stage resumed across sessions reports the time of its earlier sessions as "seconds_before"
+                info["seconds"] = round(time.time() - t0 + float(info.pop("seconds_before", 0.0)), 1)
                 self.exp.mark_done(stage, info)
                 self._prune(stage)
                 log.info("Stage '%s' finished in %s", stage, format_seconds(info["seconds"]))
@@ -160,7 +173,7 @@ class Pipeline:
         """Delete checkpoints that no completed stage will ever read again (their results are in the stage's
         JSON/CSV outputs). A finished experiment keeps only its final best-validation weights."""
         ck = self.exp.checkpoints
-        targets = {"search": [ck / "search_state.pt", ck / "search_state.pt.prev"],
+        targets = {"search": [ck / "search_state.pt", ck / "search_state.pt.prev", ck / "supervised_search"],
                    "candidates": [ck / "candidates"], "loss_weights": [ck / "loss_weights"]}.get(stage, [])
         if stage == "completed":
             targets = ([p for p in ck.iterdir() if p.name != "final"] +
@@ -175,6 +188,8 @@ class Pipeline:
     def stage_split(self) -> Dict[str, Any]:
         disc = discover(self.cfg)
         splits = make_splits(disc, self.cfg)
+        from .study.revision import verify_reference_split
+        verify_reference_split(disc.dataset, splits)         # only with QENAS_REFERENCE_SPLITS (Kaggle revision cell)
         summ = split_summary(splits)
         save_json(self.path("dataset_report.json"), disc.report)
         root = self.cfg["data"]["root"]
@@ -220,7 +235,16 @@ class Pipeline:
                     "hypervolume_generation_0": hv, "hypervolume_final": hv, "zico_batches_sha256": digest}
             save_json(self.path("search_summary.json"), info)
             return {k: v for k, v in info.items() if k != "zico_batches_sha256"}
-        search = NSGA2Search(self.cfg, self.exp.dir, self.device, self.fp, zb, self.objectives)
+        if self.supervised_fitness:
+            from .search.supervised import SupervisedFitness, SupervisedNSGA2Search
+            log.info("Supervised fitness: f2 = 1 - S1, S1 = mean validation Dice over epochs 1-%d of a %d-epoch "
+                     "candidate-protocol training (QENAS' rung-1 score); ZiCo is recorded, not optimised",
+                     int(self.cfg["candidate_training"]["rungs"][0]), int(self.cfg["candidate_training"]["rungs"][0]))
+            search = SupervisedNSGA2Search(self.cfg, self.exp.dir, self.device, self.fp, zb, self.objectives,
+                                           SupervisedFitness(self.cfg, self.exp.dir, self.device, self.fp, self.data,
+                                                             self.init_model))
+        else:
+            search = NSGA2Search(self.cfg, self.exp.dir, self.device, self.fp, zb, self.objectives)
         every = max(1, int(s["plot_every"]))
 
         def on_generation(srch: NSGA2Search) -> None:
@@ -229,25 +253,35 @@ class Pipeline:
                 rows = [r for r in srch.population_history if r["generation"] == g]
                 arch = [r for r in srch.archive.values() if r["first_generation"] <= g]
                 name = "pareto_initial_population" if g == 0 else f"pareto_generation_{g:03d}"
-                plots.plot_pareto_population(rows, arch, g, srch.n_generations, self.exp.figures / name)
+                plots.plot_pareto_population(rows, arch, g, srch.n_generations, self.exp.figures / name, **self.plot_y)
 
         res = search.run(on_generation=on_generation)
         hist, table = res["population_history"], res["generation_table"]
         last_gen = max(r["generation"] for r in hist)
         plots.plot_pareto_population([r for r in hist if r["generation"] == last_gen], res["archive"], last_gen,
                                      search.n_generations, self.exp.figures / "pareto_front_final",
-                                     title=f"Final population and Pareto front (generation {last_gen})")
-        plots.plot_search_progress(hist, table, self.exp.figures / "search_progress")
+                                     title=f"Final population and Pareto front (generation {last_gen})", **self.plot_y)
+        plots.plot_search_progress(hist, table, self.exp.figures / "search_progress", **self.plot_y)
         info = {"unique_evaluations": len(res["archive"]), "final_front_size": len(res["pareto_front"]),
                 "cache_hits": res["cache_hits"], "cache_misses": res["cache_misses"],
                 "objectives": list(self.objectives),
                 "hypervolume_generation_0": table[0]["hypervolume"], "hypervolume_final": table[-1]["hypervolume"],
                 "zico_batches_sha256": digest}
+        if self.supervised_fitness:
+            from .search.supervised import fitness_store_digest, search_training_summary
+            info.update(fitness="supervised", **search_training_summary(res["archive"]),
+                        fitness_records_sha256=fitness_store_digest(self.exp.dir))
+            seconds_before = search.elapsed_before          # earlier sessions of a search resumed across sessions
+            log.info("Supervised search training: %d trainings, %d epochs, %s of training", info["fitness_trainings"],
+                     info["fitness_epochs_total"], format_seconds(info["fitness_seconds_total"]))
         save_json(self.path("search_summary.json"), info)
         log.info("Search complete: %d unique architectures evaluated, final Pareto front size %d, hypervolume "
                  "%.4f (generation 0) -> %.4f (generation %d)", info["unique_evaluations"], info["final_front_size"],
                  info["hypervolume_generation_0"], info["hypervolume_final"], last_gen)
-        return {k: v for k, v in info.items() if k != "zico_batches_sha256"}
+        out = {k: v for k, v in info.items() if k not in ("zico_batches_sha256", "fitness_records_sha256")}
+        if self.supervised_fitness:
+            out["seconds_before"] = seconds_before
+        return out
 
     # ================================================================== 3. candidates of the final population
     def stage_pareto(self) -> Dict[str, Any]:
@@ -265,7 +299,8 @@ class Pipeline:
         archive = load_json(self.path("search_results.json"))
         plots.plot_pareto_population(population, archive, last_gen, int(self.cfg["search"]["generations"]),
                                      self.exp.figures / "pareto_front_final_with_candidates", highlight=cands,
-                                     title="Final population and the candidates trained by successive halving")
+                                     title="Final population and the candidates trained by successive halving",
+                                     **self.plot_y)
         n_front = sum(1 for c in cands if c["selection_reason"].startswith(("Pareto front", "extreme")))
         log.info("Final Pareto front: %d architectures; %d candidates for successive halving (%d from the front%s)",
                  len(front), len(cands), n_front,
@@ -694,7 +729,9 @@ def research_summary(cfg: Dict[str, Any], method: Dict[str, Any], best: Dict[str
     if search is not None:
         a = best["analysis"]
         lines += [
-            f"Search (training-free {'random sampling' if search.get('sampler') == 'random' else 'NSGA-II'}; "
+            (f"Search (NSGA-II with supervised fitness f2 = 1 - S1: {search['fitness_trainings']} 5-epoch trainings, "
+             f"{search['fitness_epochs_total']} epochs; " if search.get("fitness") == "supervised" else
+             f"Search (training-free {'random sampling' if search.get('sampler') == 'random' else 'NSGA-II'}; ") +
             f"optimised objectives: {', '.join(search['objectives'])}):",
             f"Population: {cfg['search']['population_size']}   Generations: {cfg['search']['generations']}",
             f"Unique architectures evaluated: {search['unique_evaluations']}",

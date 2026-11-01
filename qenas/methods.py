@@ -24,6 +24,14 @@ sampler (kind ``qenas`` / ``search_only``)
 loss_weights
     ``grid``   alpha chosen on validation from ``loss_weights.alphas`` (the QENAS protocol);
     ``fixed``  alpha = ``candidate_training.loss_alpha`` (0.5) without any search (loss-coefficient ablation).
+
+fitness (kind ``qenas``; journal revision)
+    ``supervised``  f2 = 1 - S1 (5-epoch candidate-protocol training, QENAS' rung-1 score) instead of ZiCo
+                    (``qenas/search/supervised.py``); absent = the training-free objectives.
+
+trainer / spans_sessions (kind ``nnunet``; journal revision)
+    the nnU-Net trainer class (default ``nnUNetTrainer_100epochs``) and whether a run continues across sessions
+    (``qenas/study/nnunet_full.py``).
 """
 
 from __future__ import annotations
@@ -95,6 +103,26 @@ METHODS: Dict[str, Dict[str, Any]] = {
         "label": "Random architecture (no search, no ZiCo)",
         "doc": "ablation: one architecture drawn uniformly from the 5^8 search space, then the QENAS loss-weight "
                "selection and final training",
+    },
+    # ---- journal revision (plan.revision_plan; REVISION.md)
+    "supervised_nsga2": {
+        "kind": "qenas", "objectives": ("f1_params", "f2_supervised"), "fitness": "supervised",
+        "selection": "learning_capability", "loss_weights": "grid",
+        "label": "Supervised NSGA-II",
+        "doc": "search baseline (NSGA-Net style): QENAS with the training-free f2 replaced by f2 = 1 - S1, S1 = mean "
+               "validation Dice over epochs 1-5 of a 5-epoch training under the candidate protocol (QENAS' rung-1 "
+               "score); everything else unchanged",
+    },
+    "nnunet_full": {
+        "kind": "nnunet", "trainer": "nnUNetTrainer", "spans_sessions": True,
+        "label": "nnU-Net (1000 epochs)",
+        "doc": "baseline: nnU-Net v2 (2d configuration, default plans, default nnUNetTrainer = 1000 epochs), fold 0 = "
+               "the QENAS train/validation split; resumed across sessions from checkpoint_latest",
+    },
+    "unext": {
+        "kind": "baseline", "network": "unext", "loss_weights": "grid",
+        "label": "UNeXt",
+        "doc": "baseline: UNeXt (Valanarasu & Patel, MICCAI 2022; official architecture), 1.47 M parameters",
     },
 }
 

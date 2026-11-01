@@ -7,6 +7,8 @@ exactly as by main.py.
     python study.py status                    # which jobs are done
     python study.py run --plan ablation --worker A --gpus 0 1   # component ablation study, Kaggle account A (or B)
     python study.py status --plan ablation    # progress of the whole ablation study (36 experiments)
+    python study.py run --plan revision --worker 1 --gpus 0 1    # journal revision, Kaggle account 1 (of 1-5)
+    python study.py status --plan revision    # progress of all revision jobs (REVISION.md)
     python study.py analyse                   # paper tables, statistics and figures -> results/analysis/
     python study.py figures                   # regenerate every experiment's figures from its saved results
     python study.py archive results.zip       # results without model checkpoints, as one zip
@@ -53,7 +55,9 @@ def cmd_job(a) -> int:
 
 
 def _status_name(a) -> str:
-    return "study_status.json" if a.plan == "v2" else f"ablation_status{'_' + a.worker.upper() if a.worker else ''}.json"
+    if a.plan == "v2":
+        return "study_status.json"
+    return f"{a.plan}_status{'_' + a.worker.upper() if a.worker else ''}.json"
 
 
 def cmd_run(a) -> int:
@@ -65,7 +69,8 @@ def cmd_run(a) -> int:
     def log(text):
         print(time.strftime("%Y-%m-%d %H:%M:%S ") + text, flush=True)
     run_study(Path(a.results), gpus, a.hours, data_root=a.data_root, num_workers=a.num_workers,
-              threads_per_job=a.threads, jobs=select_plan(a.plan, a.worker), status_name=_status_name(a), log=log)
+              threads_per_job=a.threads, jobs=select_plan(a.plan, a.worker, a.optional), status_name=_status_name(a),
+              log=log)
     return 0
 
 
@@ -73,7 +78,7 @@ def cmd_status(a) -> int:
     from qenas.study.plan import select_plan
     from qenas.study.scheduler import job_done, stage_progress
     res = Path(a.results)
-    jobs = select_plan(a.plan, a.worker)
+    jobs = select_plan(a.plan, a.worker, a.optional)
     done = [j for j in jobs if job_done(res, j)]
     for j in jobs:
         print(f"{'done   ' if j in done else 'pending'}  {j.id}" + ("" if j in done else f"  ({stage_progress(res, j)})"))
@@ -109,10 +114,14 @@ def main(argv=None) -> int:
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--results", default=DEFAULT_CONFIG["paths"]["results"], help="results folder")
     common.add_argument("--data-root", default=None, help="folder containing the dataset folders")
-    common.add_argument("--plan", default="v2", choices=["v2", "ablation"],
-                        help="v2: the evaluation study; ablation: the component ablation study (IDRiD, Kvasir-SEG)")
-    common.add_argument("--worker", default=None, type=str.upper, choices=["A", "B"],
-                        help="ablation plan only: the share of one Kaggle account (default: all jobs)")
+    common.add_argument("--plan", default="v2", choices=["v2", "ablation", "revision"],
+                        help="v2: the evaluation study; ablation: the component ablation study (IDRiD, Kvasir-SEG); "
+                             "revision: Supervised NSGA-II, nnU-Net 1000 epochs, UNeXt (REVISION.md)")
+    common.add_argument("--worker", default=None, type=str.upper, choices=["A", "B", "1", "2", "3", "4", "5"],
+                        help="the share of one Kaggle account: A/B (ablation plan) or 1-5 (revision plan); "
+                             "default: all jobs")
+    common.add_argument("--optional", action="store_true",
+                        help="revision plan: include the optional BUSI nnU-Net (1000 epochs) runs")
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run", parents=[common], help="run / resume the study plan")

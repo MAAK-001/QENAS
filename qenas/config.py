@@ -186,7 +186,12 @@ def validate_config(cfg: Dict[str, Any]) -> None:
     if cfg["model"]["base_channels"] % 16:
         raise ValueError("model.base_channels must be a multiple of 16 (official blocks use groups=16).")
     from .methods import method_spec
-    method_spec(cfg["method"])
+    spec = method_spec(cfg["method"])
+    if spec.get("network"):
+        from .models.baselines import INPUT_DIVISOR
+        k = INPUT_DIVISOR.get(spec["network"], 16)
+        if h % k or w % k:
+            raise ValueError(f"data.image_size {h}x{w} must be divisible by {k} for {spec['network']}.")
     if not 0.0 < cfg["data"]["val_fraction"] < 1.0 or not 0.0 < cfg["data"]["test_fraction"] < 1.0:
         raise ValueError("data.val_fraction and data.test_fraction must lie in (0, 1)")
     s = cfg["search"]

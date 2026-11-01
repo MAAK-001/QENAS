@@ -49,6 +49,8 @@ RECORD_KEYS = ("chromosome", "blocks", "params", "zico") + OBJECTIVE_NAMES
 
 
 class NSGA2Search:
+    record_keys = RECORD_KEYS          # fields of every archive / population / front record
+
     def __init__(self, cfg: Dict[str, Any], exp_dir: Path, device: torch.device, fingerprint: str,
                  zico_batches: List[Tuple[torch.Tensor, torch.Tensor]],
                  objectives: Sequence[str] = OBJECTIVE_NAMES):
@@ -151,7 +153,7 @@ class NSGA2Search:
             rec = self.archive[chromosome_key(X[i])]
             cd = float(crowd[i]) if crowd[i] is not None else float("nan")
             rows.append({
-                "generation": generation, **{k: rec[k] for k in RECORD_KEYS},
+                "generation": generation, **{k: rec[k] for k in self.record_keys},
                 "pareto_rank": int(rank[i]), "crowding_distance": cd if np.isfinite(cd) else "inf",
                 "nondominated": bool(rank[i] == 0),
             })
@@ -216,7 +218,7 @@ class NSGA2Search:
         X = pop.get("X").astype(int)
         F = pop.get("F")
         nd = NonDominatedSorting().do(F, only_non_dominated_front=True)
-        front = [{k: self.archive[chromosome_key(X[i])][k] for k in RECORD_KEYS}
+        front = [{k: self.archive[chromosome_key(X[i])][k] for k in self.record_keys}
                  for i in sorted(nd, key=lambda j: tuple(F[j]))]
         for r, row in enumerate(front, 1):
             row["front_index"] = r
@@ -230,13 +232,13 @@ class NSGA2Search:
         d = self.exp_dir
         archive_rows = sorted(self.archive.values(), key=lambda r: (r["first_generation"], r["params"]))
         save_csv(d / "search_results.csv", archive_rows,
-                 ["first_generation", *RECORD_KEYS, "eval_seconds"])
+                 ["first_generation", *self.record_keys, "eval_seconds"])
         save_json(d / "search_results.json", archive_rows)
         save_csv(d / "search_population_history.csv", self.population_history)
         save_json(d / "search_population_history.json", self.population_history)
         save_csv(d / "nsga2_generations.csv", self.generation_table)
         save_json(d / "nsga2_generations.json", self.generation_table)
-        save_csv(d / "pareto_front.csv", front, ["front_index", *RECORD_KEYS])
+        save_csv(d / "pareto_front.csv", front, ["front_index", *self.record_keys])
         save_json(d / "pareto_front.json", front)
 
 
@@ -271,7 +273,7 @@ class RandomSearch(NSGA2Search):
         for i, ch in enumerate(chosen):
             rec = self.archive[chromosome_key(ch)]
             self.population_history.append({
-                "generation": 0, **{k: rec[k] for k in RECORD_KEYS}, "pareto_rank": int(rank[i]),
+                "generation": 0, **{k: rec[k] for k in self.record_keys}, "pareto_rank": int(rank[i]),
                 "crowding_distance": float(crowd[i]) if np.isfinite(crowd[i]) else "inf",
                 "nondominated": bool(rank[i] == 0)})
         self.generation_table = [{
@@ -280,7 +282,7 @@ class RandomSearch(NSGA2Search):
             "best_zico": float(max(r["zico"] for r in self.archive.values())),
             "unique_evaluated_total": len(self.archive), "seconds": round(time.time() - t0, 2)}]
         nd = np.where(rank == 0)[0]
-        front = [{k: self.archive[chromosome_key(chosen[i])][k] for k in RECORD_KEYS}
+        front = [{k: self.archive[chromosome_key(chosen[i])][k] for k in self.record_keys}
                  for i in sorted(nd, key=lambda j: tuple(F[j]))]
         for r, row in enumerate(front, 1):
             row["front_index"] = r

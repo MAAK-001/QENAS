@@ -25,15 +25,15 @@ def _xy(rows: List[Dict[str, Any]], kx: str = "params", ky: str = "zico") -> np.
 # ---------------------------------------------------------------------------------------------- search
 def plot_pareto_population(pop_rows: List[Dict[str, Any]], archive_rows: List[Dict[str, Any]], generation: int,
                            n_generations: int, path: Path, highlight: Optional[List[Dict[str, Any]]] = None,
-                           title: Optional[str] = None) -> None:
-    """Population of one generation in the objective space (parameters vs ZiCo)."""
+                           title: Optional[str] = None, ykey: str = "zico", ylabel: str = ZICO_LABEL) -> None:
+    """Population of one generation in the objective space (parameters vs ZiCo, or vs ``ykey``)."""
     apply_style()
     fig, ax = plt.subplots(figsize=(7.2, 4.8))
     nd = np.array([r["nondominated"] for r in pop_rows], dtype=bool)
     if archive_rows:
-        a = _xy(archive_rows)
+        a = _xy(archive_rows, ky=ykey)
         ax.scatter(a[:, 0], a[:, 1], s=12, color=NEUTRAL_FILL, edgecolor="none", label="evaluated so far", zorder=1)
-    p = _xy(pop_rows)
+    p = _xy(pop_rows, ky=ykey)
     if (~nd).any():
         ax.scatter(p[~nd, 0], p[~nd, 1], s=26, color=MUTED, edgecolor="white", linewidth=0.8,
                    label="population (dominated)", zorder=2)
@@ -41,21 +41,22 @@ def plot_pareto_population(pop_rows: List[Dict[str, Any]], archive_rows: List[Di
         ax.scatter(p[nd, 0], p[nd, 1], s=40, color=SERIES[0], edgecolor="white", linewidth=1.0,
                    label=f"non-dominated: {int(nd.sum())}", zorder=4)
     if highlight:
-        h = _xy(highlight)
+        h = _xy(highlight, ky=ykey)
         ax.scatter(h[:, 0], h[:, 1], s=110, facecolor="none", edgecolor=SERIES[1], linewidth=1.6,
                    label="candidates (successive halving)", zorder=5)
         for r, (x, y) in zip(highlight, h):
             ax.annotate(f"C{r['candidate_id']}", (x, y), textcoords="offset points", xytext=(6, 5), fontsize=8,
                         color=INK_2)
     ax.set_xlabel(PARAMS_LABEL)
-    ax.set_ylabel(ZICO_LABEL)
+    ax.set_ylabel(ylabel)
     ax.legend(loc="lower right")
     gen_txt = "initial population (generation 0)" if generation == 0 else f"generation {generation}/{n_generations}"
     ax.set_title(title or f"NSGA-II population — {gen_txt}")
     save(fig, path)
 
 
-def plot_search_progress(history: List[Dict[str, Any]], gen_table: List[Dict[str, Any]], path: Path) -> None:
+def plot_search_progress(history: List[Dict[str, Any]], gen_table: List[Dict[str, Any]], path: Path,
+                         ykey: str = "zico", ylabel: str = "ZiCo") -> None:
     """Hypervolume of each generation's non-dominated set and the population's objective distribution."""
     apply_style()
     fig, axs = plt.subplots(1, 3, figsize=(14.5, 4.0))
@@ -63,7 +64,7 @@ def plot_search_progress(history: List[Dict[str, Any]], gen_table: List[Dict[str
     axs[0].plot(gens, [g["hypervolume"] for g in gen_table], color=SERIES[0], marker="o", markersize=4)
     axs[0].set_ylabel("Hypervolume (normalised objectives, ref. 1.1)")
     axs[0].set_title("Non-dominated set quality")
-    for ax, key, label in ((axs[1], "params", "Parameters (M)"), (axs[2], "zico", "ZiCo")):
+    for ax, key, label in ((axs[1], "params", "Parameters (M)"), (axs[2], ykey, ylabel)):
         med, q1, q3 = [], [], []
         for g in gens:
             v = np.array([_v(r, key) for r in history if r["generation"] == g])

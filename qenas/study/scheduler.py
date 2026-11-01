@@ -9,6 +9,9 @@
 * At the hard deadline still-running jobs are terminated; checkpoints are written after every epoch/generation,
   so they continue in the next session.
 * A failed job is retried once in the same session; its dependants wait. Every job writes its own log file.
+* A job that spans sessions (``Job.spans_sessions``: nnU-Net with 1000 epochs) is started whenever at least
+  ``MIN_SPAN_H`` of the budget remain. Every job receives the end of the start budget as ``QENAS_STOP_AT``; such a job
+  saves its state and exits with code 75 (paused) before it, and is not restarted in the same session.
 """
 
 from __future__ import annotations
@@ -26,6 +29,8 @@ from .plan import Job, plan
 
 HARD_MARGIN_H = 0.25        # running jobs are terminated this long after the start budget ends
 SAFETY = 1.15               # expected duration multiplier
+MIN_SPAN_H = 0.5            # a session-spanning job is started only if this much of the budget remains
+PAUSED = 75                 # exit code of a job that stopped cleanly at the session deadline (qenas.experiment)
 
 
 def job_dir(results: Path, job: Job) -> Path:
@@ -121,7 +126,7 @@ def run_study(results: Path, gpus: Sequence[Optional[int]], budget_hours: float,
             s = status.setdefault(j.id, {})
             if job_done(results, j):
                 s["status"] = "done"
-            elif s.get("status") not in ("running", "failed"):
+            elif s.get("status") not in ("running", "failed", "paused"):
                 s["status"] = "pending"
         save_json(status_file, status)
 
@@ -138,9 +143,13 @@ def run_study(results: Path, gpus: Sequence[Optional[int]], budget_hours: float,
             fh.close()
             minutes = (time.time() - ts) / 60
             ok = rc == 0 and job_done(results, j)
-            status[j.id] = {**status.get(j.id, {}), "status": "done" if ok else "failed", "exit_code": rc,
-                            "session_minutes": round(minutes, 1), "gpu": g}
-            log(f"[study] {'finished' if ok else 'FAILED  '} {j.id} (exit {rc}, {minutes:.0f} min, GPU {g})")
+            paused = rc == PAUSED and not ok
+            if paused:
+                attempts[j.id] = 2                # continues in the next session, not in this one
+            status[j.id] = {**status.get(j.id, {}), "status": "done" if ok else "paused" if paused else "failed",
+                            "exit_code": rc, "session_minutes": round(minutes, 1), "gpu": g}
+            log(f"[study] {'finished' if ok else 'paused  ' if paused else 'FAILED  '} {j.id} (exit {rc}, "
+                f"{minutes:.0f} min, GPU {g})")
             del running[g]
             save()
             last_progress = 0.0                   # report progress after every finished job
@@ -165,7 +174,8 @@ def run_study(results: Path, gpus: Sequence[Optional[int]], budget_hours: float,
             if not all(job_done(results, by_id[d]) for d in j.deps if d in by_id):
                 continue
             startable.append(j)
-        fits = [j for j in startable if elapsed_h() + expected(j, measured) / 60 <= budget_hours]
+        fits = [j for j in startable if (budget_hours - elapsed_h() >= MIN_SPAN_H if j.spans_sessions
+                                         else elapsed_h() + expected(j, measured) / 60 <= budget_hours)]
         for g in gpus:
             if g in running or not fits:
                 continue
@@ -173,7 +183,8 @@ def run_study(results: Path, gpus: Sequence[Optional[int]], budget_hours: float,
             attempts[j.id] = attempts.get(j.id, 0) + 1
             device = "cpu" if g is None else "cuda"
             cmd = command(j, device) if command else default_command(j, device, data_root, num_workers, results)
-            env = dict(os.environ, OMP_NUM_THREADS=str(threads_per_job), MKL_NUM_THREADS=str(threads_per_job))
+            env = dict(os.environ, OMP_NUM_THREADS=str(threads_per_job), MKL_NUM_THREADS=str(threads_per_job),
+                       QENAS_STOP_AT=f"{t0 + budget_hours * 3600:.0f}")
             if g is not None:
                 env["CUDA_VISIBLE_DEVICES"] = str(g)
             fh = open(logs / (j.id.replace("/", "__") + ".log"), "a", encoding="utf-8")

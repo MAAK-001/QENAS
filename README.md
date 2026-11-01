@@ -41,6 +41,7 @@ QENAS is **one pipeline with one protocol** (`main.py`). The **evaluation study*
 | [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) | every decision, with reasons and evidence (incl. the v1 results behind every 3.0 change) |
 | [PAPER_POSITIONING.md](PAPER_POSITIONING.md) | related work and what QENAS adds |
 | [DATASETS.md](DATASETS.md) | dataset structure and splits |
+| [REVISION.md](REVISION.md) | journal revision: Supervised NSGA-II, nnU-Net 1000 epochs, UNeXt — runs, Kaggle plan, merge |
 | `Old Results/` | everything of the preliminary study v1 (QENAS 2.1): results, report `QENAS_Study_v1.pdf` (local, not pushed) |
 
 ---

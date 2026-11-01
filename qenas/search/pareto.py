@@ -27,7 +27,8 @@ import numpy as np
 
 from .objectives import OBJECTIVE_NAMES
 
-_EXTREME_REASON = {"f1_params": "extreme: fewest parameters", "f2_zico": "extreme: best ZiCo objective"}
+_EXTREME_REASON = {"f1_params": "extreme: fewest parameters", "f2_zico": "extreme: best ZiCo objective",
+                   "f2_supervised": "extreme: best 5-epoch validation Dice (Supervised NSGA-II)"}
 
 
 def select_pareto_candidates(front: List[Dict[str, Any]], k: int, objectives: Sequence[str] = OBJECTIVE_NAMES,

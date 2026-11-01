@@ -90,6 +90,11 @@ class NNUNetPipeline(Pipeline):
 
     # ------------------------------------------------------------------ nnU-Net environment
     @property
+    def trainer_name(self) -> str:
+        """nnU-Net trainer class: the method's own (``nnunet_full``: the default ``nnUNetTrainer``), else ``TRAINER``."""
+        return self.method.get("trainer") or TRAINER
+
+    @property
     def work(self) -> Path:
         return self.exp.dir / "nnunet_work"
 
@@ -110,7 +115,7 @@ class NNUNetPipeline(Pipeline):
     @property
     def model_dir(self) -> Path:
         return (self.work / "results" / dataset_name(self.cfg["data"]["dataset"]) /
-                f"{TRAINER}__{PLANS}__{CONFIGURATION}")
+                f"{self.trainer_name}__{PLANS}__{CONFIGURATION}")
 
     def _predictor(self, mirroring: bool):
         from nnunetv2.inference.predict_from_raw_data import nnUNetPredictor
@@ -182,14 +187,15 @@ class NNUNetPipeline(Pipeline):
         np.random.seed(self.seed % (2 ** 32))
         torch.manual_seed(self.seed)
         from nnunetv2.run.run_training import get_trainer_from_args, maybe_load_checkpoint
-        trainer = get_trainer_from_args(str(did), CONFIGURATION, FOLD, TRAINER, PLANS, device=self.device)
+        trainer = get_trainer_from_args(str(did), CONFIGURATION, FOLD, self.trainer_name, PLANS, device=self.device)
         trainer.save_every = SAVE_EVERY
+        self._before_training(trainer)
         maybe_load_checkpoint(trainer, continue_training=True, validation_only=False)
         if self.device.type == "cuda":
             torch.backends.cudnn.deterministic = False
             torch.backends.cudnn.benchmark = True
         t0 = time.time()
-        trainer.run_training()
+        self._run_training(trainer)
         log.info("nnU-Net training finished in %.1f min (%d epochs x %d iterations, batch size %d, patch %s)",
                  (time.time() - t0) / 60, trainer.num_epochs, trainer.num_iterations_per_epoch, trainer.batch_size,
                  trainer.configuration_manager.patch_size)
@@ -209,6 +215,13 @@ class NNUNetPipeline(Pipeline):
                 f.unlink()
         return info
 
+    def _before_training(self, trainer) -> None:
+        """Hook before nnU-Net loads its checkpoint (``nnunet_full``: restore it from persistent storage)."""
+
+    def _run_training(self, trainer) -> None:
+        """nnU-Net's own training loop (``nnunet_full`` adds a session deadline and checkpoint persistence)."""
+        trainer.run_training()
+
     def stage_nnunet_test(self) -> Dict[str, Any]:
         if self.exp.state.get("test_evaluated"):
             log.info("Test set already evaluated once for this experiment — not re-evaluating.")
@@ -223,12 +236,13 @@ class NNUNetPipeline(Pipeline):
         log.info("Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA "
                  "(+ nnU-Net's mirroring TTA reported separately)")
         test_m, rows, preds = score(self.predict_arrays(test_imgs, self.work / "test_tmp", False), test_masks)
-        test_mirror, _, _ = score(self.predict_arrays(test_imgs, self.work / "test_tmp", True), test_masks)
+        test_mirror, mirror_rows, _ = score(self.predict_arrays(test_imgs, self.work / "test_tmp", True), test_masks)
         self.exp.state["test_evaluated"] = True
         self.exp.state["test_evaluated_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
         self.exp.save_state()
         ids = [s.sample_id for s in self.splits["test"]]
         save_csv(self.path("test_per_image.csv"), [{"sample_id": i, **r} for i, r in zip(ids, rows)])
+        save_csv(self.path("test_per_image_mirroring_tta.csv"), [{"sample_id": i, **r} for i, r in zip(ids, mirror_rows)])
         np.savez_compressed(self.path("test_predictions.npz"), sample_ids=np.array(ids), masks=np.stack(preds))
         from ..models.summary import cost_summary
         net = self._predictor(False).network.to(self.device)
@@ -242,9 +256,9 @@ class NNUNetPipeline(Pipeline):
         save_json(self.path("final_validation.json"), fv)
         final = {
             "dataset": self.cfg["data"]["dataset"], "method": self.method_name, "method_label": self.method["label"], "seed": self.seed,
-            "architecture": {"type": "nnunet", "configuration": CONFIGURATION, "trainer": TRAINER, "plans": PLANS,
-                             "nnunetv2": NNUNET_VERSION},
-            "architecture_label": f"nnU-Net {CONFIGURATION} ({TRAINER})", "blocks": None,
+            "architecture": {"type": "nnunet", "configuration": CONFIGURATION, "trainer": self.trainer_name,
+                             "plans": PLANS, "nnunetv2": NNUNET_VERSION},
+            "architecture_label": f"nnU-Net {CONFIGURATION} ({self.trainer_name})", "blocks": None,
             **cost, "inference_ms_per_image": latency, "inference_device": str(self.device),
             "alpha": None, "beta": None, "best_epoch": fv["best_epoch"], "epochs_run": fv["epochs_run"],
             "train": None, "validation": val_m, "test": test_m, "n_test": len(ids),

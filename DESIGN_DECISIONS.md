@@ -672,6 +672,68 @@ tests every decision changed here.
   on Kvasir-SEG it coincided with the QENAS choice in all three seeds and the ablation was identical to QENAS (v1
   T3/T4, Δ = 0). Including the dataset makes the draws independent across datasets (unit-tested).
 
+## Journal revision (REVISION.md)
+
+### D51 — Supervised NSGA-II: the controlled supervised-fitness baseline
+* **Decision:** a new condition `supervised_nsga2` that is QENAS with one change: f2 = 1 − S1, S1 = mean validation
+  Dice over epochs 1–5 of a 5-epoch training under the candidate protocol (QENAS' rung-1 score), computed by the
+  successive-halving code itself (`Pipeline.init_model`, `Trainer`, `criterion`). Everything else is inherited: space,
+  NSGA-II and operators, population 20 × 10 generations (≤ 220 evaluations), cache, checkpoints, stages 2–4. ZiCo is
+  still computed and recorded (not optimised), so all outputs keep the QENAS format. A diverged fitness training gives
+  S1 = 0 (worst f2), the consequence of gate G1 in successive halving.
+* **Reason:** the paper asks whether supervised fitness can be replaced by a training-free one with the space fixed.
+  Published NAS numbers use other spaces, splits and budgets; only a run in our own pipeline isolates f2. NSGA-Net
+  (Lu et al. 2019) uses exactly this design: NSGA-II on (complexity, validation accuracy after a short training).
+* **Evidence of the controlled difference (tests):** with f2 replaced by QENAS' own f2, the supervised search
+  reproduces QENAS' search exactly (populations, ranks, crowding, archive, hypervolume); on the CPU each candidate's
+  rung-1 score equals its search S1 bit for bit.
+* **Alternative:** a lower-fidelity S1 (fewer epochs or images) — rejected: it would no longer be QENAS' own criterion.
+
+### D52 — Where Supervised NSGA-II is run
+* **Decision:** BUSI and IDRiD, seeds 45–47 (6 runs, ≈ 20 GPU h).
+* **Reason:** 220 five-epoch trainings cost ≈ 4 h (BUSI) and 1 h (IDRiD) of search per run; BUSI and IDRiD are the
+  datasets where QENAS ties nnU-Net, i.e. where the training-free search must prove it loses nothing. CVC-ClinicDB and
+  Kvasir-SEG would add ≈ 25 GPU h without a new question.
+
+### D53 — Rung 1 of Supervised NSGA-II is retrained
+* **Decision:** successive halving retrains rung 1 for the 16 candidates instead of re-using the search's 5-epoch
+  checkpoints; the identity of the two is reported (R5).
+* **Reason:** re-use is allowed only if bit-identical. On the CPU it is (tested), on CUDA some kernels are
+  non-deterministic (`use_deterministic_algorithms(warn_only=True)`, D40), so identity cannot be guaranteed; retraining
+  keeps stages 2–4 literally unchanged and costs ≤ 17 min per run. The search checkpoints are deleted after each
+  record is stored, so they need no storage across sessions.
+
+### D54 — nnU-Net with the default 1000-epoch schedule, resumed across sessions
+* **Decision:** `nnunet_full` = the nnU-Net baseline of D46/D47 with the default `nnUNetTrainer` (1000 epochs) on IDRiD
+  (seeds 45–47; BUSI optional). A run (≈ 11.6 h on IDRiD, ≈ 30 h on BUSI) continues across 12-hour Kaggle sessions
+  exactly as `nnUNetv2_train --c`: nnU-Net's own `checkpoint_latest.pth` (written at the pause and every 5 epochs) is
+  copied atomically with a manifest (epoch, SHA-256 of checkpoint, plans, split) and kept in a private Kaggle dataset
+  of the same account; a new session recomputes the deterministic preprocessing (plans hash must match), restores the
+  checkpoint and continues. A missing or older checkpoint stops the job (state.json, pushed to GitHub, records the
+  last epoch). Only the trainer class differs from the existing runs; checkpointing does not change training.
+* **Reason:** the equivalence claim (QENAS ≈ nnU-Net on BUSI / IDRiD) needs nnU-Net's default schedule at least where
+  it is affordable. The pause hook stops at an epoch boundary before the deadline instead of killing the process
+  (nnU-Net's `torch.save` is not atomic).
+* **Not bit-reproducible:** as for every nnU-Net run (D47); resuming changes only the unseeded augmentation stream.
+
+### D55 — Equivalence test (TOST) with a pre-specified margin of ±2 Dice points
+* **Decision:** QENAS vs nnU-Net (1000 epochs) is tested for equivalence with two one-sided Wilcoxon signed-rank tests
+  on the per-image Dice differences (seed-averaged, as all paired tests of the study), margin ±2 Dice points, fixed
+  before the runs (configurable, `--margin`); the paired t-test version and the 90 % bootstrap CI are reported as
+  checks. Main analysis without TTA; nnU-Net's mirroring TTA secondary.
+* **Reason:** "no significant difference" is not evidence of equivalence; TOST is. ±2 pp is below the spread between
+  seeds of every method on these datasets and below the differences the segmentation literature treats as relevant.
+
+### D56 — UNeXt as the lightweight hand-designed baseline
+* **Decision:** UNeXt (Valanarasu & Patel, MICCAI 2022), official architecture copied unchanged (unused imports
+  dropped), default configuration, 1 output channel; trained with exactly the U-Net / Attention U-Net protocol (α grid,
+  120 epochs, best-validation checkpoint, no TTA, one test) on all four datasets, seeds 45–47, plus the external test.
+  Verified: 1,471,921 parameters (paper 1.47 M), 0.573 GFLOPs at 256 × 256 with our counter (paper 0.57). Input sides
+  must be divisible by 32 (checked). The Holm family of the main paired table becomes QENAS vs nnU-Net, Attention
+  U-Net, U-Net and UNeXt; Friedman/Nemenyi uses the five networks.
+* **Reason:** QENAS' networks have 1–2 M parameters; a state-of-the-art hand-designed network of the same size is the
+  relevant compact baseline. The official code's own loss/schedule are not used, so that only the network differs.
+
 ---
 
 ## Changes from QENAS 2.1 (study v1) and why

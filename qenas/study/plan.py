@@ -47,6 +47,10 @@ _EST = {
     "abl_random_population": {"IDRID": 40, "KVASIR": 150},
     "abl_params_only": {"IDRID": 40, "KVASIR": 150},
     "abl_random_arch": {"IDRID": 15, "KVASIR": 65},
+    # journal revision (REVISION.md §4: measured v2 stage times on a T4; the scheduler adds 15 %)
+    "supervised_nsga2": {"BUSI": 312, "IDRID": 87},
+    "nnunet_full": {"BUSI": 1810, "IDRID": 700},
+    "unext": {"BUSI": 37, "CVC": 33, "IDRID": 14, "KVASIR": 62},
 }
 
 # ---------------------------------------------------------------------------------------- component ablation study
@@ -73,7 +77,14 @@ class Job:
 
     @property
     def external(self) -> bool:
-        return self.dataset == "KVASIR" and self.method in EXTERNAL_METHODS
+        return self.dataset == "KVASIR" and self.method in EXTERNAL_METHODS + REVISION_EXTERNAL
+
+    @property
+    def spans_sessions(self) -> bool:
+        """Longer than a Kaggle session: started regardless of the remaining time, stops cleanly at the deadline
+        (exit code 75) and continues in the next session of the same account."""
+        from ..methods import method_spec
+        return bool(method_spec(self.method).get("spans_sessions"))
 
     def estimate_minutes(self) -> float:
         return float(_EST.get(self.method, {}).get(self.dataset, 120))
@@ -108,14 +119,52 @@ def ablation_plan(worker: Optional[str] = None) -> List[Job]:
     return jobs
 
 
-def select_plan(name: str = "v2", worker: Optional[str] = None) -> List[Job]:
+# ---------------------------------------------------------------------------------------- journal revision
+# Three additions requested for the revision (REVISION.md), seeds 45-47, identical splits and protocol:
+#   1. Supervised NSGA-II (f2 = 1 - S1) on BUSI and IDRiD;
+#   2. nnU-Net with its default 1000-epoch trainer on IDRiD (BUSI optional);
+#   3. UNeXt on all four datasets (+ the external Kvasir-SEG -> CVC-ClinicDB test inside the Kvasir-SEG jobs).
+# Five Kaggle accounts ("workers" 1-5). A run that spans sessions must stay on one account (its checkpoint lives in
+# that account's storage), so each of workers 1-3 takes one seed's nnU-Net run plus that seed's Supervised NSGA-II
+# runs on its second GPU; workers 4 and 5 take UNeXt. The optional BUSI nnU-Net runs go to workers 4 and 5.
+REVISION_EXTERNAL = ("unext",)
+REVISION_WORKERS = {
+    "1": [("IDRID", "nnunet_full", 45), ("BUSI", "supervised_nsga2", 45), ("IDRID", "supervised_nsga2", 45)],
+    "2": [("IDRID", "nnunet_full", 46), ("BUSI", "supervised_nsga2", 46), ("IDRID", "supervised_nsga2", 46)],
+    "3": [("IDRID", "nnunet_full", 47), ("BUSI", "supervised_nsga2", 47), ("IDRID", "supervised_nsga2", 47)],
+    "4": [(d, "unext", s) for d in ("BUSI", "CVC", "IDRID") for s in SEEDS],
+    "5": [("KVASIR", "unext", s) for s in SEEDS],
+}
+REVISION_OPTIONAL = {"4": [("BUSI", "nnunet_full", 45)],
+                     "5": [("BUSI", "nnunet_full", 46), ("BUSI", "nnunet_full", 47)]}
+
+
+def revision_plan(worker: Optional[str] = None, optional: bool = False) -> List[Job]:
+    """The revision jobs (all workers, or one Kaggle account's share). Jobs that span sessions come first, so that
+    they start at the beginning of a session; ``optional`` adds the BUSI nnU-Net (1000 epochs) runs."""
+    keys = [str(worker)] if worker is not None else sorted(REVISION_WORKERS)
+    jobs: List[Job] = []
+    for k in keys:
+        if k not in REVISION_WORKERS:
+            raise ValueError(f"unknown revision worker {k!r} (1-5)")
+        jobs += [Job(d, m, s) for d, m, s in REVISION_WORKERS[k]]
+        if optional:
+            jobs += [Job(d, m, s) for d, m, s in REVISION_OPTIONAL.get(k, [])]
+    jobs.sort(key=lambda j: not j.spans_sessions)          # stable sort: the long runs first
+    assert len({j.id for j in jobs}) == len(jobs), "duplicate job ids"
+    return jobs
+
+
+def select_plan(name: str = "v2", worker: Optional[str] = None, optional: bool = False) -> List[Job]:
     if name == "v2":
         if worker is not None:
-            raise ValueError("--worker applies to the ablation plan only")
+            raise ValueError("--worker applies to the ablation and revision plans only")
         return plan()
     if name == "ablation":
         return ablation_plan(worker)
-    raise ValueError(f"unknown plan {name!r} (v2 or ablation)")
+    if name == "revision":
+        return revision_plan(worker, optional)
+    raise ValueError(f"unknown plan {name!r} (v2, ablation or revision)")
 
 
 def summary() -> Dict[str, int]:

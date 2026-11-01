@@ -9,7 +9,7 @@ from typing import Any, Dict, Optional
 
 from .config import config_fingerprint
 from .datasets.discovery import locate_data_root
-from .experiment import Experiment, ResumeConflict
+from .experiment import PAUSED_EXIT_CODE, Experiment, ResumeConflict, SessionPause
 from .methods import method_spec
 from .pipeline import Pipeline
 from .utils.env import environment_info, resolve_device
@@ -19,7 +19,8 @@ from .utils.seed import seed_everything
 
 
 def run_experiment(cfg: Dict[str, Any], stop_after: Optional[str] = None) -> int:
-    """Returns 0 (finished or stopped as requested), 1 (error), 2 (configuration conflict), 130 (interrupted)."""
+    """Returns 0 (finished or stopped as requested), 1 (error), 2 (configuration conflict), 75 (paused at the session
+    deadline, resumable), 130 (interrupted)."""
     t_start = time.time()
     setup_logging()
     # e.g. on Kaggle the datasets live under the read-only /kaggle/input/<dataset-slug>/...
@@ -51,8 +52,13 @@ def run_experiment(cfg: Dict[str, Any], stop_after: Optional[str] = None) -> int
     pipeline_class = Pipeline
     if method_spec(cfg["method"])["kind"] == "nnunet":
         from .study.nnunet import NNUNetPipeline as pipeline_class
+        if method_spec(cfg["method"]).get("spans_sessions"):
+            from .study.nnunet_full import NNUNetFullPipeline as pipeline_class
     try:
         pipeline_class(cfg, exp, device).run(stop_after=stop_after)
+    except SessionPause as exc:
+        log.warning("Paused at the session deadline: %s. Re-run the same command in the next session to continue.", exc)
+        return PAUSED_EXIT_CODE
     except KeyboardInterrupt:
         log.warning("Interrupted. All completed epochs/generations are checkpointed; re-run the same command to resume.")
         return 130

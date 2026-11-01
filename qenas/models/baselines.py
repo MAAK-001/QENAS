@@ -108,7 +108,14 @@ class AttentionUNet(nn.Module):
         return self.out(d)
 
 
-BASELINES = {"unet": UNet, "attention_unet": AttentionUNet}
+def _unext(in_channels: int = 3, num_classes: int = 1) -> nn.Module:
+    from .unext import build_unext            # needs timm; imported only when UNeXt is used
+    return build_unext(in_channels=in_channels, num_classes=num_classes)
+
+
+BASELINES = {"unet": UNet, "attention_unet": AttentionUNet, "unext": _unext}
+# Input sides must be divisible by this (QENAS, U-Net, Attention U-Net: 16 via validate_config).
+INPUT_DIVISOR = {"unext": 32}
 
 
 def build_baseline(name: str, in_channels: int = 3, num_classes: int = 1) -> nn.Module:
