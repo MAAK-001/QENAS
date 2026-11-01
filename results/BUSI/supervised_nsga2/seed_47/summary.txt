@@ -1,0 +1,41 @@
+================ QENAS RESULT ================
+
+Dataset: BUSI
+Method: Supervised NSGA-II — search baseline (NSGA-Net style): QENAS with the training-free f2 replaced by f2 = 1 - S1, S1 = mean validation Dice over epochs 1-5 of a 5-epoch training under the candidate protocol (QENAS' rung-1 score); everything else unchanged
+Seed: 47
+
+Search (NSGA-II with supervised fitness f2 = 1 - S1: 219 5-epoch trainings, 1095 epochs; optimised objectives: f1_params, f2_supervised):
+Population: 20   Generations: 10
+Unique architectures evaluated: 219
+Hypervolume: 1.0973 (generation 0) -> 1.1997 (final)
+Final Pareto front size: 9
+Successive halving: 16 -> 8 -> 4 candidates trained to 5 -> 10 -> 20 epochs
+
+Selected architecture:
+Chromosome: [4, 3, 0, 0, 4, 2, 2, 1]
+Block sequence: ['DARTS', 'ConvNeXt', 'Residual', 'Residual', 'DARTS', 'Inception', 'Inception', 'Dense']
+ZiCo: 757.043
+
+Candidate scores (mean val Dice of the last epochs): 5 ep 0.6539, 10 ep 0.7241, 20 ep 0.7705
+Selection: Candidate 8 selected: highest mean validation Dice over the last 5 of 20 epochs among the 4 eligible of 4 successive-halving finalists (0.7705; ΔLoss 0.1683, Dice trend tau 0.62, p=2.6e-05).
+
+Loss coefficients:
+alpha (BCE): 0.500   beta (soft-mIoU): 0.500
+
+Final training:
+Epochs run: 55 (best epoch 31) — overfitting: val Dice not improved for 24 epochs (best epoch 31); val loss increasing (Kendall tau=0.37, p=0.0119) while train loss decreasing (tau=-0.75, p=1.53e-07) over the last 20 epochs
+Best validation Dice: 0.8006   mIoU: 0.8316   HD95: 33.42 px
+
+Final test (n = 129, evaluated once):
+Dice (DSC):        79.14 %
+mIoU (class mean): 82.29 %
+Params:            1.342 M
+FLOPs:             39.34 G per batch of 8 (Mixed-GGNAS convention; 4.92 G per image)
+HD95:              31.81 px
+Sensitivity:       82.87 %
+IoU (foreground):  70.30 %
+Inference:         23.16 ms per image on cuda
+Test loss:         0.1857
+
+================================================
+QENAS time on BUSI (supervised_nsga2, seed 47): 04:23:31 from start to end (all stages) | this session: 04:23:33
