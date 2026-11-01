@@ -1,0 +1,43 @@
+2026-11-01 16:33:16 | INFO    | QENAS | dataset IDRID | method nnunet_full | seed 45 | experiment /kaggle/working/QENAS_results/results/IDRID/nnunet_full/seed_45 | device cuda | torch 2.11.0+cu128 | python 3.13.15 | fingerprint 721fa30a2714eafc
+2026-11-01 16:33:16 | INFO    | Method nnunet_full (baseline: nnU-Net v2 (2d configuration, default plans, default nnUNetTrainer = 1000 epochs), fold 0 = the QENAS train/validation split; resumed across sessions from checkpoint_latest) | stages: split -> nnunet_data -> nnunet_train -> nnunet_test -> report
+2026-11-01 16:33:16 | INFO    | ####################################################################################################
+2026-11-01 16:33:16 | INFO    | STAGE: SPLIT
+2026-11-01 16:33:43 | INFO    | Dataset structure: official train/test folders; one TIF mask per lesion type (absent file = lesion absent)
+2026-11-01 16:33:43 | INFO    | 
+IDRID
+Train: 43
+Validation: 11
+Test: 27
+2026-11-01 16:33:43 | INFO    | Stage 'split' finished in 00:00:26
+2026-11-01 16:33:43 | INFO    | ####################################################################################################
+2026-11-01 16:33:43 | INFO    | STAGE: NNUNET_DATA
+2026-11-01 16:33:47 | INFO    |   preprocessing IDRID/train: 8/43 | Progress:  18.6% | Elapsed: 00:00:04 | ETA: 00:00:16
+2026-11-01 16:33:50 | INFO    |   preprocessing IDRID/train: 16/43 | Progress:  37.2% | Elapsed: 00:00:07 | ETA: 00:00:12
+2026-11-01 16:33:54 | INFO    |   preprocessing IDRID/train: 24/43 | Progress:  55.8% | Elapsed: 00:00:11 | ETA: 00:00:08
+2026-11-01 16:33:57 | INFO    |   preprocessing IDRID/train: 32/43 | Progress:  74.4% | Elapsed: 00:00:14 | ETA: 00:00:05
+2026-11-01 16:34:01 | INFO    |   preprocessing IDRID/train: 40/43 | Progress:  93.0% | Elapsed: 00:00:18 | ETA: 00:00:01
+2026-11-01 16:34:02 | INFO    |   preprocessing IDRID/train: 43/43 | Progress: 100.0% | Elapsed: 00:00:19 | ETA: 00:00:00
+2026-11-01 16:34:04 | INFO    |   preprocessing IDRID/val: 2/11 | Progress:  18.2% | Elapsed: 00:00:01 | ETA: 00:00:04
+2026-11-01 16:34:05 | INFO    |   preprocessing IDRID/val: 4/11 | Progress:  36.4% | Elapsed: 00:00:02 | ETA: 00:00:03
+2026-11-01 16:34:05 | INFO    |   preprocessing IDRID/val: 6/11 | Progress:  54.5% | Elapsed: 00:00:03 | ETA: 00:00:02
+2026-11-01 16:34:06 | INFO    |   preprocessing IDRID/val: 8/11 | Progress:  72.7% | Elapsed: 00:00:03 | ETA: 00:00:01
+2026-11-01 16:34:07 | INFO    |   preprocessing IDRID/val: 10/11 | Progress:  90.9% | Elapsed: 00:00:04 | ETA: 00:00:00
+2026-11-01 16:34:08 | INFO    |   preprocessing IDRID/val: 11/11 | Progress: 100.0% | Elapsed: 00:00:05 | ETA: 00:00:00
+2026-11-01 16:34:08 | INFO    | Data ready: train 43, validation 11 (test held out) | normalisation mean [0.4571, 0.2219, 0.0631] std [0.3224, 0.166, 0.0849]
+2026-11-01 16:34:12 | INFO    | nnU-Net raw dataset Dataset903_IDRID: 43 training + 11 validation cases (320x512 PNG)
+2026-11-01 16:34:12 | INFO    | Stage 'nnunet_data' finished in 00:00:29
+2026-11-01 16:34:12 | INFO    | ####################################################################################################
+2026-11-01 16:34:12 | INFO    | STAGE: NNUNET_TRAIN
+2026-11-02 02:39:17 | INFO    | nnU-Net training finished in 604.5 min (1000 epochs x 250 iterations, batch size 3, patch [320, 512])
+2026-11-02 02:39:17 | INFO    | nnU-Net training: 10:05:05 this session, 10:05:05 in 1 session(s)
+2026-11-02 02:39:17 | INFO    | Stage 'nnunet_train' finished in 10:05:05
+2026-11-02 02:39:17 | INFO    | ####################################################################################################
+2026-11-02 02:39:17 | INFO    | STAGE: NNUNET_TEST
+2026-11-02 02:39:22 | INFO    | Loaded cached preprocessed IDRID/test (27 samples) from IDRID_test_320x512_eb8f4a26a58d1ff1fa7a7d04.npz
+2026-11-02 02:39:22 | INFO    | Evaluating the held-out TEST split exactly once | nnU-Net final checkpoint, no TTA (+ nnU-Net's mirroring TTA reported separately)
+2026-11-02 02:39:46 | INFO    | TEST | nnU-Net | Dice (DSC) 0.9648 | mIoU 0.9659 | HD95 7.01 px | Sensitivity 0.9617 | Params 33.472 M | 13.73 ms/image | with mirroring TTA: Dice 0.9649
+2026-11-02 02:39:46 | INFO    | Stage 'nnunet_test' finished in 00:00:29
+2026-11-02 02:39:46 | INFO    | ####################################################################################################
+2026-11-02 02:39:46 | INFO    | STAGE: REPORT
+2026-11-02 02:39:46 | INFO    | Stage 'report' finished in 00:00:00
+2026-11-02 02:39:46 | INFO    | QENAS time on IDRID (nnunet_full, seed 45): 10:06:29 from start to end (all stages) | this session: 10:06:31

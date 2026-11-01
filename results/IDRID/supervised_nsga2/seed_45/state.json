@@ -1,0 +1,98 @@
+{
+  "fingerprint": "37a548805e471909",
+  "created": "2026-11-01T21:00:47",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-11-01T21:01:17",
+      "train": 43,
+      "val": 11,
+      "test": 27,
+      "seconds": 28.8
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-11-01T22:00:09",
+      "unique_evaluations": 217,
+      "final_front_size": 4,
+      "cache_hits": 0,
+      "cache_misses": 217,
+      "objectives": [
+        "f1_params",
+        "f2_supervised"
+      ],
+      "hypervolume_generation_0": 1.0902609578616387,
+      "hypervolume_final": 1.2088093564836968,
+      "fitness": "supervised",
+      "fitness_trainings": 217,
+      "fitness_epochs_total": 1085,
+      "fitness_seconds_total": 2744.2,
+      "fitness_diverged": 0,
+      "zico_seconds_total": 400.3,
+      "seconds": 3532.0
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-11-01T22:00:10",
+      "front_size": 4,
+      "n_candidates": 16,
+      "from_front": 4,
+      "seconds": 0.5
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-11-01T22:07:03",
+      "n_candidates": 16,
+      "rung_sizes": [
+        16,
+        8,
+        4
+      ],
+      "n_diverged": 0,
+      "seconds": 413.7
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-11-01T22:07:06",
+      "selected_candidate": 3,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.8
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-11-01T22:10:48",
+      "alpha": 0.4,
+      "beta": 0.6,
+      "seconds": 222.2
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-11-01T22:15:18",
+      "best_epoch": 45,
+      "best_val_dice": 0.9658953514067785,
+      "seconds": 269.9
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-11-01T22:15:43",
+      "test_dice": 0.9662037145511516,
+      "test_miou": 0.9670411174684397,
+      "test_hd95": 10.905719457085763,
+      "seconds": 24.8
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-11-01T22:15:48",
+      "seconds": 4.6
+    }
+  },
+  "test_evaluated": true,
+  "method": "supervised_nsga2",
+  "dataset": "IDRID",
+  "seed": 45,
+  "updated": "2026-11-01T22:15:48",
+  "test_evaluated_at": "2026-11-01T22:15:41",
+  "total_seconds": 4499.3
+}

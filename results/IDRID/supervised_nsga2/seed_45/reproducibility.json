@@ -1,0 +1,245 @@
+{
+  "fingerprint": "37a548805e471909",
+  "config": {
+    "method": "supervised_nsga2",
+    "seed": 45,
+    "device": "cuda",
+    "paths": {
+      "results": "/kaggle/working/QENAS_results/results",
+      "cache": "/kaggle/working/QENAS/cache"
+    },
+    "data": {
+      "dataset": "IDRID",
+      "root": "/kaggle/input/datasets/maak01/e-nas-datasets/Datasets",
+      "image_size": [
+        320,
+        512
+      ],
+      "in_channels": 3,
+      "test_fraction": 0.2,
+      "val_fraction": 0.2,
+      "split_seed": 42,
+      "mask_threshold": 127,
+      "num_workers": 1
+    },
+    "augmentation": {
+      "hflip": 0.5,
+      "vflip": 0.0,
+      "affine_p": 0.5,
+      "rotate_deg": 15.0,
+      "scale": [
+        0.9,
+        1.1
+      ],
+      "translate": 0.05,
+      "brightness": 0.1,
+      "contrast": 0.1
+    },
+    "model": {
+      "base_channels": 32,
+      "scale": 3,
+      "num_classes": 1
+    },
+    "search": {
+      "population_size": 20,
+      "generations": 10,
+      "crossover_prob": 0.9,
+      "mutation_prob_var": 0.125,
+      "plot_every": 5
+    },
+    "pareto": {
+      "max_candidates": 16
+    },
+    "candidate_training": {
+      "epochs": 20,
+      "rungs": [
+        5,
+        10,
+        20
+      ],
+      "keep_fraction": 0.5,
+      "batch_size": 4,
+      "lr": 0.001,
+      "weight_decay": 5e-05,
+      "scheduler": "none",
+      "loss_alpha": 0.5
+    },
+    "selection": {
+      "significance": 0.05,
+      "criterion_window": 5
+    },
+    "loss_weights": {
+      "alphas": [
+        0.2,
+        0.4,
+        0.5,
+        0.6,
+        0.8
+      ],
+      "criterion_window": 5
+    },
+    "final_training": {
+      "epochs": 120,
+      "batch_size": 4,
+      "lr": 0.001,
+      "weight_decay": 5e-05,
+      "scheduler": "poly",
+      "warmup_epochs": 1,
+      "poly_power": 0.9,
+      "early_stopping": {
+        "patience": 20,
+        "min_epochs": 30,
+        "significance": 0.05
+      }
+    }
+  },
+  "environment": {
+    "python_version": "3.13.15",
+    "python_implementation": "CPython",
+    "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "cpu_count": 4,
+    "torch_version": "2.11.0+cu128",
+    "torch_num_threads": 2,
+    "cuda_available": true,
+    "cuda_version": "12.8",
+    "cudnn_version": 91900,
+    "device": "cuda",
+    "numpy_version": "2.1.3",
+    "gpu_name": "Tesla T4",
+    "gpu_memory_gb": 14.56,
+    "pymoo_version": "0.6.2",
+    "scipy_version": "1.16.3",
+    "PIL_version": "13.0.0",
+    "matplotlib_version": "3.10.0"
+  },
+  "split_summary": {
+    "train": {
+      "n": 43,
+      "n_groups": 43,
+      "per_stratum": {
+        "all": 43
+      },
+      "fraction": 0.5309
+    },
+    "val": {
+      "n": 11,
+      "n_groups": 11,
+      "per_stratum": {
+        "all": 11
+      },
+      "fraction": 0.1358
+    },
+    "test": {
+      "n": 27,
+      "n_groups": 27,
+      "per_stratum": {
+        "all": 27
+      },
+      "fraction": 0.3333
+    }
+  },
+  "selected_architecture": {
+    "architecture": {
+      "type": "qenas",
+      "chromosome": [
+        4,
+        0,
+        0,
+        1,
+        4,
+        4,
+        2,
+        4
+      ]
+    },
+    "params": 891881
+  },
+  "loss_coefficients": {
+    "alpha_bce": 0.4,
+    "beta_soft_miou": 0.6,
+    "rule": "grid"
+  },
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-11-01T21:01:17",
+      "train": 43,
+      "val": 11,
+      "test": 27,
+      "seconds": 28.8
+    },
+    "search": {
+      "status": "done",
+      "finished": "2026-11-01T22:00:09",
+      "unique_evaluations": 217,
+      "final_front_size": 4,
+      "cache_hits": 0,
+      "cache_misses": 217,
+      "objectives": [
+        "f1_params",
+        "f2_supervised"
+      ],
+      "hypervolume_generation_0": 1.0902609578616387,
+      "hypervolume_final": 1.2088093564836968,
+      "fitness": "supervised",
+      "fitness_trainings": 217,
+      "fitness_epochs_total": 1085,
+      "fitness_seconds_total": 2744.2,
+      "fitness_diverged": 0,
+      "zico_seconds_total": 400.3,
+      "seconds": 3532.0
+    },
+    "pareto": {
+      "status": "done",
+      "finished": "2026-11-01T22:00:10",
+      "front_size": 4,
+      "n_candidates": 16,
+      "from_front": 4,
+      "seconds": 0.5
+    },
+    "candidates": {
+      "status": "done",
+      "finished": "2026-11-01T22:07:03",
+      "n_candidates": 16,
+      "rung_sizes": [
+        16,
+        8,
+        4
+      ],
+      "n_diverged": 0,
+      "seconds": 413.7
+    },
+    "selection": {
+      "status": "done",
+      "finished": "2026-11-01T22:07:06",
+      "selected_candidate": 3,
+      "rule": "learning_capability",
+      "relaxed_gates": [],
+      "seconds": 2.8
+    },
+    "loss_weights": {
+      "status": "done",
+      "finished": "2026-11-01T22:10:48",
+      "alpha": 0.4,
+      "beta": 0.6,
+      "seconds": 222.2
+    },
+    "final": {
+      "status": "done",
+      "finished": "2026-11-01T22:15:18",
+      "best_epoch": 45,
+      "best_val_dice": 0.9658953514067785,
+      "seconds": 269.9
+    },
+    "test": {
+      "status": "done",
+      "finished": "2026-11-01T22:15:43",
+      "test_dice": 0.9662037145511516,
+      "test_miou": 0.9670411174684397,
+      "test_hd95": 10.905719457085763,
+      "seconds": 24.8
+    }
+  },
+  "zico_batches_sha256": "418bc697d460948166354639"
+}

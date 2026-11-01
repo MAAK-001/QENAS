@@ -1,0 +1,63 @@
+{
+  "fingerprint": "721fa30a2714eafc",
+  "created": "2026-11-01T16:33:15",
+  "status": "completed",
+  "stages": {
+    "split": {
+      "status": "done",
+      "finished": "2026-11-01T16:33:43",
+      "train": 43,
+      "val": 11,
+      "test": 27,
+      "seconds": 26.5
+    },
+    "nnunet_data": {
+      "status": "done",
+      "finished": "2026-11-01T16:34:12",
+      "train": 43,
+      "val": 11,
+      "seconds": 29.0
+    },
+    "nnunet_train": {
+      "status": "done",
+      "finished": "2026-11-02T02:39:17",
+      "num_epochs": 1000,
+      "iterations_per_epoch": 250,
+      "batch_size": 3,
+      "patch_size": [
+        320,
+        512
+      ],
+      "sessions": 1,
+      "seconds": 36305.0
+    },
+    "nnunet_test": {
+      "status": "done",
+      "finished": "2026-11-02T02:39:46",
+      "test_dice": 0.9648441362087369,
+      "test_dice_mirroring_tta": 0.9649483030138889,
+      "seconds": 28.7
+    },
+    "report": {
+      "status": "done",
+      "finished": "2026-11-02T02:39:46",
+      "seconds": 0.0
+    }
+  },
+  "test_evaluated": true,
+  "method": "nnunet_full",
+  "dataset": "IDRID",
+  "seed": 45,
+  "updated": "2026-11-02T02:39:46",
+  "nnunet_progress": {
+    "epoch": 1000,
+    "checkpoint": "checkpoint_final.pth",
+    "sha256": "aaee8a0069b657b39277da5a31a7d8a349a772fe80cfafcf3cebbdb4d596c475",
+    "saved": "2026-11-02T02:39:17",
+    "train_seconds": 36305.0,
+    "sessions": 1,
+    "completed": true
+  },
+  "test_evaluated_at": "2026-11-02T02:39:38",
+  "total_seconds": 36389.2
+}
