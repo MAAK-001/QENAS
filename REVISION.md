@@ -94,7 +94,9 @@ with the one-sided t-test version and the 90 % bootstrap CI as checks (D55).
 1. The code on GitHub branch `revision` (this commit); write its SHA into `CODE_COMMIT` of the cell — the same SHA on
    all five accounts.
 2. Kaggle secrets: `GITHUB_TOKEN` (the study token). Workers 1–3 (and 4–5 if `OPTIONAL = True`) also `KAGGLE_USERNAME`
-   and `KAGGLE_KEY` (Settings → API → *Create New Token*), for the private dataset that keeps the nnU-Net checkpoints.
+   (your Kaggle user name) and `KAGGLE_API_TOKEN` (Settings → API → *Generate New Token*: the `KGAT_…` token; a
+   legacy `kaggle.json` key also works as `KAGGLE_KEY`), all **ticked for the notebook** in *Add-ons → Secrets*, for
+   the private dataset that keeps the nnU-Net checkpoints. The cell checks the login before any training.
 3. Notebook: **GPU T4 x2**, Internet on, the dataset input with `BUSI…`, `CVC…`, `IDRID…`, `Kvasir-SEG` (the same input
    as study v2). Environment: *pin to original environment* if offered; otherwise the cell installs torch 2.11.0
    (cu128) when the image has another version (`TORCH_POLICY`).

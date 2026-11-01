@@ -15,8 +15,9 @@
 #   2 hours and at the end. Never move a started nnU-Net run to another account.
 #
 # One-time setup per account: Kaggle secrets GITHUB_TOKEN (the study token), and for workers 1-3 (and 4, 5 with
-# OPTIONAL) KAGGLE_USERNAME + KAGGLE_KEY (Account -> Settings -> API -> Create New Token); accelerator GPU T4 x2;
-# Internet on; the datasets input with BUSI..., CVC..., IDRID..., Kvasir-SEG (the same input as study v2).
+# OPTIONAL) KAGGLE_USERNAME (your Kaggle user name) + KAGGLE_API_TOKEN (Settings -> API -> Generate New Token: the
+# "KGAT_..." token; the legacy kaggle.json "key" also works, as KAGGLE_KEY), all ticked for this notebook;
+# accelerator GPU T4 x2; Internet on; the datasets input with BUSI..., CVC..., IDRID..., Kvasir-SEG (as study v2).
 import glob, json, os, shutil, subprocess, threading, time
 
 # ---------------- settings ----------------
@@ -45,9 +46,24 @@ secrets = UserSecretsClient()
 token = secrets.get_secret("GITHUB_TOKEN").strip()
 url = f"https://x-access-token:{token}@{REPO_PATH}"
 NEEDS_PERSIST = WORKER in ("1", "2", "3") or OPTIONAL
+
+
+def secret(label):
+    try:
+        return secrets.get_secret(label).strip()
+    except Exception:
+        return ""
+
+
 if NEEDS_PERSIST:
-    os.environ["KAGGLE_USERNAME"] = secrets.get_secret("KAGGLE_USERNAME").strip()
-    os.environ["KAGGLE_KEY"] = secrets.get_secret("KAGGLE_KEY").strip()
+    # new Kaggle API token ("KGAT_...", KAGGLE_API_TOKEN, Kaggle CLI >= 1.8) or legacy kaggle.json key (KAGGLE_KEY)
+    os.environ["KAGGLE_USERNAME"] = secret("KAGGLE_USERNAME")
+    for label in ("KAGGLE_API_TOKEN", "KAGGLE_KEY"):
+        if secret(label):
+            os.environ[label] = secret(label)
+    if not os.environ["KAGGLE_USERNAME"] or not (os.environ.get("KAGGLE_API_TOKEN") or os.environ.get("KAGGLE_KEY")):
+        raise RuntimeError("Worker 1-3 needs the notebook secrets KAGGLE_USERNAME (your Kaggle user name) and "
+                           "KAGGLE_API_TOKEN (the KGAT_... token from Settings -> API), both ticked for this notebook")
     DATASET_ID = f"{os.environ['KAGGLE_USERNAME']}/{PERSIST_SLUG}"
 
 
@@ -127,6 +143,15 @@ torch_after = sh(["python", "-c", "import torch, nnunetv2, pymoo, timm; print(to
 if torch_after != torch_before:
     raise RuntimeError(f"the package installation changed torch ({torch_before} -> {torch_after}); stopping")
 log(f"torch {torch_after} | nnunetv2 2.8.1 | pymoo | timm installed")
+if NEEDS_PERSIST:                         # the Kaggle CLI (not used by any experiment): >= 1.8 reads KGAT_ tokens
+    sh(pip + ["--upgrade", "kaggle>=1.8.0"], timeout=1200)
+    if sh(["python", "-c", "import torch; print(torch.__version__)"]).stdout.strip() != torch_after:
+        raise RuntimeError("upgrading the Kaggle CLI changed torch; stopping")
+    r = sh(["kaggle", "datasets", "list", "--mine"], check=False, timeout=300)
+    if r.returncode != 0:
+        raise RuntimeError("Kaggle API login failed - check the secrets KAGGLE_USERNAME / KAGGLE_API_TOKEN: "
+                           + (r.stdout + r.stderr)[-800:])
+    log(f"Kaggle API login OK ({os.environ['KAGGLE_USERNAME']})")
 
 # 3) Identity checks: code, splits, data and software (stops the session on a split or data mismatch)
 data_root = sh(["python", "-c", "from qenas.datasets.discovery import locate_data_root; "
