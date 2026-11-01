@@ -1,0 +1,28 @@
+================ QENAS RESULT ================
+
+Dataset: KVASIR
+Method: UNeXt — baseline: UNeXt (Valanarasu & Patel, MICCAI 2022; official architecture), 1.47 M parameters
+Seed: 47
+
+Architecture: UNeXt (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.500   beta (soft-mIoU): 0.500
+
+Final training:
+Epochs run: 120 (best epoch 118)
+Best validation Dice: 0.8482   mIoU: 0.8625   HD95: 29.73 px
+
+Final test (n = 120, evaluated once):
+Dice (DSC):        78.92 %
+mIoU (class mean): 81.89 %
+Params:            1.472 M
+FLOPs:             4.58 G per batch of 8 (Mixed-GGNAS convention; 0.57 G per image)
+HD95:              37.35 px
+Sensitivity:       81.06 %
+IoU (foreground):  70.71 %
+Inference:         13.70 ms per image on cuda
+Test loss:         0.2402
+
+================================================
+QENAS time on KVASIR (unext, seed 47): 00:40:08 from start to end (all stages) | this session: 00:40:10
