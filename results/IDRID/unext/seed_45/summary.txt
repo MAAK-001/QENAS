@@ -1,0 +1,28 @@
+================ QENAS RESULT ================
+
+Dataset: IDRID
+Method: UNeXt — baseline: UNeXt (Valanarasu & Patel, MICCAI 2022; official architecture), 1.47 M parameters
+Seed: 45
+
+Architecture: UNeXt (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.200   beta (soft-mIoU): 0.800
+
+Final training:
+Epochs run: 82 (best epoch 56) — overfitting: val Dice not improved for 26 epochs (best epoch 56); val loss increasing (Kendall tau=0.35, p=0.0168) while train loss decreasing (tau=-0.28, p=0.0428) over the last 20 epochs
+Best validation Dice: 0.9388   mIoU: 0.9418   HD95: 18.76 px
+
+Final test (n = 27, evaluated once):
+Dice (DSC):        91.59 %
+mIoU (class mean): 92.52 %
+Params:            1.472 M
+FLOPs:             5.73 G per batch of 4 (Mixed-GGNAS convention; 1.43 G per image)
+HD95:              34.11 px
+Sensitivity:       91.89 %
+IoU (foreground):  85.35 %
+Inference:         15.36 ms per image on cuda
+Test loss:         0.0649
+
+================================================
+QENAS time on IDRID (unext, seed 45): 00:07:11 from start to end (all stages) | this session: 00:07:13

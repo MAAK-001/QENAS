@@ -1,0 +1,28 @@
+================ QENAS RESULT ================
+
+Dataset: CVC
+Method: UNeXt — baseline: UNeXt (Valanarasu & Patel, MICCAI 2022; official architecture), 1.47 M parameters
+Seed: 45
+
+Architecture: UNeXt (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.200   beta (soft-mIoU): 0.800
+
+Final training:
+Epochs run: 120 (best epoch 75)
+Best validation Dice: 0.6496   mIoU: 0.7360   HD95: 48.83 px
+
+Final test (n = 121, evaluated once):
+Dice (DSC):        63.50 %
+mIoU (class mean): 75.02 %
+Params:            1.472 M
+FLOPs:             4.58 G per batch of 8 (Mixed-GGNAS convention; 0.57 G per image)
+HD95:              74.95 px  (7 empty predictions scored as the image diagonal)
+Sensitivity:       65.57 %
+IoU (foreground):  53.90 %
+Inference:         14.11 ms per image on cuda
+Test loss:         0.2439
+
+================================================
+QENAS time on CVC (unext, seed 45): 00:25:34 from start to end (all stages) | this session: 00:25:35

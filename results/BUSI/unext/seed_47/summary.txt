@@ -1,0 +1,28 @@
+================ QENAS RESULT ================
+
+Dataset: BUSI
+Method: UNeXt — baseline: UNeXt (Valanarasu & Patel, MICCAI 2022; official architecture), 1.47 M parameters
+Seed: 47
+
+Architecture: UNeXt (fixed baseline, no search)
+
+Loss coefficients:
+alpha (BCE): 0.500   beta (soft-mIoU): 0.500
+
+Final training:
+Epochs run: 65 (best epoch 41) — overfitting: val Dice not improved for 24 epochs (best epoch 41); val loss increasing (Kendall tau=0.29, p=0.037) while train loss decreasing (tau=-0.75, p=1.53e-07) over the last 20 epochs
+Best validation Dice: 0.7710   mIoU: 0.8165   HD95: 34.32 px
+
+Final test (n = 129, evaluated once):
+Dice (DSC):        75.21 %
+mIoU (class mean): 80.19 %
+Params:            1.472 M
+FLOPs:             4.58 G per batch of 8 (Mixed-GGNAS convention; 0.57 G per image)
+HD95:              36.69 px  (1 empty predictions scored as the image diagonal)
+Sensitivity:       77.10 %
+IoU (foreground):  65.86 %
+Inference:         16.00 ms per image on cuda
+Test loss:         0.1990
+
+================================================
+QENAS time on BUSI (unext, seed 47): 00:20:13 from start to end (all stages) | this session: 00:20:14
